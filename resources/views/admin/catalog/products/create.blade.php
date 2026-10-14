@@ -111,6 +111,30 @@
                                                 </div> --}}
                                             </div>
 
+                                           
+<div class="col-lg-6 col-md-6 col-sm-">
+    <div class="mb-3 add-product">
+        <label class="form-label">Restaurant</label>
+        <select class="select" name="restaurant_id" id="restaurantSelect">
+            <option value="">Select Restaurant (Optional)</option>
+
+            @foreach ($restaurants as $restaurant)
+                <option
+                    value="{{ $restaurant->id }}"
+                    {{ old('restaurant_id') == $restaurant->id ? 'selected' : '' }}
+                >
+                    {{ $restaurant->name }}
+                </option>
+            @endforeach
+        </select>
+
+        @error('restaurant_id')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+</div>
+
+
                                             <div class="add-product-new">
                                                 <div class="row">
                                                     <div class="col-lg-6 col-md-6 col-sm-6 mb-3">

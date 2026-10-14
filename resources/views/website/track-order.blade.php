@@ -1,417 +1,354 @@
 
 @extends('layouts.website')
 
+@section('title', 'Track Your Order | BAKASURAN')
+
 @section('content')
 
 <style>
+    /* =========================================
+       BAKASURAN - TRACK ORDER
+    ========================================= */
 
-    /* =========================================================
-       SUDHEERA SAREES - TRACK ORDER
-    ========================================================= */
-
-    .sudheera-track-page {
-        background: #faf7f2;
+    .bakasuran-track-page {
         min-height: 100vh;
-        padding: 45px 15px 70px;
+        padding: 45px 16px 70px;
+        background:
+            radial-gradient(circle at top left, rgba(255, 159, 28, .09), transparent 32%),
+            #fffaf4;
+        color: #202124;
     }
 
-    .sudheera-track-wrapper {
+    .bakasuran-track-wrapper {
         max-width: 850px;
         margin: 0 auto;
     }
 
+    /* Top navigation */
 
-    /* =========================================================
-       TOP BAR
-    ========================================================= */
-
-    .sudheera-track-topbar {
+    .bakasuran-track-topbar {
         display: flex;
         justify-content: flex-end;
-        align-items: center;
         margin-bottom: 18px;
     }
 
-    .sudheera-back-home {
+    .bakasuran-back-home {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-
-        padding: 10px 17px;
-
-        background: #30000e;
-        color: #fff !important;
-
-        border: 1px solid #30000e;
+        justify-content: center;
+        gap: 9px;
+        padding: 11px 18px;
+        border: 1px solid #202124;
         border-radius: 12px;
-
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 600;
-
-        transition: all .3s ease;
-    }
-
-    .sudheera-back-home i {
-        color: #d4a84f;
-        font-size: 14px;
-    }
-
-    .sudheera-back-home:hover {
-        background: #c88618;
-        border-color: #c88618;
+        background: #202124;
         color: #fff !important;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all .25s ease;
+    }
+
+    .bakasuran-back-home i {
+        color: #FF9F1C;
+    }
+
+    .bakasuran-back-home:hover {
+        background: #E85D04;
+        border-color: #E85D04;
         transform: translateY(-2px);
     }
 
-    .sudheera-back-home:hover i {
+    .bakasuran-back-home:hover i {
         color: #fff;
     }
 
+    /* Brand section */
 
-    /* =========================================================
-       LOGO
-    ========================================================= */
-
-    .sudheera-track-logo {
-        background: #fff;
-        border: 1px solid #eee1d5;
-
-        border-radius: 20px;
-
-        padding: 25px 20px;
-
-        text-align: center;
-
+    .bakasuran-track-logo {
         margin-bottom: 22px;
-
-        box-shadow: 0 8px 25px rgba(48, 0, 14, .06);
+        padding: 25px 20px;
+        border: 1px solid #F0E5DA;
+        border-radius: 22px;
+        background: #fff;
+        text-align: center;
+        box-shadow: 0 8px 28px rgba(32, 33, 36, .045);
     }
 
-    .sudheera-track-logo img {
+    .bakasuran-track-logo a {
+        display: inline-block;
+    }
+
+    .bakasuran-track-logo img {
+        display: block;
         max-width: 220px;
-        max-height: 75px;
+        max-height: 80px;
+        margin: 0 auto;
         object-fit: contain;
     }
 
-
-    /* =========================================================
-       MAIN CARD
-    ========================================================= */
-
-    .sudheera-track-card {
-        background: #fff;
-
-        border: 1px solid #eee1d5;
-
-        border-radius: 28px;
-
-        padding: 38px 40px 42px;
-
-        box-shadow: 0 15px 45px rgba(48, 0, 14, .08);
-
-        position: relative;
-
-        overflow: hidden;
+    .bakasuran-track-logo p {
+        margin: 12px 0 0;
+        color: #77736E;
+        font-size: 13px;
+        letter-spacing: .3px;
     }
 
-    .sudheera-track-card::before {
-        content: '';
+    .bakasuran-brand-highlight {
+        color: #E85D04;
+        font-weight: 800;
+    }
 
+    /* Main card */
+
+    .bakasuran-track-card {
+        position: relative;
+        overflow: hidden;
+        padding: 40px 40px 42px;
+        border: 1px solid #F0E5DA;
+        border-radius: 28px;
+        background: #fff;
+        box-shadow: 0 18px 55px rgba(32, 33, 36, .075);
+    }
+
+    .bakasuran-track-card::before {
         position: absolute;
-
         top: 0;
         left: 0;
-
         width: 100%;
-        height: 4px;
-
-        background: linear-gradient(
-            90deg,
-            #30000e,
-            #76001f,
-            #c88618
-        );
+        height: 5px;
+        background: linear-gradient(90deg, #202124, #E85D04, #FF9F1C);
+        content: '';
     }
 
+    /* Heading */
 
-    /* =========================================================
-       TITLE
-    ========================================================= */
-
-    .sudheera-track-title {
-        text-align: center;
-
-        color: #30000e;
-
-        font-size: 38px;
-
-        font-weight: 600;
-
-        line-height: 1.2;
-
-        margin: 5px 0 10px;
-
-        font-family: 'Cormorant Garamond', serif;
-    }
-
-    .sudheera-track-subtitle {
-        text-align: center;
-
-        color: #796c6d;
-
-        font-size: 15px;
-
-        margin: 0 0 30px;
-    }
-
-
-    /* =========================================================
-       DECORATIVE TITLE LINE
-    ========================================================= */
-
-    .sudheera-track-divider {
+    .bakasuran-track-eyebrow {
         display: flex;
-
         align-items: center;
-
         justify-content: center;
-
-        gap: 10px;
-
-        margin-bottom: 30px;
+        gap: 8px;
+        margin: 5px 0 12px;
+        color: #E85D04;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
     }
 
-    .sudheera-track-divider span {
-        display: block;
+    .bakasuran-track-title {
+        margin: 0 0 12px;
+        color: #202124;
+        font-size: 38px;
+        font-weight: 800;
+        line-height: 1.2;
+        text-align: center;
+        letter-spacing: -.8px;
+    }
 
+    .bakasuran-track-subtitle {
+        max-width: 480px;
+        margin: 0 auto;
+        color: #77736E;
+        font-size: 14px;
+        line-height: 1.8;
+        text-align: center;
+    }
+
+    /* Divider */
+
+    .bakasuran-track-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin: 25px 0 30px;
+    }
+
+    .bakasuran-track-divider span {
         width: 55px;
         height: 1px;
-
-        background: #d2a34b;
+        background: #E8D8C7;
     }
 
-    .sudheera-track-divider i {
-        color: #c88618;
-
-        font-size: 14px;
-
-        font-style: normal;
+    .bakasuran-track-divider i {
+        color: #E85D04;
+        font-size: 15px;
     }
 
+    /* Tabs */
 
-    /* =========================================================
-       TABS
-    ========================================================= */
-
-    .sudheera-track-tabs {
-        max-width: 540px;
-
-        margin: 0 auto 35px;
-
+    .bakasuran-track-tabs {
         display: flex;
-
-        gap: 5px;
-
-        padding: 5px;
-
-        background: #f7f1eb;
-
-        border: 1px solid #eadfd6;
-
-        border-radius: 15px;
-    }
-
-    .sudheera-track-tab {
-        flex: 1;
-
-        height: 46px;
-
-        border: 0;
-
-        border-radius: 11px;
-
-        background: transparent;
-
-        color: #553c42;
-
-        font-size: 14px;
-
-        font-weight: 600;
-
-        cursor: pointer;
-
-        transition: all .3s ease;
-    }
-
-    .sudheera-track-tab:hover {
-        color: #30000e;
-    }
-
-    .sudheera-track-tab.active {
-        background: #30000e;
-
-        color: #fff;
-
-        box-shadow: 0 7px 18px rgba(48, 0, 14, .18);
-    }
-
-
-    /* =========================================================
-       FORM
-    ========================================================= */
-
-    .sudheera-track-form {
+        gap: 6px;
         max-width: 540px;
+        margin: 0 auto 30px;
+        padding: 5px;
+        border: 1px solid #F0E5DA;
+        border-radius: 15px;
+        background: #FFF8F1;
+    }
 
+    .bakasuran-track-tab {
+        display: inline-flex;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 47px;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 11px;
+        background: transparent;
+        color: #6B625B;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all .25s ease;
+    }
+
+    .bakasuran-track-tab:hover {
+        color: #E85D04;
+    }
+
+    .bakasuran-track-tab.active {
+        background: #202124;
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(32, 33, 36, .15);
+    }
+
+    .bakasuran-track-tab.active i {
+        color: #FF9F1C;
+    }
+
+    /* Form */
+
+    .bakasuran-track-form {
+        max-width: 540px;
         margin: 0 auto;
     }
 
-
-    /* =========================================================
-       FIELD
-    ========================================================= */
-
-    .sudheera-track-field {
-        display: flex;
-
-        align-items: center;
-
-        gap: 13px;
-
+    .bakasuran-track-field {
         margin-bottom: 20px;
     }
 
-    .sudheera-track-icon {
-        width: 50px;
-        min-width: 50px;
-        height: 50px;
+    .bakasuran-track-field label {
+        display: block;
+        margin-bottom: 9px;
+        color: #292929;
+        font-size: 13px;
+        font-weight: 700;
+    }
 
+    .bakasuran-track-input-wrap {
         display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 55px;
+        padding: 0 15px;
+        border: 1px solid #E6DED6;
+        border-radius: 14px;
+        background: #fff;
+        transition: border-color .25s ease, box-shadow .25s ease;
+    }
 
+    .bakasuran-track-input-wrap:focus-within {
+        border-color: #E85D04;
+        box-shadow: 0 0 0 4px rgba(232, 93, 4, .09);
+    }
+
+    .bakasuran-track-input-icon {
+        display: flex;
+        flex: 0 0 35px;
         align-items: center;
         justify-content: center;
-
-        border-radius: 14px;
-
-        background: #fff8ee;
-
-        border: 1px solid #ead7bb;
-
-        color: #a36c0c;
-
-        font-size: 20px;
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        background: #FFF1E4;
+        color: #E85D04;
+        font-size: 17px;
     }
 
-    .sudheera-track-field input {
+    .bakasuran-track-input-wrap input {
         width: 100%;
-
+        min-width: 0;
         height: 52px;
-
-        padding: 0 17px;
-
-        border: 1px solid #dcd0c8;
-
-        border-radius: 13px;
-
-        background: #fff;
-
-        color: #30000e;
-
-        font-size: 14px;
-
-        outline: none;
-
-        transition: all .3s ease;
-    }
-
-    .sudheera-track-field input::placeholder {
-        color: #a19596;
-    }
-
-    .sudheera-track-field input:focus {
-        border-color: #c88618;
-
-        box-shadow:
-            0 0 0 3px rgba(200, 134, 24, .10);
-    }
-
-
-    /* =========================================================
-       BUTTON
-    ========================================================= */
-
-    .sudheera-track-btn-wrap {
-        text-align: center;
-
-        margin-top: 25px;
-    }
-
-    .sudheera-track-btn {
-        min-width: 220px;
-
-        height: 52px;
-
-        padding: 0 30px;
-
+        padding: 0;
         border: 0;
+        outline: 0;
+        background: transparent;
+        color: #202124;
+        font-size: 14px;
+        box-shadow: none !important;
+    }
 
-        border-radius: 13px;
+    .bakasuran-track-input-wrap input::placeholder {
+        color: #AAA29B;
+    }
 
-        background: linear-gradient(
-            135deg,
-            #30000e 0%,
-            #65001b 55%,
-            #8f3b16 100%
-        );
+    .bakasuran-track-hint {
+        display: block;
+        margin-top: 8px;
+        color: #89817A;
+        font-size: 11px;
+        line-height: 1.6;
+    }
 
+    /* Submit button */
+
+    .bakasuran-track-btn-wrap {
+        margin-top: 27px;
+        text-align: center;
+    }
+
+    .bakasuran-track-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 54px;
+        padding: 14px 24px;
+        border: 0;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #E85D04, #FF7B00);
         color: #fff;
-
-        font-size: 16px;
-
-        font-weight: 600;
-
-        letter-spacing: .3px;
-
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: .2px;
         cursor: pointer;
-
-        box-shadow:
-            0 10px 24px rgba(48, 0, 14, .18);
-
-        transition: all .3s ease;
+        box-shadow: 0 10px 24px rgba(232, 93, 4, .2);
+        transition: all .25s ease;
     }
 
-    .sudheera-track-btn:hover {
-        background: linear-gradient(
-            135deg,
-            #8f3b16 0%,
-            #c88618 100%
-        );
-
+    .bakasuran-track-btn:hover {
+        background: linear-gradient(135deg, #C94B00, #E85D04);
         transform: translateY(-2px);
-
-        box-shadow:
-            0 14px 28px rgba(200, 134, 24, .22);
+        box-shadow: 0 14px 28px rgba(232, 93, 4, .25);
     }
 
+    .bakasuran-track-btn:focus-visible,
+    .bakasuran-track-tab:focus-visible,
+    .bakasuran-back-home:focus-visible {
+        outline: 3px solid rgba(232, 93, 4, .4);
+        outline-offset: 3px;
+    }
 
-    /* =========================================================
-       PANES
-    ========================================================= */
+    /* Form panes */
 
-    .sudheera-track-pane {
+    .bakasuran-track-pane {
         display: none;
     }
 
-    .sudheera-track-pane.active {
+    .bakasuran-track-pane.active {
         display: block;
-        animation: sudheeraFade .3s ease;
+        animation: bakasuranTrackFade .3s ease;
     }
 
-    @keyframes sudheeraFade {
+    @keyframes bakasuranTrackFade {
         from {
             opacity: 0;
-            transform: translateY(5px);
+            transform: translateY(7px);
         }
 
         to {
@@ -420,494 +357,488 @@
         }
     }
 
+    /* Error / status message */
 
-    /* =========================================================
-       ERROR
-    ========================================================= */
-
-    .sudheera-track-error {
-        max-width: 540px;
-
+    .bakasuran-track-message {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
         margin: 0 auto 22px;
-
-        padding: 12px 16px;
-
-        border-radius: 12px;
-
-        background: #fff0f1;
-
-        border: 1px solid #e6bfc4;
-
-        color: #8b1e2d;
-
-        text-align: center;
-
-        font-size: 14px;
+        padding: 14px 16px;
+        border: 1px solid #F2C7C3;
+        border-radius: 13px;
+        background: #FFF1F0;
+        color: #A12C25;
+        font-size: 13px;
+        line-height: 1.6;
     }
 
+    .bakasuran-track-message i {
+        margin-top: 3px;
+    }
 
-    /* =========================================================
-       BOTTOM BRAND NOTE
-    ========================================================= */
+    .bakasuran-track-success {
+        border-color: #B7E4C7;
+        background: #F0FFF4;
+        color: #216E39;
+    }
 
-    .sudheera-track-note {
-        text-align: center;
+    .bakasuran-track-validation {
+        margin-top: 7px;
+        color: #C62828;
+        font-size: 12px;
+    }
 
-        margin-top: 25px;
+    /* Bottom support section */
 
-        color: #897878;
+    .bakasuran-track-support {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+        padding: 18px;
+        border: 1px solid #F0E5DA;
+        border-radius: 17px;
+        background: rgba(255, 255, 255, .8);
+    }
 
+    .bakasuran-track-support-icon {
+        display: flex;
+        flex: 0 0 40px;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #FFF1E4;
+        color: #E85D04;
+        font-size: 17px;
+    }
+
+    .bakasuran-track-support-text {
+        color: #77736E;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .bakasuran-track-support-text strong {
+        display: block;
+        color: #202124;
         font-size: 13px;
     }
 
-    .sudheera-track-note strong {
-        color: #30000e;
+    .bakasuran-track-note {
+        margin-top: 22px;
+        color: #89817A;
+        font-size: 12px;
+        line-height: 1.7;
+        text-align: center;
     }
 
+    .bakasuran-track-note strong {
+        color: #E85D04;
+    }
 
-    /* =========================================================
-       TABLET
-    ========================================================= */
+    /* Tablet */
 
     @media (max-width: 767px) {
-
-        .sudheera-track-page {
+        .bakasuran-track-page {
             padding: 30px 12px 45px;
         }
 
-        .sudheera-track-card {
-            padding: 32px 22px 35px;
-
+        .bakasuran-track-card {
+            padding: 34px 24px 35px;
             border-radius: 23px;
         }
 
-        .sudheera-track-title {
+        .bakasuran-track-title {
             font-size: 32px;
         }
 
-        .sudheera-track-subtitle {
-            font-size: 14px;
-        }
-
-        .sudheera-track-tabs {
-            margin-bottom: 28px;
-        }
-
-        .sudheera-track-tab {
-            height: 44px;
-
+        .bakasuran-track-subtitle {
             font-size: 13px;
-
-            padding: 0 8px;
         }
 
-        .sudheera-track-field {
-            gap: 9px;
+        .bakasuran-track-tabs {
+            margin-bottom: 25px;
         }
 
-        .sudheera-track-icon {
-            width: 44px;
-            min-width: 44px;
-            height: 44px;
-
-            font-size: 18px;
+        .bakasuran-track-tab {
+            min-height: 44px;
+            padding: 8px;
+            font-size: 12px;
         }
 
-        .sudheera-track-field input {
-            height: 50px;
-
-            font-size: 14px;
-        }
-
-        .sudheera-track-btn {
-            width: 100%;
-            min-width: 100%;
+        .bakasuran-track-btn {
+            min-height: 51px;
         }
     }
 
-
-    /* =========================================================
-       SMALL MOBILE
-    ========================================================= */
+    /* Small mobile */
 
     @media (max-width: 480px) {
-
-        .sudheera-track-page {
-            padding: 22px 9px 35px;
+        .bakasuran-track-page {
+            padding: 20px 9px 32px;
         }
 
-        .sudheera-track-topbar {
+        .bakasuran-track-topbar {
             margin-bottom: 12px;
         }
 
-        .sudheera-back-home {
-            padding: 8px 12px;
-
-            font-size: 12px;
-
+        .bakasuran-back-home {
+            padding: 9px 12px;
             border-radius: 10px;
+            font-size: 12px;
         }
 
-        .sudheera-track-logo {
+        .bakasuran-track-logo {
             padding: 20px 15px;
-
             border-radius: 17px;
         }
 
-        .sudheera-track-logo img {
+        .bakasuran-track-logo img {
             max-width: 180px;
         }
 
-        .sudheera-track-card {
-            padding: 28px 15px 30px;
-
+        .bakasuran-track-card {
+            padding: 29px 16px 30px;
             border-radius: 20px;
         }
 
-        .sudheera-track-title {
+        .bakasuran-track-title {
             font-size: 28px;
         }
 
-        .sudheera-track-subtitle {
-            font-size: 13px;
-            line-height: 1.6;
+        .bakasuran-track-eyebrow {
+            font-size: 10px;
+            letter-spacing: 1.5px;
         }
 
-        .sudheera-track-divider span {
-            width: 40px;
-        }
-
-        .sudheera-track-tab {
+        .bakasuran-track-subtitle {
             font-size: 12px;
-            padding: 0 5px;
         }
 
-        .sudheera-track-field {
-            gap: 7px;
+        .bakasuran-track-divider {
+            margin: 22px 0 25px;
         }
 
-        .sudheera-track-icon {
+        .bakasuran-track-divider span {
             width: 40px;
-            min-width: 40px;
-            height: 46px;
-
-            font-size: 17px;
         }
 
-        .sudheera-track-field input {
-            height: 46px;
+        .bakasuran-track-tab {
+            gap: 5px;
+            font-size: 11px;
+        }
 
-            padding: 0 12px;
+        .bakasuran-track-input-wrap {
+            min-height: 51px;
+            gap: 9px;
+            padding: 0 11px;
+        }
 
+        .bakasuran-track-input-icon {
+            flex-basis: 32px;
+            width: 32px;
+            height: 32px;
+            font-size: 15px;
+        }
+
+        .bakasuran-track-input-wrap input {
+            height: 49px;
             font-size: 13px;
         }
 
-        .sudheera-track-btn {
-            height: 48px;
-
-            font-size: 15px;
+        .bakasuran-track-support {
+            padding: 14px 12px;
         }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+        .bakasuran-track-page *,
+        .bakasuran-track-page *::before,
+        .bakasuran-track-page *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+        }
+    }
 </style>
 
+<div class="bakasuran-track-page">
+    <div class="bakasuran-track-wrapper">
 
-<!-- =========================================================
-     TRACK PAGE
-========================================================= -->
-
-<div class="sudheera-track-page">
-
-    <div class="sudheera-track-wrapper">
-
-
-        <!-- ================= TOP BAR ================= -->
-
-        <div class="sudheera-track-topbar">
-
-            <a href="{{ route('home') }}"
-               class="sudheera-back-home">
-
-                <i class="fa fa-home"></i>
-
+        {{-- Top navigation --}}
+        <div class="bakasuran-track-topbar">
+            <a href="{{ route('home') }}" class="bakasuran-back-home">
+                <i class="fa fa-home" aria-hidden="true"></i>
                 Back to Home
-
             </a>
-
         </div>
 
-
-        <!-- ================= LOGO ================= -->
-
-        <div class="sudheera-track-logo">
-
-            <a href="{{ route('home') }}">
-
+        {{-- BAKASURAN branding --}}
+        <div class="bakasuran-track-logo">
+            <a href="{{ route('home') }}" aria-label="BAKASURAN Home">
                 <img
-                    src="{{ asset('website') }}/images/sudheera.png"
-                    alt="Sudheera Sarees">
-
+                    src="{{ asset('website/images/bakalogo.png') }}"
+                    alt="BAKASURAN Food Delivery">
             </a>
 
+            <p>
+                Delicious food.
+                <span class="bakasuran-brand-highlight">Delivered with care.</span>
+            </p>
         </div>
 
-
-        <!-- ================= ERROR ================= -->
-
-        @if(session('error'))
-
-            <div class="sudheera-track-error">
-
-                {{ session('error') }}
-
+        {{-- Server messages --}}
+        @if (session('error'))
+            <div class="bakasuran-track-message" role="alert">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                <div>{{ session('error') }}</div>
             </div>
-
         @endif
 
+        @if (session('success'))
+            <div class="bakasuran-track-message bakasuran-track-success" role="status">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                <div>{{ session('success') }}</div>
+            </div>
+        @endif
 
-        <!-- ================= MAIN CARD ================= -->
+        {{-- Main tracking card --}}
+        <div class="bakasuran-track-card">
 
-        <div class="sudheera-track-card">
+            <div class="bakasuran-track-eyebrow">
+                <i class="fa fa-cutlery" aria-hidden="true"></i>
+                Your food journey
+            </div>
 
+            <h1 class="bakasuran-track-title">Track Your Order</h1>
 
-            <h2 class="sudheera-track-title">
-                Track Your Order
-            </h2>
-
-
-            <p class="sudheera-track-subtitle">
-                Enter your order number or tracking number
-                to check your delivery status.
+            <p class="bakasuran-track-subtitle">
+                Your favourite food is worth the wait.
+                Enter your order details below to check your delivery status.
             </p>
 
-
-            <!-- Decorative Divider -->
-
-            <div class="sudheera-track-divider">
-
+            <div class="bakasuran-track-divider" aria-hidden="true">
                 <span></span>
-
-                <i>✦</i>
-
+                <i class="fa fa-circle"></i>
                 <span></span>
-
             </div>
 
-
-            <!-- ================= TABS ================= -->
-
-            <div class="sudheera-track-tabs">
+            {{-- Tabs --}}
+            <div class="bakasuran-track-tabs" role="tablist" aria-label="Tracking method">
 
                 <button
                     type="button"
-                    class="sudheera-track-tab active"
-                    data-target="sudheera-order-pane">
+                    id="bakasuran-order-tab"
+                    class="bakasuran-track-tab active"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="bakasuran-order-pane"
+                    data-target="bakasuran-order-pane">
 
+                    <i class="fa fa-shopping-bag" aria-hidden="true"></i>
                     Order Number
-
                 </button>
-
 
                 <button
                     type="button"
-                    class="sudheera-track-tab"
-                    data-target="sudheera-tracking-pane">
+                    id="bakasuran-shipment-tab"
+                    class="bakasuran-track-tab"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="bakasuran-shipment-pane"
+                    data-target="bakasuran-shipment-pane">
 
+                    <i class="fa fa-truck" aria-hidden="true"></i>
                     Tracking Number
-
                 </button>
-
             </div>
 
-
-            <!-- =================================================
-                 ORDER NUMBER
-            ================================================== -->
-
+            {{-- Order number form --}}
             <div
-                id="sudheera-order-pane"
-                class="sudheera-track-pane active">
+                id="bakasuran-order-pane"
+                class="bakasuran-track-pane active"
+                role="tabpanel"
+                aria-labelledby="bakasuran-order-tab">
 
                 <form
                     action="#"
                     method="POST"
-                    class="sudheera-track-form">
+                    class="bakasuran-track-form"
+                    id="bakasuran-order-form">
 
                     @csrf
 
+                    <div class="bakasuran-track-field">
+                        <label for="bakasuran-order-id">Order Number</label>
 
-                    <!-- Order ID -->
+                        <div class="bakasuran-track-input-wrap">
+                            <span class="bakasuran-track-input-icon">
+                                <i class="fa fa-receipt" aria-hidden="true"></i>
+                            </span>
 
-                    <div class="sudheera-track-field">
+                            <input
+                                type="text"
+                                id="bakasuran-order-id"
+                                name="order_id"
+                                value="{{ old('order_id') }}"
+                                placeholder="e.g. BK-10025"
+                                autocomplete="off"
+                                required>
+                        </div>
 
-                        <span class="sudheera-track-icon">
-                            🛍️
-                        </span>
+                        <small class="bakasuran-track-hint">
+                            Find your order number in your order confirmation.
+                        </small>
 
-                        <input
-                            type="text"
-                            name="order_id"
-                            placeholder="Enter Order ID"
-                            required>
-
+                        @error('order_id')
+                            <div class="bakasuran-track-validation">{{ $message }}</div>
+                        @enderror
                     </div>
 
+                    <div class="bakasuran-track-field">
+                        <label for="bakasuran-phone">Phone Number</label>
 
-                    <!-- Phone -->
+                        <div class="bakasuran-track-input-wrap">
+                            <span class="bakasuran-track-input-icon">
+                                <i class="fa fa-phone" aria-hidden="true"></i>
+                            </span>
 
-                    <div class="sudheera-track-field">
+                            <input
+                                type="tel"
+                                id="bakasuran-phone"
+                                name="phone"
+                                value="{{ old('phone') }}"
+                                placeholder="Enter your registered phone number"
+                                autocomplete="tel"
+                                inputmode="tel"
+                                required>
+                        </div>
 
-                        <span class="sudheera-track-icon">
-                            📞
-                        </span>
+                        <small class="bakasuran-track-hint">
+                            Use the phone number associated with your order.
+                        </small>
 
-                        <input
-                            type="text"
-                            name="phone"
-                            placeholder="Enter Phone Number"
-                            required>
-
+                        @error('phone')
+                            <div class="bakasuran-track-validation">{{ $message }}</div>
+                        @enderror
                     </div>
 
-
-                    <!-- Button -->
-
-                    <div class="sudheera-track-btn-wrap">
-
-                        <button
-                            type="button"
-                            class="sudheera-track-btn">
-
-                            Track Order
-
+                    <div class="bakasuran-track-btn-wrap">
+                        <button type="submit" class="bakasuran-track-btn">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            Track My Order
                         </button>
-
                     </div>
-
                 </form>
-
             </div>
 
-
-            <!-- =================================================
-                 TRACKING NUMBER
-            ================================================== -->
-
+            {{-- Tracking number form --}}
             <div
-                id="sudheera-tracking-pane"
-                class="sudheera-track-pane">
+                id="bakasuran-shipment-pane"
+                class="bakasuran-track-pane"
+                role="tabpanel"
+                aria-labelledby="bakasuran-shipment-tab"
+                hidden>
 
                 <form
                     action="#"
                     method="POST"
-                    class="sudheera-track-form">
+                    class="bakasuran-track-form"
+                    id="bakasuran-shipment-form">
 
                     @csrf
 
+                    <div class="bakasuran-track-field">
+                        <label for="bakasuran-tracking-number">Tracking Number</label>
 
-                    <!-- Tracking Number -->
+                        <div class="bakasuran-track-input-wrap">
+                            <span class="bakasuran-track-input-icon">
+                                <i class="fa fa-truck" aria-hidden="true"></i>
+                            </span>
 
-                    <div class="sudheera-track-field">
+                            <input
+                                type="text"
+                                id="bakasuran-tracking-number"
+                                name="awb"
+                                value="{{ old('awb') }}"
+                                placeholder="Enter your shipment tracking number"
+                                autocomplete="off"
+                                required>
+                        </div>
 
-                        <span class="sudheera-track-icon">
-                            🚚
-                        </span>
+                        <small class="bakasuran-track-hint">
+                            Enter the shipment tracking number provided for your delivery.
+                        </small>
 
-                        <input
-                            type="text"
-                            name="awb"
-                            placeholder="Enter Tracking Number"
-                            required>
-
+                        @error('awb')
+                            <div class="bakasuran-track-validation">{{ $message }}</div>
+                        @enderror
                     </div>
 
-
-                    <!-- Button -->
-
-                    <div class="sudheera-track-btn-wrap">
-
-                        <button
-                            type="submit"
-                            class="sudheera-track-btn">
-
+                    <div class="bakasuran-track-btn-wrap">
+                        <button type="submit" class="bakasuran-track-btn">
+                            <i class="fa fa-location-arrow" aria-hidden="true"></i>
                             Track Shipment
-
                         </button>
-
                     </div>
-
                 </form>
+            </div>
+        </div>
 
+        {{-- Customer support --}}
+        <div class="bakasuran-track-support">
+            <div class="bakasuran-track-support-icon">
+                <i class="fa fa-headphones" aria-hidden="true"></i>
             </div>
 
-
+            <div class="bakasuran-track-support-text">
+                Need help with your order?
+                <strong>BAKASURAN Customer Support</strong>
+            </div>
         </div>
 
-
-        <!-- ================= NOTE ================= -->
-
-        <div class="sudheera-track-note">
-
-            Need help with your order?
-            <strong>Contact Sudheera Sarees Support</strong>
-
+        <div class="bakasuran-track-note">
+            Fresh food, careful packing, happy moments.
+            <strong>That's the BAKASURAN promise.</strong>
         </div>
-
-
     </div>
-
 </div>
 
-
-<!-- =========================================================
-     TAB SCRIPT
-========================================================= -->
-
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.bakasuran-track-tab');
+        const panes = document.querySelectorAll('.bakasuran-track-pane');
 
-    document
-        .querySelectorAll('.sudheera-track-tab')
-        .forEach(function(tab) {
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                const targetId = this.dataset.target;
+                const targetPane = document.getElementById(targetId);
 
-            tab.addEventListener('click', function() {
-
-                document
-                    .querySelectorAll('.sudheera-track-tab')
-                    .forEach(function(t) {
-
-                        t.classList.remove('active');
-
-                    });
-
-
-                document
-                    .querySelectorAll('.sudheera-track-pane')
-                    .forEach(function(p) {
-
-                        p.classList.remove('active');
-
-                    });
-
-
-                this.classList.add('active');
-
-
-                const target =
-                    document.getElementById(
-                        this.dataset.target
-                    );
-
-
-                if (target) {
-
-                    target.classList.add('active');
-
+                if (!targetPane) {
+                    return;
                 }
 
+                tabs.forEach(function (item) {
+                    item.classList.remove('active');
+                    item.setAttribute('aria-selected', 'false');
+                });
+
+                panes.forEach(function (pane) {
+                    pane.classList.remove('active');
+                    pane.hidden = true;
+                });
+
+                this.classList.add('active');
+                this.setAttribute('aria-selected', 'true');
+
+                targetPane.hidden = false;
+                targetPane.classList.add('active');
             });
-
         });
-
+    });
 </script>
 
 @endsection

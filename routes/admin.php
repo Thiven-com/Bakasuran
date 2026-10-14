@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ManualOrderController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\RestaurantController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -54,6 +55,28 @@ Route::group(['middleware' => 'admin'], function () {
     Route::resource('brands', BrandController::class)->names('admin.brands');
     Route::resource('banners', BannerController::class)->names('admin.banners');
     Route::resource('products', ProductController::class)->names('admin.products');
+    // Restaurants
+// Restaurants
+    Route::get('restaurants', [RestaurantController::class, 'index'])
+        ->name('admin.restaurants.index');
+
+    Route::get('restaurants/create', [RestaurantController::class, 'create'])
+        ->name('admin.restaurants.create');
+
+    Route::post('restaurants', [RestaurantController::class, 'store'])
+        ->name('admin.restaurants.store');
+
+    Route::get('restaurants/{restaurant}/edit', [RestaurantController::class, 'edit'])
+        ->name('admin.restaurants.edit');
+
+    Route::put('restaurants/{restaurant}', [RestaurantController::class, 'update'])
+        ->name('admin.restaurants.update');
+
+    Route::delete('restaurants/{restaurant}', [RestaurantController::class, 'destroy'])
+        ->name('admin.restaurants.destroy');
+
+    Route::get('restaurants/{restaurant}', [RestaurantController::class, 'show'])
+        ->name('admin.restaurants.show');
     // Route::resource('coupons', CouponController::class)->names('admin.coupons');
     Route::resource('orders', OrderController::class)->names('admin.orders');
     Route::resource('flash-sales', FlashSaleController::class)->names('admin.flash-sales');

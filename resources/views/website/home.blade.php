@@ -2479,7 +2479,7 @@
         }
 
         .bestseller-scrollbar .swiper-scrollbar-drag {
-            background: #651027 !important;
+            background: #000 !important;
         }
 
         .bestseller-navigation {
@@ -2503,7 +2503,7 @@
 
             background: #fff;
 
-            color: #651027;
+            color: #000;
         }
 
         .bestseller-prev::after,

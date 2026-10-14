@@ -67,7 +67,8 @@
                                                 </li>
                                                 <li class="{{ Request::is('admin/manualorders') ? 'active' : '' }}"><a
                                                                 href="{{route('admin.sku.report')}}"><i
-                                                                        class="ti ti-box fs-16 me-2"></i>SKU Order Reports</a>
+                                                                        class="ti ti-box fs-16 me-2"></i>SKU Order
+                                                                Reports</a>
                                                 </li>
 
                                                 <li class="{{ Request::is('admin/abandonedCart') ? 'active' : '' }}"><a
@@ -118,6 +119,15 @@
                                                                         class="{{ Request::is('admin/attributes') ? 'active' : '' }}">
                                                                         <a href="{{route('admin.attributes.index')}}"><i
                                                                                         class="ti ti-checklist fs-16 me-2"></i><span>Attributes</span></a>
+                                                                </li>
+
+                                                                <li
+                                                                        class="{{ Request::is('restaurants') ? 'active' : '' }}">
+                                                                        <a
+                                                                                href="{{ route('admin.restaurants.index') }}">
+                                                                                <i data-feather="coffee"></i>
+                                                                                <span>Restaurants</span>
+                                                                        </a>
                                                                 </li>
                                                                 <li
                                                                         class="{{ Request::is('admin/coupons') ? 'active' : '' }}">

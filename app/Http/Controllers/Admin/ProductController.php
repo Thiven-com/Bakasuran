@@ -27,6 +27,7 @@ use DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
 use RealRashid\SweetAlert\Facades\Alert;
+use App\Models\Restaurant;
 
 class ProductController extends Controller
 {
@@ -79,8 +80,10 @@ class ProductController extends Controller
         $brands = Brand::where('status', 'show')->get();
         $categories = Category::where(['status' => 'show', 'parent_id' => 0])->get();
         $variantAttributes = Attribute::with('attributeValues')->where('status', 'show')->get();
+        // Load active restaurants
+        $restaurants = Restaurant::where('is_active', true)->orderBy('name')->get();
         // $taxes = Tax::where('status', 'Show')->where('company_id',$user->id)->get();
-        return view('admin.catalog.products.create', compact('categories', 'brands', 'variantAttributes'));
+        return view('admin.catalog.products.create', compact('categories', 'brands', 'variantAttributes', 'restaurants'));
     }
 
     /**
@@ -120,6 +123,7 @@ class ProductController extends Controller
         $product->category_id = $request->category_id ?? 0;
         $product->brand_id = $request->brand_id ?? 0;
         $product->status = $request->status;
+        $product->restaurant_id = $request->restaurant_id ?: null;
         $product->hsn_code = $request->hsn_code;
         $product->is_feature = $request->has('is_feature') ? 'yes' : 'no';
         $product->save();
@@ -265,8 +269,12 @@ class ProductController extends Controller
         $brands = Brand::all();
         $variantAttributes = Attribute::with('attributeValues')->get();
         $selectedSubcategories = $product->subcategories->pluck('id')->toArray();
+        // Load active restaurants
+        $restaurants = Restaurant::where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.catalog.products.edit', compact('product', 'categories', 'brands', 'variantAttributes', 'selectedSubcategories'));
+        return view('admin.catalog.products.edit', compact('product', 'categories', 'brands', 'variantAttributes', 'selectedSubcategories', 'restaurants'));
     }
 
     /**
@@ -276,6 +284,9 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         $product = Product::findOrFail($id);
+        $request->validate([
+            'restaurant_id' => 'nullable|integer|exists:restaurants,id',
+        ]);
         $product->title = $request->title;
         if ($product->title != $request->title) {
             $product->slug = $this->slugGenerate($request->title, 0);
@@ -284,6 +295,7 @@ class ProductController extends Controller
         $product->short_description = $request->short_description;
         $product->category_id = $request->category_id ?? 0;
         $product->brand_id = $request->brand_id ?? 0;
+        $product->restaurant_id = $request->restaurant_id ?: null;
         $product->status = $request->status;
         // $product->hsn_code = $request->hsn_code;
         $product->is_feature = $request->has('is_feature') ? 'yes' : 'no';

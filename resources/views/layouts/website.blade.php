@@ -3489,7 +3489,7 @@
         .footer-bottom p {
             margin: 0;
 
-            font-size: 11px;
+            font-size: 13px;
 
             color: rgba(255,
                     238,
@@ -3506,7 +3506,7 @@
         .footer-links a {
             text-decoration: none;
 
-            font-size: 11px;
+            font-size: 13px;
 
             color: rgba(255,
                     238,
@@ -3940,7 +3940,7 @@
 
                 color: #c7beb5;
 
-                font-size: 13px;
+                font-size: 14px;
                 line-height: 1.8;
             }
 
@@ -3954,7 +3954,7 @@
 
                 color: #fff;
 
-                font-size: 15px;
+                font-size: 18px;
                 font-weight: 500;
             }
 
@@ -4052,7 +4052,7 @@
 
                 color: #c7beb5;
 
-                font-size: 12px;
+                font-size: 14px;
                 line-height: 1.7;
 
                 text-decoration: none;

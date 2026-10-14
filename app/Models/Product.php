@@ -40,4 +40,9 @@ class Product extends Model
     {
         return $this->hasOne(ProductMedia::class)->where('is_primary', true)->ofMany('id', 'min');
     }
+
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class, 'restaurant_id');
+    }
 }
