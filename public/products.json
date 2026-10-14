@@ -1,0 +1,122 @@
+[
+    {
+        "name": "Kanchipuram Silk Sare",
+        "image": "media\/products\/1791442770.webp",
+        "sale_price": "5499",
+        "actual_price": "6000",
+        "product_id": 1,
+        "product_variant_id": 1,
+        "stock": "55",
+        "sku": "SILK"
+    },
+    {
+        "name": "Banarasi Silk Saree",
+        "image": "media\/products\/1791443153.webp",
+        "sale_price": "6299",
+        "actual_price": "8000",
+        "product_id": 2,
+        "product_variant_id": 2,
+        "stock": "5",
+        "sku": "Sudhee1234"
+    },
+    {
+        "name": "Handloom Cotton Saree",
+        "image": "media\/products\/1791443236.webp",
+        "sale_price": "1899",
+        "actual_price": "2000",
+        "product_id": 3,
+        "product_variant_id": 3,
+        "stock": "5",
+        "sku": "iygikjrfv"
+    },
+    {
+        "name": "Premium Cotton Saree",
+        "image": "media\/products\/1791443340.webp",
+        "sale_price": "2199",
+        "actual_price": "3000",
+        "product_id": 4,
+        "product_variant_id": 4,
+        "stock": "5",
+        "sku": "ljkbvjvdb"
+    },
+    {
+        "name": "Party Wear Saree",
+        "image": "media\/products\/1791445036.webp",
+        "sale_price": "3499",
+        "actual_price": "5499",
+        "product_id": 5,
+        "product_variant_id": 5,
+        "stock": "5",
+        "sku": "sku005"
+    },
+    {
+        "name": "Elegant Party Saree",
+        "image": "media\/products\/1791445356.webp",
+        "sale_price": "4299",
+        "actual_price": "6499",
+        "product_id": 6,
+        "product_variant_id": 6,
+        "stock": "5",
+        "sku": "sku006"
+    },
+    {
+        "name": "Designer Party Wear",
+        "image": "media\/products\/1791448499.webp",
+        "sale_price": "3499",
+        "actual_price": "6499",
+        "product_id": 7,
+        "product_variant_id": 7,
+        "stock": "5",
+        "sku": "sku007"
+    },
+    {
+        "name": "Royal Designer Saree",
+        "image": "media\/products\/1791448652.webp",
+        "sale_price": "4999",
+        "actual_price": "7999",
+        "product_id": 8,
+        "product_variant_id": 8,
+        "stock": "5",
+        "sku": "sku008"
+    },
+    {
+        "name": "Chanderi Party Saree",
+        "image": "media\/products\/1791448893.webp",
+        "sale_price": "2499",
+        "actual_price": "3999",
+        "product_id": 9,
+        "product_variant_id": 9,
+        "stock": "5",
+        "sku": "sku009"
+    },
+    {
+        "name": "Linen Silk Saree",
+        "image": "media\/products\/1791449004.jpg",
+        "sale_price": "2499",
+        "actual_price": "3999",
+        "product_id": 10,
+        "product_variant_id": 10,
+        "stock": "5",
+        "sku": "sku000"
+    },
+    {
+        "name": "Organza Floral Saree",
+        "image": "media\/products\/1791449222.webp",
+        "sale_price": "2799",
+        "actual_price": "4499",
+        "product_id": 11,
+        "product_variant_id": 11,
+        "stock": "5",
+        "sku": "sku001"
+    },
+    {
+        "name": "Rose Pink Designer Saree",
+        "image": "media\/products\/1791449379.jpg",
+        "sale_price": "3499",
+        "actual_price": "5499",
+        "product_id": 12,
+        "product_variant_id": 12,
+        "stock": "5",
+        "sku": "sku002"
+    }
+]

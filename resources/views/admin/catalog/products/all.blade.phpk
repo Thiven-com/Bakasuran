@@ -1,0 +1,186 @@
+<?php $page = 'Category'; ?>
+@extends('layout.mainlayout')
+@section('content')
+    <div class="page-wrapper">
+        <div class="content">
+            @component('components.breadcrumb')
+                @slot('title')
+                    Product List
+                @endslot
+                @slot('li_1')
+                    Manage Your Products
+                @endslot
+                @slot('li_2')
+                    {{ route('admin.products.create') }}
+                @endslot
+                @slot('li_3')
+                    Add New Product
+                @endslot
+            @endcomponent
+
+            <style>
+                .profile-pic-upload {
+                    position: relative;
+                    width: 120px;
+                    height: 120px;
+                }
+                .brand-pic {
+                    width: 100%;
+                    height: 100%;
+                    border: 2px dashed #ccc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    background-size: cover;
+                    background-position: center;
+                }
+                .remove-btn {
+                    position: absolute;
+                    top: -8px;
+                    right: -8px;
+                    background: red;
+                    color: white;
+                    border: none;
+                    border-radius: 50%;
+                    font-size: 18px;
+                    width: 24px;
+                    height: 24px;
+                    cursor: pointer;
+                }
+
+            </style>
+
+            <!-- /product list -->
+            <div class="card table-list-card">
+                <div class="card-body">
+                    <div class="table-top">
+                        <div class="search-set">
+                            <div class="search-input">
+                                <a href="" class="btn btn-searchset"><i data-feather="search"
+                                        class="feather-search"></i></a>
+                            </div>
+                        </div>
+                        <div class="search-path">
+                            <div class="d-flex align-items-center">
+                                <a class="btn btn-filter" id="filter_search">
+                                    <i data-feather="filter" class="filter-icon"></i>
+                                    <span><img src="{{ asset('admin/build/img/icons/closes.svg') }}" alt="img"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table datanew">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort">
+                                        <label class="checkboxs">
+                                            <input type="checkbox" id="select-all">
+                                            <span class="checkmarks"></span>
+                                        </label>
+                                    </th>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Slug</th>
+                                    <th>Category</th>
+                                    <th>Brand</th>
+                                    <th>Status</th>
+                                    {{-- <th>KYC Status</th> --}}
+                                    <th class="no-sort">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($products as $product)
+                                <tr>
+                                    <td>
+                                        <label class="checkboxs">
+                                            <input type="checkbox">
+                                            <span class="checkmarks"></span>
+                                        </label>
+                                    </td>
+
+                                        <div class="productimgname">
+                                            <div>
+                                                <td><span class="d-flex"><img class="product-img stock-img" style="height:50px;width:50px;" src="{{ asset($product->image) }}" alt=""></span></td>
+                                            </div>
+                                        </div>
+
+                                    {{-- <td>201</td> --}}
+                                    <td> {{ $product->title }} </td>
+                                    <td> {{ $product->slug }} </td>
+                                    <td> {{ $product->category->title ?? '-' }} </td>
+                                    <td> {{ $product->brand->name ?? '-' }} </td>
+                                    <td> {{ $product->status ?? '-' }} </td>
+                                    <td class="action-table-data">
+                                        <div class="edit-delete-action">
+                                            {{-- <a class="me-2 p-2 mb-0" href="javascript:void(0);">
+                                                <i data-feather="eye" class="action-eye"></i>
+                                            </a> --}}
+                                            {{-- <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units">
+                                                <i data-feather="edit" class="feather-edit"></i>
+                                            </a> --}}
+                                           <a class="me-2 p-2" href="{{ route('admin.products.edit',$product->id) }}">
+                                                <i data-feather="edit" class="feather-edit"></i>
+                                            </a>
+                                            <a class="confirm-texts p-2" href="javascript:void(0);" data-id="{{ $product->id }}" data-url="{{ route('admin.products.destroy', $product->id) }}">
+                                                <i data-feather="trash-2" class="feather-trash-2"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- /product list -->
+        </div>
+    </div>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    // Click anywhere on upload area to trigger file input
+    $('#imagePreview').on('click', function () {
+        $('#imageInput').click();
+    });
+
+    // When a file is selected
+    $('#imageInput').on('change', function (event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $('#imagePreview')
+                    .css('background-image', 'url(' + e.target.result + ')')
+                    .css('border', 'none'); // remove dashed border
+                $('#uploadText').hide();
+                $('#removeImage').show();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Remove image
+    $('#removeImage').on('click', function () {
+        $('#imagePreview')
+            .css('background-image', 'none')
+            .css('border', '2px dashed #ccc');
+        $('#uploadText').show();
+        $('#imageInput').val('');
+        $(this).hide();
+    });
+
+});
+</script>
+
+@endsection
+
+
