@@ -736,6 +736,14 @@
                 font-size: 18px;
             }
         }
+
+        .sudheera-product-restaurant {
+    font-size: 13px;
+    color: #777;
+    margin-top: 5px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
     </style>
 
 
@@ -887,6 +895,12 @@
                                                     {{ $product?->title ?? 'Product' }}
 
                                                 </a>
+
+                                                @if($product?->restaurant)
+    <div class="sudheera-product-restaurant">
+        {{ $product->restaurant->name }}
+    </div>
+@endif
 
 
                                                 @if($variant?->attributeValues && $variant->attributeValues->count())

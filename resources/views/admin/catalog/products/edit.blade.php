@@ -91,9 +91,8 @@
                                                     style="max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:10px;">
                                                 </div>
                                             </div> --}}
-                                        </div>
 
-<div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="col-lg-6 col-md-6 col-sm-6">
     <div class="mb-3 add-product">
         <label class="form-label">Restaurant</label>
 
@@ -115,6 +114,9 @@
         @enderror
     </div>
 </div>
+                                        </div>
+
+
 
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6 col-sm-6 mb-3">

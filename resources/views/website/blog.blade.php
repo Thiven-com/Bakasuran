@@ -4,16 +4,16 @@
 
     <style>
         /* =========================================================
-               BLOG PAGE
-            ========================================================= */
+                   BLOG PAGE
+                ========================================================= */
 
         .static-blog-section {
             padding: 20px 0 50px;
         }
 
         /* =========================================================
-               BREADCRUMB
-            ========================================================= */
+                   BREADCRUMB
+                ========================================================= */
 
         .static-blog-breadcrumb {
             padding: 35px 0 20px;
@@ -43,8 +43,8 @@
         }
 
         /* =========================================================
-               HEADING
-            ========================================================= */
+                   HEADING
+                ========================================================= */
 
         .static-blog-heading {
             text-align: center;
@@ -66,8 +66,8 @@
         }
 
         /* =========================================================
-               BLOG GRID
-            ========================================================= */
+                   BLOG GRID
+                ========================================================= */
 
         .static-blog-grid {
             display: grid;
@@ -77,8 +77,8 @@
         }
 
         /* =========================================================
-               BLOG CARD
-            ========================================================= */
+                   BLOG CARD
+                ========================================================= */
 
         .static-blog-card {
             width: 100%;
@@ -89,8 +89,8 @@
         }
 
         /* =========================================================
-               BLOG IMAGE
-            ========================================================= */
+                   BLOG IMAGE
+                ========================================================= */
 
         .static-blog-image {
             position: relative;
@@ -108,8 +108,8 @@
             display: block;
 
             /*
-                 * Keeps all images the same size
-                 */
+                     * Keeps all images the same size
+                     */
             object-fit: fill;
             object-position: center;
 
@@ -121,8 +121,8 @@
         }
 
         /* =========================================================
-               DATE
-            ========================================================= */
+                   DATE
+                ========================================================= */
 
         .static-blog-date {
             position: absolute;
@@ -142,8 +142,8 @@
         }
 
         /* =========================================================
-               BLOG CONTENT
-            ========================================================= */
+                   BLOG CONTENT
+                ========================================================= */
 
         .static-blog-content {
             display: flex;
@@ -154,8 +154,8 @@
         }
 
         /* =========================================================
-               BLOG TAG
-            ========================================================= */
+                   BLOG TAG
+                ========================================================= */
 
         .static-blog-tag {
             display: block;
@@ -176,8 +176,8 @@
         }
 
         /* =========================================================
-               BLOG TITLE
-            ========================================================= */
+                   BLOG TITLE
+                ========================================================= */
 
         .static-blog-title {
             display: -webkit-box;
@@ -196,8 +196,8 @@
             text-decoration: none;
 
             /*
-                 * All titles get same height
-                 */
+                     * All titles get same height
+                     */
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
@@ -210,8 +210,8 @@
         }
 
         /* =========================================================
-               DESCRIPTION
-            ========================================================= */
+                   DESCRIPTION
+                ========================================================= */
 
         .static-blog-description {
             display: -webkit-box;
@@ -232,8 +232,8 @@
         }
 
         /* =========================================================
-               READ ARTICLE
-            ========================================================= */
+                   READ ARTICLE
+                ========================================================= */
 
         .static-blog-read {
             display: inline-flex;
@@ -268,8 +268,8 @@
         }
 
         /* =========================================================
-               TABLET
-            ========================================================= */
+                   TABLET
+                ========================================================= */
 
         @media (max-width: 991px) {
 
@@ -289,8 +289,8 @@
         }
 
         /* =========================================================
-               MOBILE
-            ========================================================= */
+                   MOBILE
+                ========================================================= */
 
         @media (max-width: 767px) {
 
@@ -316,8 +316,8 @@
             }
 
             /*
-                 * 2 BLOGS PER ROW
-                 */
+                     * 2 BLOGS PER ROW
+                     */
             .static-blog-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 25px 10px;
@@ -382,8 +382,8 @@
         }
 
         /* =========================================================
-               SMALL MOBILE
-            ========================================================= */
+                   SMALL MOBILE
+                ========================================================= */
 
         @media (max-width: 480px) {
 
@@ -409,149 +409,158 @@
         }
     </style>
 
+    
+    <style>
+        .static-blog-restaurant {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 8px 0;
+    color: #E85D04;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.static-blog-restaurant i {
+    font-size: 13px;
+}
+    </style>
+
 
     <!-- =========================================================
-             BLOG PAGE
-        ========================================================= -->
+                 BLOG PAGE
+            ========================================================= -->
 
-<section class="static-blog-section">
+    <section class="static-blog-section">
 
-    <div class="container">
+        <div class="container">
 
-        {{-- =====================================================
-             BREADCRUMB
-        ====================================================== --}}
+            {{-- =====================================================
+            BREADCRUMB
+            ====================================================== --}}
 
-        <div class="static-blog-breadcrumb">
+            <div class="static-blog-breadcrumb">
 
-            <ul>
+                <ul>
 
-                <li>
-                    <a href="{{ route('home') }}">
-                        Home
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ route('home') }}">
+                            Home
+                        </a>
+                    </li>
 
-                <li>
-                    /
-                </li>
+                    <li>
+                        /
+                    </li>
 
-                <li class="current">
-                    Blog
-                </li>
+                    <li class="current">
+                        Blog
+                    </li>
 
-            </ul>
+                </ul>
 
-        </div>
-
-
-        {{-- =====================================================
-             HEADING
-        ====================================================== --}}
-
-        <div class="static-blog-heading">
-
-            <h2>
-                BAKASURAN Food Stories
-            </h2>
-
-            <p>
-                Discover delicious recipes, food trends, cooking tips,
-                restaurant favourites and inspiration for every craving.
-            </p>
-
-        </div>
+            </div>
 
 
-        {{-- =====================================================
-             BLOG GRID
-        ====================================================== --}}
+            {{-- =====================================================
+            HEADING
+            ====================================================== --}}
 
-        <div class="static-blog-grid">
+            <div class="static-blog-heading">
 
-            @forelse($blogs as $blog)
+                <h2>
+                    BAKASURAN Food Stories
+                </h2>
 
-                <article class="static-blog-card">
+                <p>
+                    Discover delicious recipes, food trends, cooking tips,
+                    restaurant favourites and inspiration for every craving.
+                </p>
 
-                    <a
-                        href="{{ route('blogdetails', $blog->slug) }}"
-                        class="static-blog-image"
-                    >
-
-                        <img
-                            loading="lazy"
-                            src="{{ asset($blog->image) }}"
-                            alt="{{ $blog->title }}"
-                        >
-
-                        <span class="static-blog-date">
-                            {{ $blog->created_at->format('d M, Y') }}
-                        </span>
-
-                    </a>
+            </div>
 
 
-                    <div class="static-blog-content">
+            {{-- =====================================================
+            BLOG GRID
+            ====================================================== --}}
 
-                        <a
-                            href="{{ route('blogdetails', $blog->slug) }}"
-                            class="static-blog-tag"
-                        >
+            <div class="static-blog-grid">
 
-                            {{ $blogCategories[$blog->category_id]->name ?? 'Food Blog' }}
+                @forelse($blogs as $blog)
+
+                    <article class="static-blog-card">
+
+                        <a href="{{ route('blogdetails', $blog->slug) }}" class="static-blog-image">
+
+                            <img loading="lazy" src="{{ asset($blog->image) }}" alt="{{ $blog->title }}">
+
+                            <span class="static-blog-date">
+                                {{ $blog->created_at->format('d M, Y') }}
+                            </span>
 
                         </a>
 
 
-                        <a
-                            href="{{ route('blogdetails', $blog->slug) }}"
-                            class="static-blog-title"
-                        >
+                        <div class="static-blog-content">
 
-                            {{ $blog->title }}
+                            <a href="{{ route('blogdetails', $blog->slug) }}" class="static-blog-tag">
 
-                        </a>
+                                {{ $blogCategories[$blog->category_id]->name ?? 'Food Blog' }}
+
+                            </a>
 
 
-                        <p class="static-blog-description">
+                            <a href="{{ route('blogdetails', $blog->slug) }}" class="static-blog-title">
 
-                            {{ $blog->short_description }}
+                                {{ $blog->title }}
 
+                            </a>
+
+                            {{-- RESTAURANT NAME --}}
+                            @if($blog->restaurant)
+                                <div class="static-blog-restaurant">
+                                    <i class="fa-solid fa-utensils"></i>
+                                    <span>{{ $blog->restaurant->name }}</span>
+                                </div>
+                            @endif
+
+
+                            <p class="static-blog-description">
+
+                                {{ $blog->short_description }}
+
+                            </p>
+
+
+                            <a href="{{ route('blogdetails', $blog->slug) }}" class="static-blog-read">
+
+                                READ ARTICLE
+
+                                <i class="icon icon-ArrowRight"></i>
+
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                @empty
+
+                    <div class="static-blog-empty">
+
+                        <p>
+                            No food stories available at the moment.
+                            Please check back soon.
                         </p>
-
-
-                        <a
-                            href="{{ route('blogdetails', $blog->slug) }}"
-                            class="static-blog-read"
-                        >
-
-                            READ ARTICLE
-
-                            <i class="icon icon-ArrowRight"></i>
-
-                        </a>
 
                     </div>
 
-                </article>
+                @endforelse
 
-            @empty
-
-                <div class="static-blog-empty">
-
-                    <p>
-                        No food stories available at the moment.
-                        Please check back soon.
-                    </p>
-
-                </div>
-
-            @endforelse
+            </div>
 
         </div>
 
-    </div>
-
-</section>
+    </section>
 
 @endsection

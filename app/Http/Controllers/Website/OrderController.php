@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\PaymentGateway;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,14 +18,101 @@ use Illuminate\Support\Facades\Log;
 use Razorpay\Api\Api;
 use RealRashid\SweetAlert\Facades\Alert;
 
-
 class OrderController extends Controller
 {
+    /**
+     * ORDER NOW: Save the selected product in the session
+     * and redirect directly to checkout.
+     */
+
+public function buyNow(Request $request)
+{
+    $validated = $request->validate([
+        'product_variant_id' => [
+            'required',
+            'integer',
+            'exists:product_variants,id',
+        ],
+        'quantity' => ['required', 'integer', 'min:1'],
+    ]);
+
+    if (!Auth::guard('customer')->check()) {
+        return redirect()->route('login');
+    }
+
+    $variant = ProductVariant::with('product')
+        ->findOrFail($validated['product_variant_id']);
+
+    $quantity = (int) $validated['quantity'];
+
+    \Log::info('Buy Now variant check', [
+        'variant_id' => $variant->id,
+        'variant_status' => $variant->status,
+        'stock' => $variant->stock,
+        'quantity' => $quantity,
+        'has_product' => $variant->product !== null,
+    ]);
+
+    if (!$variant->product || $variant->status !== 'show') {
+    return back()->with(
+        'error',
+        'This product is not available.'
+    );
+}
+
+    if ($quantity > (int) $variant->stock) {
+        return back()->with(
+            'error',
+            'Requested quantity is unavailable.'
+        );
+    }
+
+    if (
+        $variant->product_min_order &&
+        $quantity < (int) $variant->product_min_order
+    ) {
+        return back()->with(
+            'error',
+            'Minimum order quantity is ' . $variant->product_min_order
+        );
+    }
+
+    if (
+        $variant->product_max_order &&
+        $quantity > (int) $variant->product_max_order
+    ) {
+        return back()->with(
+            'error',
+            'Maximum order quantity is ' . $variant->product_max_order
+        );
+    }
+
+    session([
+        'buy_now' => [
+            'product_variant_id' => $variant->id,
+            'quantity' => $quantity,
+        ],
+    ]);
+
+    \Log::info('Buy Now session saved', [
+        'buy_now' => session('buy_now'),
+    ]);
+
+    return redirect()->route('checkout', [
+        'mode' => 'buy_now',
+    ]);
+}
+
+
+    /**
+     * Create an order from ORDER NOW or the shopping cart.
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'address_id' => 'required|integer',
-            'payment_method' => 'required|in:cod,online_payment',
+            'address_id' => ['required', 'integer'],
+            'payment_method' => ['required', 'in:cod,online_payment'],
+            'mode' => ['nullable', 'in:buy_now'],
         ]);
 
         $userId = Auth::guard('customer')->id();
@@ -40,7 +128,6 @@ class OrderController extends Controller
             return redirect()->route('login');
         }
 
-        // Ensure the selected address belongs to this customer.
         $address = Address::where('id', $request->address_id)
             ->where('customer_id', $user->id)
             ->first();
@@ -50,31 +137,21 @@ class OrderController extends Controller
             return back()->withInput();
         }
 
-        $cartItems = CartItem::with('variant.product')
-            ->where('user_id', $user->id)
-            ->get();
+        $isBuyNow = $request->input('mode') === 'buy_now';
+        $buyNow = $isBuyNow ? session('buy_now') : null;
 
-        if ($cartItems->isEmpty()) {
-            Alert::toast('Your cart is empty.', 'warning');
-            return redirect()->route('cart');
-        }
+        if (
+            $isBuyNow &&
+            (
+                !$buyNow ||
+                empty($buyNow['product_variant_id']) ||
+                !isset($buyNow['quantity']) ||
+                (int) $buyNow['quantity'] < 1
+            )
+        ) {
+            Alert::toast('Your direct purchase session has expired.', 'warning');
 
-        foreach ($cartItems as $item) {
-            if (!$item->variant || !$item->variant->product) {
-                Alert::toast('A product in your cart is no longer available.', 'error');
-                return redirect()->route('cart');
-            }
-
-            if (
-                $item->quantity < 1 ||
-                $item->quantity > $item->variant->stock
-            ) {
-                Alert::toast(
-                    'Insufficient stock for ' . $item->variant->product->title,
-                    'error'
-                );
-                return redirect()->route('cart');
-            }
+            return redirect()->route('checkout');
         }
 
         $shippingAddress = [
@@ -90,91 +167,184 @@ class OrderController extends Controller
             'pincode' => $address->pincode,
         ];
 
-        $subtotal = $cartItems->sum(function ($item) {
-            return (float) $item->unit_price * (int) $item->quantity;
-        });
-
-        $shipping = 0;
-        $discount = 0;
-        $grandTotal = max(0, $subtotal + $shipping - $discount);
-
-        DB::beginTransaction();
-
         try {
-            $order = Order::create([
-                'customer_id' => $user->id,
-                'invoice_id' => 'TEMP-' . uniqid(),
-                'subtotal' => $subtotal,
-                'grand_total' => $grandTotal,
-                'status' => 'pending',
-                'payment_status' => 'pending',
-                'shipping_address' => $shippingAddress,
-                'billing_address' => $shippingAddress,
-            ]);
+            $result = DB::transaction(function () use (
+                $request,
+                $user,
+                $shippingAddress,
+                $isBuyNow,
+                $buyNow
+            ) {
+                $items = collect();
 
-            $invoiceId = 'VS' . str_pad(
-                $order->id,
-                5,
-                '0',
-                STR_PAD_LEFT
-            );
+                if ($isBuyNow) {
+                    $variant = ProductVariant::with('product')
+                        ->whereKey($buyNow['product_variant_id'])
+                        ->lockForUpdate()
+                        ->first();
 
-            $order->update(['invoice_id' => $invoiceId]);
+                    $quantity = (int) $buyNow['quantity'];
 
-            foreach ($cartItems as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_variant_id' => $item->product_variant_id,
-                    'seller_id' => 0,
-                    'product_title' => $item->variant->product->title,
-                    'sku' => $item->variant->sku,
-                    'unit_price' => $item->unit_price,
-                    'quantity' => $item->quantity,
-                    'subtotal' => $item->unit_price * $item->quantity,
-                ]);
-            }
+                    if (!$variant || !$variant->product) {
+                        throw new \RuntimeException(
+                            'The selected product is no longer available.'
+                        );
+                    }
 
-            $payment = Payment::create([
-                'order_id' => $order->id,
-                'user_id' => $user->id,
-                'amount' => $grandTotal,
-                'currency' => 'INR',
-                'status' => 'pending',
-                'method' => $request->payment_method,
-                'reference_no' => $invoiceId,
-            ]);
+                    $items->push((object) [
+                        'product_variant_id' => $variant->id,
+                        'variant' => $variant,
+                        'quantity' => $quantity,
+                        'unit_price' => $variant->price,
+                    ]);
+                } else {
+                    $cartItems = CartItem::where('user_id', $user->id)
+                        ->get();
 
-            // Cash on Delivery
-            if ($request->payment_method === 'cod') {
-                $order->update([
-                    'status' => 'placed',
-                    'payment_status' => 'pending',
-                ]);
+                    if ($cartItems->isEmpty()) {
+                        throw new \RuntimeException('Your cart is empty.');
+                    }
 
-                $payment->update([
-                    'status' => 'pending',
-                ]);
+                    foreach ($cartItems as $cartItem) {
+                        $variant = ProductVariant::with('product')
+                            ->whereKey($cartItem->product_variant_id)
+                            ->lockForUpdate()
+                            ->first();
 
-                foreach ($cartItems as $item) {
-                    $item->variant->decrement(
-                        'stock',
-                        $item->quantity
-                    );
+                        if (!$variant || !$variant->product) {
+                            throw new \RuntimeException(
+                                'A product in your cart is no longer available.'
+                            );
+                        }
+
+                        $items->push((object) [
+                            'product_variant_id' => $variant->id,
+                            'variant' => $variant,
+                            'quantity' => (int) $cartItem->quantity,
+                            'unit_price' => $variant->price,
+                        ]);
+                    }
                 }
 
-                CartItem::where('user_id', $user->id)->delete();
+                // Validate every item before creating the order.
+                foreach ($items as $item) {
+                    $variant = $item->variant;
+                    $quantity = (int) $item->quantity;
 
-                DB::commit();
+                    if ($variant->status !== 'active') {
+                        throw new \RuntimeException(
+                            $variant->product->title . ' is not available.'
+                        );
+                    }
 
-                Alert::success('Success', 'Your order has been placed.');
+                    if ($quantity < 1 || $quantity > (int) $variant->stock) {
+                        throw new \RuntimeException(
+                            'Insufficient stock for ' . $variant->product->title
+                        );
+                    }
 
-                return redirect()->route('customer.orders');
-            }
+                    if (
+                        $variant->product_min_order &&
+                        $quantity < (int) $variant->product_min_order
+                    ) {
+                        throw new \RuntimeException(
+                            'Minimum order quantity is ' .
+                            $variant->product_min_order
+                        );
+                    }
 
-            // Razorpay Online Payment
+                    if (
+                        $variant->product_max_order &&
+                        $quantity > (int) $variant->product_max_order
+                    ) {
+                        throw new \RuntimeException(
+                            'Maximum order quantity is ' .
+                            $variant->product_max_order
+                        );
+                    }
+                }
 
-            // Razorpay Online Payment
-            if ($request->payment_method === 'online_payment') {
+                $subtotal = $items->sum(function ($item) {
+                    return (float) $item->unit_price * $item->quantity;
+                });
+
+                // TODO: Connect the checkout shipping and coupon calculations.
+                $shipping = 0;
+                $discount = 0;
+                $grandTotal = max(0, $subtotal + $shipping - $discount);
+
+                $order = Order::create([
+                    'customer_id' => $user->id,
+                    'invoice_id' => 'TEMP-' . uniqid(),
+                    'subtotal' => $subtotal,
+                    'grand_total' => $grandTotal,
+                    'status' => 'pending',
+                    'payment_status' => 'pending',
+                    'shipping_address' => $shippingAddress,
+                    'billing_address' => $shippingAddress,
+                ]);
+
+                $invoiceId = 'VS' . str_pad(
+                    $order->id,
+                    5,
+                    '0',
+                    STR_PAD_LEFT
+                );
+
+                $order->update(['invoice_id' => $invoiceId]);
+
+                foreach ($items as $item) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_variant_id' => $item->product_variant_id,
+                        'seller_id' => 0,
+                        'product_title' => $item->variant->product->title,
+                        'sku' => $item->variant->sku,
+                        'unit_price' => $item->unit_price,
+                        'quantity' => $item->quantity,
+                        'subtotal' => $item->unit_price * $item->quantity,
+                    ]);
+                }
+
+                $payment = Payment::create([
+                    'order_id' => $order->id,
+                    'user_id' => $user->id,
+                    'amount' => $grandTotal,
+                    'currency' => 'INR',
+                    'status' => 'pending',
+                    'method' => $request->payment_method,
+                    'reference_no' => $invoiceId,
+                ]);
+
+                if ($request->payment_method === 'cod') {
+                    foreach ($items as $item) {
+                        $updated = ProductVariant::whereKey(
+                            $item->product_variant_id
+                        )
+                            ->where('stock', '>=', $item->quantity)
+                            ->decrement('stock', $item->quantity);
+
+                        if (!$updated) {
+                            throw new \RuntimeException(
+                                'Stock changed while placing your order. Please try again.'
+                            );
+                        }
+                    }
+
+                    $order->update([
+                        'status' => 'placed',
+                        'payment_status' => 'pending',
+                    ]);
+
+                    if (!$isBuyNow) {
+                        CartItem::where('user_id', $user->id)->delete();
+                    }
+
+                    return [
+                        'type' => 'cod',
+                        'order_id' => $order->id,
+                    ];
+                }
 
                 $gateway = PaymentGateway::where('code', 'razorpay')
                     ->where('is_online', 1)
@@ -183,25 +353,23 @@ class OrderController extends Controller
 
                 if (!$gateway) {
                     throw new \RuntimeException(
-                        'Razorpay gateway is disabled or not configured.'
+                        'Razorpay is not configured. Please select Cash on Delivery.'
                     );
                 }
 
-                // The config column contains JSON with key_id and secret.
-                $gatewayConfig = is_array($gateway->config)
+                $config = is_array($gateway->config)
                     ? $gateway->config
                     : json_decode($gateway->config ?? '{}', true);
 
-                $key = $gatewayConfig['key_id'] ?? null;
-                $secret = $gatewayConfig['secret'] ?? null;
+                $key = $config['key_id'] ?? null;
+                $secret = $config['secret'] ?? null;
 
-                if (empty($key) || empty($secret)) {
+                if (!$key || !$secret) {
                     throw new \RuntimeException(
-                        'Razorpay key_id or secret is missing from the gateway configuration.'
+                        'Razorpay keys are missing. Please select Cash on Delivery.'
                     );
                 }
 
-                // Create Razorpay order.
                 $api = new Api($key, $secret);
 
                 $razorpayOrder = $api->order->create([
@@ -210,35 +378,50 @@ class OrderController extends Controller
                     'currency' => 'INR',
                 ]);
 
-                // Save gateway details to the payment record.
                 $payment->update([
                     'provider' => 'razorpay',
                     'provider_order_id' => $razorpayOrder['id'],
                 ]);
 
-                DB::commit();
-
-                // Open the Razorpay payment page.
-                return view('website.razorpay-payment', [
+                return [
+                    'type' => 'online',
                     'order' => $order,
                     'payment' => $payment,
-                    'razorpayOrder' => $razorpayOrder,
-                    'grandTotal' => $grandTotal,
+                    'razorpay_order' => $razorpayOrder,
+                    'grand_total' => $grandTotal,
                     'user' => $user,
-                    'razorpayKey' => $key,
-                ]);
+                    'key' => $key,
+                ];
+            });
+
+            if ($result['type'] === 'cod') {
+                if ($isBuyNow) {
+                    session()->forget('buy_now');
+                }
+
+                Alert::success('Success', 'Your order has been placed.');
+
+                return redirect()->route('customer.orders');
             }
 
+            return view('website.razorpay-payment', [
+                'order' => $result['order'],
+                'payment' => $result['payment'],
+                'razorpayOrder' => $result['razorpay_order'],
+                'grandTotal' => $result['grand_total'],
+                'user' => $result['user'],
+                'razorpayKey' => $result['key'],
+            ]);
         } catch (\Throwable $e) {
-            DB::rollBack();
-
             Log::error('Checkout order creation failed', [
                 'customer_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
 
             Alert::toast(
-                'Unable to place your order. Please try again.',
+                $e instanceof \RuntimeException
+                    ? $e->getMessage()
+                    : 'Unable to place your order. Please try again.',
                 'error'
             );
 
@@ -246,6 +429,9 @@ class OrderController extends Controller
         }
     }
 
+    /**
+     * Display the logged-in customer's orders.
+     */
     public function orders()
     {
         if (!Auth::guard('customer')->check()) {
@@ -260,25 +446,34 @@ class OrderController extends Controller
         return view('website.orders', compact('orders'));
     }
 
+    /**
+     * Display one order belonging to the logged-in customer.
+     */
     public function show($id)
     {
         if (!Auth::guard('customer')->check()) {
             return redirect()->route('login');
         }
 
-        $order = Order::where('customer_id', Auth::guard('customer')->id())
+        $order = Order::where(
+            'customer_id',
+            Auth::guard('customer')->id()
+        )
             ->where('id', $id)
             ->firstOrFail();
 
         return view('website.order-details', compact('order'));
     }
 
+    /**
+     * Verify Razorpay payment and finalize the order.
+     */
     public function paymentSuccess(Request $request)
     {
         $request->validate([
-            'razorpay_payment_id' => 'required|string',
-            'razorpay_order_id' => 'required|string',
-            'razorpay_signature' => 'required|string',
+            'razorpay_payment_id' => ['required', 'string'],
+            'razorpay_order_id' => ['required', 'string'],
+            'razorpay_signature' => ['required', 'string'],
         ]);
 
         $customerId = Auth::guard('customer')->id();
@@ -305,18 +500,19 @@ class OrderController extends Controller
 
             $config = is_array($gateway->config)
                 ? $gateway->config
-                : json_decode($gateway->config, true);
+                : json_decode($gateway->config ?? '{}', true);
 
             $key = $config['key_id'] ?? null;
             $secret = $config['secret'] ?? null;
 
             if (!$key || !$secret) {
-                throw new \RuntimeException('Razorpay credentials are missing.');
+                throw new \RuntimeException(
+                    'Razorpay credentials are missing.'
+                );
             }
 
             $api = new Api($key, $secret);
 
-            // Verify the payment signature before marking the order as paid.
             $api->utility->verifyPaymentSignature([
                 'razorpay_order_id' => $request->razorpay_order_id,
                 'razorpay_payment_id' => $request->razorpay_payment_id,
@@ -324,28 +520,83 @@ class OrderController extends Controller
             ]);
 
             DB::transaction(function () use ($payment, $request) {
-                $payment->update([
+                $lockedPayment = Payment::whereKey($payment->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($lockedPayment->status !== 'pending') {
+                    throw new \RuntimeException(
+                        'This payment has already been processed.'
+                    );
+                }
+
+                $order = Order::where('id', $lockedPayment->order_id)
+                    ->where('customer_id', $lockedPayment->user_id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+                if ($orderItems->isEmpty()) {
+                    throw new \RuntimeException(
+                        'No items were found for this order.'
+                    );
+                }
+
+                foreach ($orderItems as $item) {
+                    $variant = ProductVariant::whereKey(
+                        $item->product_variant_id
+                    )
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$variant || (int) $variant->stock < (int) $item->quantity) {
+                        throw new \RuntimeException(
+                            'Insufficient stock to complete the order.'
+                        );
+                    }
+                }
+
+                foreach ($orderItems as $item) {
+                    $updated = ProductVariant::whereKey(
+                        $item->product_variant_id
+                    )
+                        ->where('stock', '>=', $item->quantity)
+                        ->decrement('stock', $item->quantity);
+
+                    if (!$updated) {
+                        throw new \RuntimeException(
+                            'Stock changed while completing the order.'
+                        );
+                    }
+                }
+
+                $lockedPayment->update([
                     'provider_payment_id' => $request->razorpay_payment_id,
                     'provider_signature' => $request->razorpay_signature,
                     'status' => 'paid',
                     'paid_at' => now(),
                 ]);
 
-                $order = Order::where('id', $payment->order_id)
-                    ->where('customer_id', $payment->user_id)
-                    ->lockForUpdate()
-                    ->firstOrFail();
-
                 $order->update([
                     'status' => 'placed',
                     'payment_status' => 'paid',
                 ]);
 
-                // Remove only the purchased customer's cart items.
-                CartItem::where('user_id', $payment->user_id)->delete();
+                // Clear cart only if it was a cart checkout.
+                // Direct orders must preserve the existing cart.
+                if (!session()->has('buy_now')) {
+                    CartItem::where('user_id', $lockedPayment->user_id)
+                        ->delete();
+                }
             });
 
-            Alert::success('Payment Successful', 'Your order has been placed.');
+            session()->forget('buy_now');
+
+            Alert::success(
+                'Payment Successful',
+                'Your order has been placed.'
+            );
 
             return redirect()->route('customer.orders');
         } catch (\Throwable $e) {

@@ -135,6 +135,16 @@
                                                                                         class="ti ti-ticket fs-16 me-2"></i><span>Coupons</span></a>
                                                                 </li>
 
+                                                                <li
+                                                                        class="{{ Request::is('admin/testimonials*') ? 'active' : '' }}">
+                                                                        <a
+                                                                                href="{{ route('admin.testimonials.index') }}">
+                                                                                <i
+                                                                                        class="ti ti-message-star fs-16 me-2"></i>
+                                                                                <span>Testimonials</span>
+                                                                        </a>
+                                                                </li>
+
                                                         </ul>
                                                 </li>
                                                 @if (isset($admin->role) && $admin->role == 'super_admin')

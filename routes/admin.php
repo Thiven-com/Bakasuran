@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AbandonedCartController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\FaqController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\RestaurantController;
+use App\Http\Controllers\Admin\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -97,6 +99,10 @@ Route::group(['middleware' => 'admin'], function () {
     //Blogs
     Route::resource('blogs', BlogController::class)->names('admin.blogs');
     Route::resource('blog/categories', BlogCategoryController::class)->names('admin.blog.categories');
+
+    // Testimonials
+    Route::resource('testimonials', TestimonialController::class)
+        ->names('admin.testimonials');
 
     //faqs
     Route::resource('faqs', FaqController::class)->names('admin.faqs');

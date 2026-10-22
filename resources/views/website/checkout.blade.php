@@ -540,6 +540,49 @@
             }
 
         }
+
+        /* Checkout restaurant name */
+.checkout-restaurant-name {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #de0000;
+    margin-top: 5px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* Optional restaurant icon */
+.checkout-restaurant-name::before {
+    /* content: "📍"; */
+     content: "🏪";
+    margin-right: 5px;
+    font-size: 11px;
+}
+
+.add-address-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid #98702e;
+    border-radius: 8px;
+    color: #98702e;
+    background: transparent;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.add-address-btn:hover {
+    background: #98702e;
+    color: #fff;
+}
+
+.add-address-btn span {
+    font-size: 20px;
+    line-height: 1;
+}
     </style>
 
 
@@ -607,6 +650,12 @@
     >
         @csrf
 
+        <input
+    type="hidden"
+    name="mode"
+    value="{{ $mode ?? '' }}"
+>   
+
 
                     <!-- =================================================
                                          LEFT
@@ -656,55 +705,74 @@
 
                         <!-- ================= DELIVERY ================= -->
 
-                        <div class="checkout-card">
-                            <div class="checkout-card-title">
-                                <div class="checkout-step">02</div>
-                                <h2>Delivery Address</h2>
-                            </div>
 
-                            @if($addresses->isNotEmpty())
-                                @foreach($addresses as $address)
-                                    <label class="address-card" style="margin-bottom: 12px;">
-                                      <input
-    type="radio"
-    name="address_id"
-    value="{{ $address->id }}"
-    required
-    {{ old('address_id', $addresses->firstWhere('default', true)?->id ?? $addresses->first()?->id) == $address->id ? 'checked' : '' }}
->
+<div class="checkout-card">
+    <div class="checkout-card-title">
+        <div class="checkout-step">02</div>
+        <h2>Delivery Address</h2>
+    </div>
 
-                                        <div>
-                                            <strong>
-                                                {{ $address->name }}
-                                                @if($address->default)
-                                                    <span style="color:#98702e;">(Default)</span>
-                                                @endif
-                                            </strong>
+    {{-- Add New Address Button --}}
+    <div style="margin-bottom: 16px;">
+        <a href="{{ route('addresses') }}"
+           class="add-address-btn">
+            <span>+</span> Add New Address
+        </a>
+    </div>
 
-                                            <p>
-                                                {{ $address->address }}
-                                                @if($address->address_2)
-                                                    , {{ $address->address_2 }}
-                                                @endif
-                                                <br>
-                                                {{ $address->city }}, {{ $address->state }}
-                                                - {{ $address->pincode }}
-                                                <br>
-                                                Mobile: {{ $address->mobile }}
-                                                @if($address->email)
-                                                    <br>Email: {{ $address->email }}
-                                                @endif
-                                            </p>
-                                        </div>
-                                    </label>
-                                @endforeach
-                            @else
-                               <p>
-    No saved delivery address found. Please add a delivery address to your account
-    before placing your food order.
-</p>
-                            @endif
-                        </div>
+    @if($addresses->isNotEmpty())
+        @foreach($addresses as $address)
+            <label class="address-card" style="margin-bottom: 12px;">
+                <input
+                    type="radio"
+                    name="address_id"
+                    value="{{ $address->id }}"
+                    required
+                    {{ old(
+                        'address_id',
+                        $addresses->firstWhere('default', true)?->id
+                            ?? $addresses->first()?->id
+                    ) == $address->id ? 'checked' : '' }}
+                >
+
+                <div>
+                    <strong>
+                        {{ $address->name }}
+
+                        @if($address->default)
+                            <span style="color:#98702e;">(Default)</span>
+                        @endif
+                    </strong>
+
+                    <p>
+                        {{ $address->address }}
+
+                        @if($address->address_2)
+                            , {{ $address->address_2 }}
+                        @endif
+
+                        <br>
+                        {{ $address->city }}, {{ $address->state }}
+                        - {{ $address->pincode }}
+
+                        <br>
+                        Mobile: {{ $address->mobile }}
+
+                        @if($address->email)
+                            <br>Email: {{ $address->email }}
+                        @endif
+                    </p>
+                </div>
+            </label>
+        @endforeach
+    @else
+        <p>
+            No saved delivery address found. Please add a delivery
+            address to your account before placing your food order.
+        </p>
+    @endif
+</div>
+
 
 
                         
@@ -811,6 +879,12 @@
 
                                     <div class="summary-product-info">
                                         <h4>{{ $productTitle }}</h4>
+
+                                        @if($product?->restaurant)
+                                         <span class="checkout-restaurant-name" style="color: red;">
+                                         {{ $product->restaurant->name }}
+                                             </span>
+                                        @endif
 
                                         @if($variant?->attributeValues)
                                             @foreach($variant->attributeValues as $attributeValue)

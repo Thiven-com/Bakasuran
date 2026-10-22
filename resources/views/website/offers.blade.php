@@ -4,8 +4,8 @@
 
     <style>
         /* =========================================================
-                                                           SUDHEERA SAREES - OFFERS PAGE
-                                                        ========================================================= */
+                                                               SUDHEERA SAREES - OFFERS PAGE
+                                                            ========================================================= */
 
         .offers-page {
             background: #fbf7f1;
@@ -601,347 +601,361 @@
         }
     </style>
 
+<style>
+    .offer-restaurant-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 10px;
+    color: #E85D04;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.offer-restaurant-name i {
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.offer-restaurant-name span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
 
 
-<div class="offers-page">
+    <div class="offers-page">
 
-    {{-- ================= HERO ================= --}}
+        {{-- ================= HERO ================= --}}
 
-    <section class="offers-hero">
+        <section class="offers-hero">
 
-        <div class="offers-hero-content">
+            <div class="offers-hero-content">
 
-            <div class="offers-small-title">
-                BAKASURAN
-            </div>
-
-            <h1>
-                Exclusive <span>Offers</span>
-            </h1>
-
-            <p>
-                Discover delicious meals at irresistible prices.
-                Explore our food collection, enjoy exciting savings
-                and find something special for every craving.
-            </p>
-
-            <div class="hero-offer-badge">
-                ✦ EXCITING DEALS ON YOUR FAVOURITE FOODS ✦
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <div class="offers-container">
-
-        {{-- ================= HEADING ================= --}}
-
-        <div class="section-heading">
-
-            <div class="mini-title">
-                Special For You
-            </div>
-
-            <h2>
-                Explore Our Best Offers
-            </h2>
-
-            <p>
-                Enjoy delicious biryanis, burgers, pizzas, snacks
-                and desserts with exciting offers from BAKASURAN.
-            </p>
-
-        </div>
-
-
-        {{-- ================= OFFER CARDS ================= --}}
-
-        <div class="offer-cards">
-
-            <div class="offer-card">
-
-                <div class="offer-icon">
-                    %
+                <div class="offers-small-title">
+                    BAKASURAN
                 </div>
 
-                <h3>
-                    Flat 30% Off
-                </h3>
+                <h1>
+                    Exclusive <span>Offers</span>
+                </h1>
 
                 <p>
-                    Enjoy up to 30% savings on selected food products
-                    and discover delicious deals for your next meal.
+                    Discover delicious meals at irresistible prices.
+                    Explore our food collection, enjoy exciting savings
+                    and find something special for every craving.
                 </p>
 
-                <span class="offer-code">
-                    USE: BAKA30
-                </span>
-
-            </div>
-
-
-            <div class="offer-card">
-
-                <div class="offer-icon">
-                    ₹
+                <div class="hero-offer-badge">
+                    ✦ EXCITING DEALS ON YOUR FAVOURITE FOODS ✦
                 </div>
 
-                <h3>
-                    Save ₹100
-                </h3>
-
-                <p>
-                    Get ₹100 off eligible orders when your
-                    purchase meets the minimum order value.
-                </p>
-
-                <span class="offer-code">
-                    USE: BAKA100
-                </span>
-
             </div>
 
+        </section>
 
-            <div class="offer-card">
 
-                <div class="offer-icon">
-                    ✦
+        <div class="offers-container">
+
+            {{-- ================= HEADING ================= --}}
+
+            <div class="section-heading">
+
+                <div class="mini-title">
+                    Special For You
                 </div>
 
-                <h3>
-                    Foodie Specials
-                </h3>
+                <h2>
+                    Explore Our Best Offers
+                </h2>
 
                 <p>
-                    Explore special prices on selected biryanis,
-                    burgers, pizzas, snacks and sweet treats.
+                    Enjoy delicious biryanis, burgers, pizzas, snacks
+                    and desserts with exciting offers from BAKASURAN.
                 </p>
 
-                <span class="offer-code">
-                    LIMITED OFFER
-                </span>
-
             </div>
 
-        </div>
 
+            {{-- ================= OFFER CARDS ================= --}}
 
-        {{-- ================= PRODUCTS ================= --}}
+            <div class="offer-cards">
 
-        <div class="section-heading">
+                <div class="offer-card">
 
-            <div class="mini-title">
-                Limited Time Deals
-            </div>
-
-            <h2>
-                Food Offers You’ll Love
-            </h2>
-
-        </div>
-
-
-        <div class="offer-products">
-
-            @forelse ($products as $product)
-
-                @php
-
-                    // PRODUCT VARIANT
-                    $variant = $product->variants->first();
-
-                    // PRODUCT IMAGE
-                    $productImage = $variant?->image
-                        ?: $product->primaryMedia?->url
-                        ?: $product->image
-                        ?: null;
-
-                    // PRODUCT NAME
-                    $productName = $product->name
-                        ?? $product->title
-                        ?? 'Food Product';
-
-                    // CATEGORY
-                    $categoryName = $product->category?->name
-                        ?? $product->category?->title
-                        ?? $variant?->category?->name
-                        ?? 'Food & Beverages';
-
-                    // PRICES
-                    $salePrice = (float) ($variant?->price ?? 0);
-
-                    $oldPrice = (float) (
-                        $variant?->actual_price ?? $salePrice
-                    );
-
-                    // DISCOUNT
-                    $discount = ($oldPrice > $salePrice && $oldPrice > 0)
-                        ? round((($oldPrice - $salePrice) / $oldPrice) * 100)
-                        : 0;
-
-                    // IMAGE URL
-                    $imageUrl = $productImage
-                        ? (
-                            preg_match('/^https?:\/\//i', $productImage)
-                                ? $productImage
-                                : asset($productImage)
-                        )
-                        : asset('website/images/product-placeholder.png');
-
-                    // WISHLIST STATUS
-                    $isWishlisted = $variant
-                        && in_array(
-                            $variant->id,
-                            $wishlistVariantIds ?? []
-                        );
-
-                @endphp
-
-                <div class="offer-product">
-
-                    <div class="product-image">
-
-                        {{-- DISCOUNT BADGE --}}
-
-                        @if ($discount > 0)
-
-                            <span class="discount-badge">
-                                {{ $discount }}% OFF
-                            </span>
-
-                        @endif
-
-
-                        {{-- WISHLIST --}}
-
-                        <button
-                            type="button"
-                            class="wishlist product-wishlist {{ $isWishlisted ? 'active' : '' }}"
-                            data-variant-id="{{ $variant?->id }}"
-                            aria-label="Add to wishlist"
-                        >
-
-                            <span class="wishlist-icon">
-                                {{ $isWishlisted ? '♥' : '♡' }}
-                            </span>
-
-                        </button>
-
-
-                        {{-- PRODUCT IMAGE --}}
-
-                        <img
-                            src="{{ $imageUrl }}"
-                            alt="{{ $productName }}"
-                            loading="lazy"
-                        >
-
+                    <div class="offer-icon">
+                        %
                     </div>
 
+                    <h3>
+                        Flat 30% Off
+                    </h3>
 
-                    {{-- PRODUCT DETAILS --}}
+                    <p>
+                        Enjoy up to 30% savings on selected food products
+                        and discover delicious deals for your next meal.
+                    </p>
 
-                    <div class="product-info">
+                    <span class="offer-code">
+                        USE: BAKA30
+                    </span>
 
-                        <div class="product-category">
-                            {{ $categoryName }}
-                        </div>
-
-                        <h3>
-                            {{ $productName }}
-                        </h3>
+                </div>
 
 
-                        {{-- PRICE --}}
+                <div class="offer-card">
 
-                        <div class="price-row">
+                    <div class="offer-icon">
+                        ₹
+                    </div>
 
-                            <span class="sale-price">
-                                ₹{{ number_format($salePrice, 0) }}
-                            </span>
+                    <h3>
+                        Save ₹100
+                    </h3>
 
-                            @if ($oldPrice > $salePrice)
+                    <p>
+                        Get ₹100 off eligible orders when your
+                        purchase meets the minimum order value.
+                    </p>
 
-                                <span class="old-price">
-                                    ₹{{ number_format($oldPrice, 0) }}
+                    <span class="offer-code">
+                        USE: BAKA100
+                    </span>
+
+                </div>
+
+
+                <div class="offer-card">
+
+                    <div class="offer-icon">
+                        ✦
+                    </div>
+
+                    <h3>
+                        Foodie Specials
+                    </h3>
+
+                    <p>
+                        Explore special prices on selected biryanis,
+                        burgers, pizzas, snacks and sweet treats.
+                    </p>
+
+                    <span class="offer-code">
+                        LIMITED OFFER
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            {{-- ================= PRODUCTS ================= --}}
+
+            <div class="section-heading">
+
+                <div class="mini-title">
+                    Limited Time Deals
+                </div>
+
+                <h2>
+                    Food Offers You’ll Love
+                </h2>
+
+            </div>
+
+
+            <div class="offer-products">
+
+                @forelse ($products as $product)
+
+                    @php
+
+                        // PRODUCT VARIANT
+                        $variant = $product->variants->first();
+
+                        // PRODUCT IMAGE
+                        $productImage = $variant?->image
+                            ?: $product->primaryMedia?->url
+                            ?: $product->image
+                            ?: null;
+
+                        // PRODUCT NAME
+                        $productName = $product->name
+                            ?? $product->title
+                            ?? 'Food Product';
+
+                        // CATEGORY
+                        $categoryName = $product->category?->name
+                            ?? $product->category?->title
+                            ?? $variant?->category?->name
+                            ?? 'Food & Beverages';
+
+                        // PRICES
+                        $salePrice = (float) ($variant?->price ?? 0);
+
+                        $oldPrice = (float) (
+                            $variant?->actual_price ?? $salePrice
+                        );
+
+                        // DISCOUNT
+                        $discount = ($oldPrice > $salePrice && $oldPrice > 0)
+                            ? round((($oldPrice - $salePrice) / $oldPrice) * 100)
+                            : 0;
+
+                        // IMAGE URL
+                        $imageUrl = $productImage
+                            ? (
+                                preg_match('/^https?:\/\//i', $productImage)
+                                ? $productImage
+                                : asset($productImage)
+                            )
+                            : asset('website/images/product-placeholder.png');
+
+                        // WISHLIST STATUS
+                        $isWishlisted = $variant
+                            && in_array(
+                                $variant->id,
+                                $wishlistVariantIds ?? []
+                            );
+
+                    @endphp
+
+                    <div class="offer-product">
+
+                        <div class="product-image">
+
+                            {{-- DISCOUNT BADGE --}}
+
+                            @if ($discount > 0)
+
+                                <span class="discount-badge">
+                                    {{ $discount }}% OFF
                                 </span>
 
                             @endif
 
+
+                            {{-- WISHLIST --}}
+
+                            <button type="button" class="wishlist product-wishlist {{ $isWishlisted ? 'active' : '' }}"
+                                data-variant-id="{{ $variant?->id }}" aria-label="Add to wishlist">
+
+                                <span class="wishlist-icon">
+                                    {{ $isWishlisted ? '♥' : '♡' }}
+                                </span>
+
+                            </button>
+
+
+                            {{-- PRODUCT IMAGE --}}
+
+                            <img src="{{ $imageUrl }}" alt="{{ $productName }}" loading="lazy">
+
                         </div>
 
 
-                        {{-- ADD TO CART --}}
+                        {{-- PRODUCT DETAILS --}}
 
-                        <button
-                            type="button"
-                            class="add-cart-btn"
-                            data-product-id="{{ $product->id }}"
-                            data-variant-id="{{ $variant?->id }}"
-                        >
-                            ADD TO CART
-                        </button>
+                        <div class="product-info">
+
+                            <div class="product-category">
+                                {{ $categoryName }}
+                            </div>
+
+                            <h3>
+                                {{ $productName }}
+                            </h3>
+
+                            {{-- RESTAURANT NAME --}}
+                            @if($product->restaurant)
+                                <div class="offer-restaurant-name">
+                                    <i class="fa-solid fa-utensils"></i>
+                                    <span>{{ $product->restaurant->name }}</span>
+                                </div>
+                            @endif
+
+
+                            {{-- PRICE --}}
+
+                            <div class="price-row">
+
+                                <span class="sale-price">
+                                    ₹{{ number_format($salePrice, 0) }}
+                                </span>
+
+                                @if ($oldPrice > $salePrice)
+
+                                    <span class="old-price">
+                                        ₹{{ number_format($oldPrice, 0) }}
+                                    </span>
+
+                                @endif
+
+                            </div>
+
+
+                            {{-- ADD TO CART --}}
+
+                            <button type="button" class="add-cart-btn" data-product-id="{{ $product->id }}"
+                                data-variant-id="{{ $variant?->id }}">
+                                ADD TO CART
+                            </button>
+
+                        </div>
 
                     </div>
 
-                </div>
+                @empty
 
-            @empty
+                    <p>
+                        No food offers are available right now.
+                        Please check back soon.
+                    </p>
 
-                <p>
-                    No food offers are available right now.
-                    Please check back soon.
-                </p>
-
-            @endforelse
-
-        </div>
-
-
-        {{-- ================= COUPON BANNER ================= --}}
-
-        <div class="coupon-banner">
-
-            <div class="coupon-content">
-
-                <small>
-                    Exclusive Online Offer
-                </small>
-
-                <h2>
-                    Enjoy Extra Savings On Your First Order
-                </h2>
-
-                <p>
-                    Discover delicious food and enter the coupon
-                    code at checkout if it is eligible for your order.
-                </p>
+                @endforelse
 
             </div>
 
-            <div class="coupon-code-box">
 
-                <div class="coupon-code">
-                    WELCOME10
+            {{-- ================= COUPON BANNER ================= --}}
+
+            <div class="coupon-banner">
+
+                <div class="coupon-content">
+
+                    <small>
+                        Exclusive Online Offer
+                    </small>
+
+                    <h2>
+                        Enjoy Extra Savings On Your First Order
+                    </h2>
+
+                    <p>
+                        Discover delicious food and enter the coupon
+                        code at checkout if it is eligible for your order.
+                    </p>
+
                 </div>
 
-                <button
-                    type="button"
-                    class="coupon-btn"
-                    onclick="navigator.clipboard.writeText('WELCOME10')"
-                >
-                    COPY CODE
-                </button>
+                <div class="coupon-code-box">
+
+                    <div class="coupon-code">
+                        WELCOME10
+                    </div>
+
+                    <button type="button" class="coupon-btn" onclick="navigator.clipboard.writeText('WELCOME10')">
+                        COPY CODE
+                    </button>
+
+                </div>
 
             </div>
 
         </div>
 
     </div>
-
-</div>
 
 
 

@@ -11,6 +11,7 @@ use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use App\Models\Restaurant;
 
 class BlogController extends Controller
 {
@@ -27,10 +28,15 @@ class BlogController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        $blog_categories = BlogCategory::get();
-        return view('admin.blogs.create', compact('blog_categories'));
-    }
+{
+    $blog_categories = BlogCategory::get();
+    $restaurants = Restaurant::orderBy('name')->get();
+
+    return view('admin.blogs.create', compact(
+        'blog_categories',
+        'restaurants'
+    ));
+}
 
 
     public function store(Request $request)
@@ -38,6 +44,7 @@ class BlogController extends Controller
         // dd($request->all());
         $blog = new Blog();
         $blog->category_id = $request->category_id;
+        $blog->restaurant_id = $request->restaurant_id ?: null;
         $blog->title = $request->title;
         if (!empty($request->title)) {
             $request->merge(['slug' => strtolower(str_replace(' ', '_', $request->title))]);
@@ -112,11 +119,17 @@ class BlogController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-    {
-        $blog = Blog::findOrFail($id);
-        $blog_categories = BlogCategory::get();
-        return view('admin.blogs.edit', compact('blog', 'blog_categories'));
-    }
+{
+    $blog = Blog::findOrFail($id);
+    $blog_categories = BlogCategory::get();
+    $restaurants = Restaurant::orderBy('name')->get();
+
+    return view('admin.blogs.edit', compact(
+        'blog',
+        'blog_categories',
+        'restaurants'
+    ));
+}
 
     /**
      * Update the specified resource in storage.
@@ -125,6 +138,7 @@ class BlogController extends Controller
     {
         $blog = Blog::where('id', $id)->first();
         $blog->category_id = $request->category_id;
+        $blog->restaurant_id = $request->restaurant_id ?: null;
         if (!empty($request->title) && $request->title != $blog->title) {
             $request->merge(['slug' => strtolower(str_replace(' ', '_', $request->title))]);
 

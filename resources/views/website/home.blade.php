@@ -2,8 +2,8 @@
 @section('content')
     <style>
         /* =========================================
-                                                                                   HERO BANNER
-                                                                                ========================================= */
+                                                                                           HERO BANNER
+                                                                                        ========================================= */
 
         .hero-banner {
             width: 100%;
@@ -36,8 +36,8 @@
 
 
         /* =========================================
-                                                                                   HERO CONTENT
-                                                                                ========================================= */
+                                                                                           HERO CONTENT
+                                                                                        ========================================= */
 
         .hero-content {
             position: absolute;
@@ -110,8 +110,8 @@
 
 
         /* =========================================
-                                                                                   BUTTONS
-                                                                                ========================================= */
+                                                                                           BUTTONS
+                                                                                        ========================================= */
 
         .hero-buttons {
             display: flex;
@@ -175,8 +175,8 @@
 
 
         /* =========================================
-                                                                                   FEATURES
-                                                                                ========================================= */
+                                                                                           FEATURES
+                                                                                        ========================================= */
 
         .hero-features {
             display: flex;
@@ -230,8 +230,8 @@
 
 
         /* =========================================
-                                                                                   ARROWS
-                                                                                ========================================= */
+                                                                                           ARROWS
+                                                                                        ========================================= */
 
         .hero-arrow {
             position: absolute;
@@ -274,8 +274,8 @@
 
 
         /* =========================================
-                                                                                   DOTS
-                                                                                ========================================= */
+                                                                                           DOTS
+                                                                                        ========================================= */
 
         .hero-dots {
             position: absolute;
@@ -306,8 +306,8 @@
 
 
         /* =========================================
-                                                                                   TABLET
-                                                                                ========================================= */
+                                                                                           TABLET
+                                                                                        ========================================= */
 
         @media (max-width: 1100px) {
 
@@ -334,8 +334,8 @@
 
 
         /* =========================================
-                                                                                   MOBILE
-                                                                                ========================================= */
+                                                                                           MOBILE
+                                                                                        ========================================= */
 
         @media (max-width: 768px) {
 
@@ -395,8 +395,8 @@
 
 
         /* =========================================
-                                                                                   SMALL MOBILE
-                                                                                ========================================= */
+                                                                                           SMALL MOBILE
+                                                                                        ========================================= */
 
         @media (max-width: 480px) {
 
@@ -446,8 +446,8 @@
 
 
         /* =========================================
-                                                                                   SHOP BY CATEGORY
-                                                                                ========================================= */
+                                                                                           SHOP BY CATEGORY
+                                                                                        ========================================= */
 
         .shop-category-section {
             width: 100%;
@@ -462,8 +462,8 @@
 
 
         /* =========================================
-                                                                                   HEADING
-                                                                                ========================================= */
+                                                                                           HEADING
+                                                                                        ========================================= */
 
         .category-heading {
             max-width: 1100px;
@@ -539,8 +539,8 @@
 
 
         /* =========================================
-                                                                                   CATEGORY WRAPPER
-                                                                                ========================================= */
+                                                                                           CATEGORY WRAPPER
+                                                                                        ========================================= */
 
         .category-wrapper {
             width: 100%;
@@ -554,8 +554,8 @@
 
 
         /* =========================================
-                                                                                   CARD
-                                                                                ========================================= */
+                                                                                           CARD
+                                                                                        ========================================= */
 
         .category-card {
             min-width: 0;
@@ -592,8 +592,8 @@
 
 
         /* =========================================
-                                                                                   IMAGE
-                                                                                ========================================= */
+                                                                                           IMAGE
+                                                                                        ========================================= */
 
         .category-image {
             width: 100%;
@@ -624,8 +624,8 @@
 
 
         /* =========================================
-                                                                                   INFO
-                                                                                ========================================= */
+                                                                                           INFO
+                                                                                        ========================================= */
 
         .category-info {
             min-height: 62px;
@@ -671,8 +671,8 @@
 
 
         /* =========================================
-                                                                                   ARROW
-                                                                                ========================================= */
+                                                                                           ARROW
+                                                                                        ========================================= */
 
         .category-arrow {
             width: 23px;
@@ -708,8 +708,8 @@
 
 
         /* =========================================
-                                                                                   TABLET
-                                                                                ========================================= */
+                                                                                           TABLET
+                                                                                        ========================================= */
 
         @media (max-width: 1100px) {
 
@@ -726,8 +726,8 @@
 
 
         /* =========================================
-                                                                                   MOBILE
-                                                                                ========================================= */
+                                                                                           MOBILE
+                                                                                        ========================================= */
 
         @media (max-width: 700px) {
 
@@ -805,8 +805,8 @@
 
 
         /* =========================================
-                                                                                   SMALL MOBILE
-                                                                                ========================================= */
+                                                                                           SMALL MOBILE
+                                                                                        ========================================= */
 
         @media (max-width: 400px) {
 
@@ -817,8 +817,8 @@
         }
 
         /* =========================================
-                                                                                   PROMOTIONAL COLLECTION SECTION
-                                                                                ========================================= */
+                                                                                           PROMOTIONAL COLLECTION SECTION
+                                                                                        ========================================= */
 
         .promo-section {
             width: 100%;
@@ -848,8 +848,8 @@
 
 
         /* =========================================
-                                                                                   COMMON CARD
-                                                                                ========================================= */
+                                                                                           COMMON CARD
+                                                                                        ========================================= */
 
         .promo-card {
             position: relative;
@@ -883,8 +883,8 @@
 
 
         /* =========================================
-                                                                                   IMAGE
-                                                                                ========================================= */
+                                                                                           IMAGE
+                                                                                        ========================================= */
 
         .promo-card img {
             position: absolute;
@@ -911,8 +911,8 @@
 
 
         /* =========================================
-                                                                                   OVERLAY
-                                                                                ========================================= */
+                                                                                           OVERLAY
+                                                                                        ========================================= */
 
         .promo-overlay {
             position: absolute;
@@ -926,8 +926,8 @@
 
 
         /* =========================================
-                                                                                   WEDDING CARD
-                                                                                ========================================= */
+                                                                                           WEDDING CARD
+                                                                                        ========================================= */
 
         .wedding-card {
             grid-column: 1;
@@ -935,13 +935,13 @@
         }
 
         /* .wedding-card .promo-overlay {
-                background:
-                    linear-gradient(90deg,
-                        rgba(70, 0, 20, 0.96) 0%,
-                        rgba(95, 0, 25, 0.88) 32%,
-                        rgba(75, 0, 20, 0.30) 62%,
-                        rgba(50, 0, 10, 0.03) 100%);
-            } */
+                        background:
+                            linear-gradient(90deg,
+                                rgba(70, 0, 20, 0.96) 0%,
+                                rgba(95, 0, 25, 0.88) 32%,
+                                rgba(75, 0, 20, 0.30) 62%,
+                                rgba(50, 0, 10, 0.03) 100%);
+                    } */
 
         .wedding-content {
             position: absolute;
@@ -1039,8 +1039,8 @@
 
 
         /* =========================================
-                                                                                   DECORATIVE FLOWERS
-                                                                                ========================================= */
+                                                                                           DECORATIVE FLOWERS
+                                                                                        ========================================= */
 
         .decor-flower {
             position: absolute;
@@ -1075,8 +1075,8 @@
 
 
         /* =========================================
-                                                                                   FESTIVE CARD
-                                                                                ========================================= */
+                                                                                           FESTIVE CARD
+                                                                                        ========================================= */
 
         .festive-card {
             grid-column: 2;
@@ -1084,13 +1084,13 @@
         }
 
         /* .festive-card .promo-overlay {
-                background:
-                    linear-gradient(90deg,
-                        rgba(255, 222, 216, 0.96) 0%,
-                        rgba(255, 222, 216, 0.88) 32%,
-                        rgba(255, 222, 216, 0.30) 62%,
-                        rgba(255, 222, 216, 0.03) 100%)
-            } */
+                        background:
+                            linear-gradient(90deg,
+                                rgba(255, 222, 216, 0.96) 0%,
+                                rgba(255, 222, 216, 0.88) 32%,
+                                rgba(255, 222, 216, 0.30) 62%,
+                                rgba(255, 222, 216, 0.03) 100%)
+                    } */
 
         .festive-content {
             position: absolute;
@@ -1202,8 +1202,8 @@
 
 
         /* =========================================
-                                                                                   COTTON CARD
-                                                                                ========================================= */
+                                                                                           COTTON CARD
+                                                                                        ========================================= */
 
         .cotton-card {
             grid-column: 3;
@@ -1211,13 +1211,13 @@
         }
 
         /* .cotton-card .promo-overlay {
-                background:
-                    linear-gradient(90deg,
-                        rgba(215, 232, 238, 0.95) 0%,
-                        rgba(215, 232, 238, 0.88) 32%,
-                        rgba(215, 232, 238, 0.30) 62%,
-                        rgba(215, 232, 238, 0.03) 100%);
-            } */
+                        background:
+                            linear-gradient(90deg,
+                                rgba(215, 232, 238, 0.95) 0%,
+                                rgba(215, 232, 238, 0.88) 32%,
+                                rgba(215, 232, 238, 0.30) 62%,
+                                rgba(215, 232, 238, 0.03) 100%);
+                    } */
 
         .cotton-content {
             position: absolute;
@@ -1262,8 +1262,8 @@
 
 
         /* =========================================
-                                                                                   NEW ARRIVALS
-                                                                                ========================================= */
+                                                                                           NEW ARRIVALS
+                                                                                        ========================================= */
 
         .arrivals-card {
             grid-column: 2 / 4;
@@ -1335,8 +1335,8 @@
 
 
         /* =========================================
-                                                                                   TABLET
-                                                                                ========================================= */
+                                                                                           TABLET
+                                                                                        ========================================= */
 
         @media (max-width: 900px) {
 
@@ -1377,8 +1377,8 @@
 
 
         /* =========================================
-                                                                                   MOBILE
-                                                                                ========================================= */
+                                                                                           MOBILE
+                                                                                        ========================================= */
 
         @media (max-width: 600px) {
 
@@ -1483,8 +1483,8 @@
 
 
         /* =========================================
-                                                                                   VERY SMALL DEVICES
-                                                                                ========================================= */
+                                                                                           VERY SMALL DEVICES
+                                                                                        ========================================= */
 
         @media (max-width: 380px) {
 
@@ -1508,8 +1508,8 @@
         }
 
         /* =========================================================
-                                       MOBILE HERO BANNER
-                                    ========================================================= */
+                                               MOBILE HERO BANNER
+                                            ========================================================= */
 
         @media (max-width: 767px) {
 
@@ -1635,63 +1635,63 @@
                     @endif
 
                     <!-- <h1>
-                                        Good Food.<br>
-                                        <span>Bigger Moments.</span>
-                                    </h1>
+                                                        Good Food.<br>
+                                                        <span>Bigger Moments.</span>
+                                                    </h1>
 
-                                    <p>
-                                        From delicious biryanis to sizzling pizzas,<br>
-                                        discover your next favourite meal.
-                                    </p>
-
-
-                                    <div class="hero-buttons">
-
-                                        <a href="{{ $banner->link_url ?: url('/shop') }}" class="hero-btn hero-btn-primary">
-                                            ORDER NOW
-                                            <span>→</span>
-                                        </a>
-
-                                        <a href="{{ url('/shop') }}" class="hero-btn hero-btn-secondary">
-                                            EXPLORE MENU
-                                        </a>
-
-                                    </div>
+                                                    <p>
+                                                        From delicious biryanis to sizzling pizzas,<br>
+                                                        discover your next favourite meal.
+                                                    </p>
 
 
-                                    <div class="hero-features">
+                                                    <div class="hero-buttons">
 
-                                        <div class="hero-feature">
-                                            <div class="feature-icon">
-                                                <i class="fas fa-motorcycle"></i>
-                                            </div>
-                                            <div>
-                                                <strong>Fast Delivery</strong>
-                                                <small>At your doorstep</small>
-                                            </div>
-                                        </div>
+                                                        <a href="{{ $banner->link_url ?: url('/shop') }}" class="hero-btn hero-btn-primary">
+                                                            ORDER NOW
+                                                            <span>→</span>
+                                                        </a>
 
-                                        <div class="hero-feature">
-                                            <div class="feature-icon">
-                                                <i class="fas fa-utensils"></i>
-                                            </div>
-                                            <div>
-                                                <strong>Fresh Food</strong>
-                                                <small>Made with love</small>
-                                            </div>
-                                        </div>
+                                                        <a href="{{ url('/shop') }}" class="hero-btn hero-btn-secondary">
+                                                            EXPLORE MENU
+                                                        </a>
 
-                                        <div class="hero-feature">
-                                            <div class="feature-icon">
-                                                <i class="fas fa-star"></i>
-                                            </div>
-                                            <div>
-                                                <strong>Top Quality</strong>
-                                                <small>Every single bite</small>
-                                            </div>
-                                        </div>
+                                                    </div>
 
-                                    </div> -->
+
+                                                    <div class="hero-features">
+
+                                                        <div class="hero-feature">
+                                                            <div class="feature-icon">
+                                                                <i class="fas fa-motorcycle"></i>
+                                                            </div>
+                                                            <div>
+                                                                <strong>Fast Delivery</strong>
+                                                                <small>At your doorstep</small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="hero-feature">
+                                                            <div class="feature-icon">
+                                                                <i class="fas fa-utensils"></i>
+                                                            </div>
+                                                            <div>
+                                                                <strong>Fresh Food</strong>
+                                                                <small>Made with love</small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="hero-feature">
+                                                            <div class="feature-icon">
+                                                                <i class="fas fa-star"></i>
+                                                            </div>
+                                                            <div>
+                                                                <strong>Top Quality</strong>
+                                                                <small>Every single bite</small>
+                                                            </div>
+                                                        </div>
+
+                                                    </div> -->
 
                 </div>
 
@@ -1728,8 +1728,8 @@
                         </a>
 
                         <!-- <a href="{{ url('/shop') }}" class="hero-btn hero-btn-secondary">
-                                            EXPLORE MENU
-                                        </a> -->
+                                                            EXPLORE MENU
+                                                        </a> -->
                     </div>
                 </div>
 
@@ -1845,25 +1845,25 @@
 
                 <!-- <div class="wedding-content">
 
-                        <span class="decor-flower flower-one">✦</span>
-                        <span class="decor-flower flower-two">✧</span>
+                                <span class="decor-flower flower-one">✦</span>
+                                <span class="decor-flower flower-two">✧</span>
 
-                        <h2>
-                            Good Food.<br>
-                            Bigger Moments.
-                        </h2>
+                                <h2>
+                                    Good Food.<br>
+                                    Bigger Moments.
+                                </h2>
 
-                        <p>
-                            Big flavours<br>
-                            unforgettable cravings
-                        </p>
+                                <p>
+                                    Big flavours<br>
+                                    unforgettable cravings
+                                </p>
 
-                        <span class="promo-button">
-                            ORDER NOW
-                            <span>→</span>
-                        </span>
+                                <span class="promo-button">
+                                    ORDER NOW
+                                    <span>→</span>
+                                </span>
 
-                    </div> -->
+                            </div> -->
 
             </a>
 
@@ -1877,19 +1877,19 @@
 
                 <!-- <div class="festive-content">
 
-                        <h3>Feast Specials</h3>
+                                <h3>Feast Specials</h3>
 
-                        <div class="offer">
-                            <small>DEALS UP TO</small>
-                            <strong>50% OFF</strong>
-                        </div>
+                                <div class="offer">
+                                    <small>DEALS UP TO</small>
+                                    <strong>50% OFF</strong>
+                                </div>
 
-                        <span class="small-button">
-                            VIEW OFFERS
-                            <span>→</span>
-                        </span>
+                                <span class="small-button">
+                                    VIEW OFFERS
+                                    <span>→</span>
+                                </span>
 
-                    </div> -->
+                            </div> -->
 
             </a>
 
@@ -1903,21 +1903,21 @@
 
                 <!-- <div class="cotton-content">
 
-                        <h3>
-                            Juicy Burgers<br>
-                            Big Flavours
-                        </h3>
+                                <h3>
+                                    Juicy Burgers<br>
+                                    Big Flavours
+                                </h3>
 
-                        <p>
-                            Freshly made. Always delicious.
-                        </p>
+                                <p>
+                                    Freshly made. Always delicious.
+                                </p>
 
-                        <span class="small-button">
-                            EXPLORE MENU
-                            <span>→</span>
-                        </span>
+                                <span class="small-button">
+                                    EXPLORE MENU
+                                    <span>→</span>
+                                </span>
 
-                    </div> -->
+                            </div> -->
 
             </a>
 
@@ -1931,22 +1931,22 @@
 
                 <!-- <div class="arrivals-content">
 
-                        <h3>
-                            Cravings<br>
-                            Delivered
-                        </h3>
+                                <h3>
+                                    Cravings<br>
+                                    Delivered
+                                </h3>
 
-                        <p>
-                            Discover your next<br>
-                            favourite meal
-                        </p>
+                                <p>
+                                    Discover your next<br>
+                                    favourite meal
+                                </p>
 
-                        <span class="small-button">
-                            EXPLORE FOOD
-                            <span>→</span>
-                        </span>
+                                <span class="small-button">
+                                    EXPLORE FOOD
+                                    <span>→</span>
+                                </span>
 
-                    </div> -->
+                            </div> -->
 
             </a>
 
@@ -1958,15 +1958,15 @@
 
 
     <!-- =========================
-                                                                                     SWIPER CSS
-                                                                                ========================= -->
+                                                                                             SWIPER CSS
+                                                                                        ========================= -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
 
     <style>
         /* =========================================
-                                                                                       BESTSELLER SECTION
-                                                                                    ========================================= */
+                                                                                               BESTSELLER SECTION
+                                                                                            ========================================= */
 
         .bestseller-section {
             width: 100%;
@@ -1977,8 +1977,8 @@
 
 
         /* =========================================
-                                                                                       HEADER
-                                                                                    ========================================= */
+                                                                                               HEADER
+                                                                                            ========================================= */
 
         .bestseller-header {
             max-width: 1180px;
@@ -1991,8 +1991,8 @@
 
 
         /* =========================================
-                                                                                       TITLE
-                                                                                    ========================================= */
+                                                                                               TITLE
+                                                                                            ========================================= */
 
         .bestseller-title-wrap {
             display: flex;
@@ -2041,8 +2041,8 @@
 
 
         /* =========================================
-                                                                                       FILTERS
-                                                                                    ========================================= */
+                                                                                               FILTERS
+                                                                                            ========================================= */
 
         .bestseller-filters {
             display: flex;
@@ -2103,8 +2103,8 @@
 
 
         /* =========================================
-                                                                                       SLIDER
-                                                                                    ========================================= */
+                                                                                               SLIDER
+                                                                                            ========================================= */
 
         .bestseller-slider {
             width: 100%;
@@ -2123,8 +2123,8 @@
 
 
         /* =========================================
-                                                                                       PRODUCT CARD
-                                                                                    ========================================= */
+                                                                                               PRODUCT CARD
+                                                                                            ========================================= */
 
         .product-card {
             width: 100%;
@@ -2155,8 +2155,8 @@
 
 
         /* =========================================
-                                                                                       PRODUCT IMAGE
-                                                                                    ========================================= */
+                                                                                               PRODUCT IMAGE
+                                                                                            ========================================= */
 
         .product-image {
             position: relative;
@@ -2183,8 +2183,8 @@
 
 
         /* =========================================
-                                                                                       BADGES
-                                                                                    ========================================= */
+                                                                                               BADGES
+                                                                                            ========================================= */
 
         .product-badge {
             position: absolute;
@@ -2215,8 +2215,8 @@
 
 
         /* =========================================
-                                                                                       WISHLIST
-                                                                                    ========================================= */
+                                                                                               WISHLIST
+                                                                                            ========================================= */
 
         .wishlist {
             position: absolute;
@@ -2256,8 +2256,8 @@
 
 
         /* =========================================
-                                                                                       QUICK ADD
-                                                                                    ========================================= */
+                                                                                               QUICK ADD
+                                                                                            ========================================= */
 
         .quick-add {
             position: absolute;
@@ -2296,8 +2296,8 @@
 
 
         /* =========================================
-                                                                                       DETAILS
-                                                                                    ========================================= */
+                                                                                               DETAILS
+                                                                                            ========================================= */
 
         .product-details {
             padding: 7px 8px 8px;
@@ -2324,8 +2324,8 @@
 
 
         /* =========================================
-                                                                                       FABRIC TAG
-                                                                                    ========================================= */
+                                                                                               FABRIC TAG
+                                                                                            ========================================= */
 
         .fabric-tag {
             display: inline-block;
@@ -2343,8 +2343,8 @@
 
 
         /* =========================================
-                                                                                       META
-                                                                                    ========================================= */
+                                                                                               META
+                                                                                            ========================================= */
 
         .product-meta {
             min-height: 23px;
@@ -2372,8 +2372,8 @@
 
 
         /* =========================================
-                                                                                       COLOR DOTS
-                                                                                    ========================================= */
+                                                                                               COLOR DOTS
+                                                                                            ========================================= */
 
         .color-dots {
             margin-left: auto;
@@ -2411,8 +2411,8 @@
 
 
         /* =========================================
-                                                                                       PRICE
-                                                                                    ========================================= */
+                                                                                               PRICE
+                                                                                            ========================================= */
 
         .price-row {
             display: flex;
@@ -2457,8 +2457,8 @@
 
 
         /* =========================================
-                                                                                       SLIDER FOOTER
-                                                                                    ========================================= */
+                                                                                               SLIDER FOOTER
+                                                                                            ========================================= */
 
         .bestseller-slider-footer {
             max-width: 1480px;
@@ -2514,8 +2514,8 @@
 
 
         /* =========================================
-                                                                                       TABLET
-                                                                                    ========================================= */
+                                                                                               TABLET
+                                                                                            ========================================= */
 
         @media (max-width: 1050px) {
 
@@ -2545,8 +2545,8 @@
 
 
         /* =========================================
-                                                                                       MOBILE
-                                                                                    ========================================= */
+                                                                                               MOBILE
+                                                                                            ========================================= */
 
         @media (max-width: 650px) {
 
@@ -2605,8 +2605,8 @@
         }
 
         /* =========================================
-                                                                                   WHY CHOOSE SUDHEERA
-                                                                                ========================================= */
+                                                                                           WHY CHOOSE SUDHEERA
+                                                                                        ========================================= */
 
         .why-sudheera {
             position: relative;
@@ -2637,8 +2637,8 @@
 
 
         /* =========================================
-                                                                                   HEADER
-                                                                                ========================================= */
+                                                                                           HEADER
+                                                                                        ========================================= */
 
         .why-header {
             position: relative;
@@ -2679,8 +2679,8 @@
 
 
         /* =========================================
-                                                                                   FEATURES
-                                                                                ========================================= */
+                                                                                           FEATURES
+                                                                                        ========================================= */
 
         .why-features {
             position: relative;
@@ -2699,8 +2699,8 @@
 
 
         /* =========================================
-                                                                                   FEATURE CARD
-                                                                                ========================================= */
+                                                                                           FEATURE CARD
+                                                                                        ========================================= */
 
         .why-card {
             min-height: 43px;
@@ -2758,8 +2758,8 @@
 
 
         /* =========================================
-                                                                                   ICON
-                                                                                ========================================= */
+                                                                                           ICON
+                                                                                        ========================================= */
 
         .why-icon {
             flex-shrink: 0;
@@ -2779,8 +2779,8 @@
 
 
         /* =========================================
-                                                                                   CONTENT
-                                                                                ========================================= */
+                                                                                           CONTENT
+                                                                                        ========================================= */
 
         .why-content {
             min-width: 0;
@@ -2822,8 +2822,8 @@
 
 
         /* =========================================
-                                                                                   DECORATIVE FLOWERS
-                                                                                ========================================= */
+                                                                                           DECORATIVE FLOWERS
+                                                                                        ========================================= */
 
         .why-decoration {
             position: absolute;
@@ -2862,8 +2862,8 @@
 
 
         /* =========================================
-                                                                                   TABLET
-                                                                                ========================================= */
+                                                                                           TABLET
+                                                                                        ========================================= */
 
         @media (max-width: 900px) {
 
@@ -2884,8 +2884,8 @@
 
 
         /* =========================================
-                                                                                   MOBILE
-                                                                                ========================================= */
+                                                                                           MOBILE
+                                                                                        ========================================= */
 
         @media (max-width: 600px) {
 
@@ -2945,8 +2945,8 @@
 
 
         /* =========================================
-                                                                                   SMALL MOBILE
-                                                                                ========================================= */
+                                                                                           SMALL MOBILE
+                                                                                        ========================================= */
 
         @media (max-width: 380px) {
 
@@ -2963,8 +2963,8 @@
         }
 
         /* =========================================
-                                                                                   TESTIMONIALS SECTION
-                                                                                ========================================= */
+                                                                                           TESTIMONIALS SECTION
+                                                                                        ========================================= */
 
         .testimonials-section {
             width: 100%;
@@ -2992,8 +2992,8 @@
 
 
         /* =========================================
-                                                                                   MAIN CONTAINER
-                                                                                ========================================= */
+                                                                                           MAIN CONTAINER
+                                                                                        ========================================= */
 
         .testimonials-container {
             position: relative;
@@ -3018,8 +3018,8 @@
 
 
         /* =========================================
-                                                                                   CUSTOMER GALLERY
-                                                                                ========================================= */
+                                                                                           CUSTOMER GALLERY
+                                                                                        ========================================= */
 
         .customer-gallery {
             position: relative;
@@ -3047,8 +3047,8 @@
 
 
         /* =========================================
-                                                                                   CUSTOMER PHOTO
-                                                                                ========================================= */
+                                                                                           CUSTOMER PHOTO
+                                                                                        ========================================= */
 
         /* Image scroll container */
         .customer-photos {
@@ -3157,8 +3157,8 @@
 
 
         /* =========================================
-                                                                                   HEADING
-                                                                                ========================================= */
+                                                                                           HEADING
+                                                                                        ========================================= */
 
         .testimonial-content {
             min-width: 0;
@@ -3209,8 +3209,8 @@
 
 
         /* =========================================
-                                                                                   TESTIMONIAL CARD
-                                                                                ========================================= */
+                                                                                           TESTIMONIAL CARD
+                                                                                        ========================================= */
 
         .testimonial-card {
             width: 100%;
@@ -3249,8 +3249,8 @@
 
 
         /* =========================================
-                                                                                   QUOTE
-                                                                                ========================================= */
+                                                                                           QUOTE
+                                                                                        ========================================= */
 
         .quote-mark {
             flex-shrink: 0;
@@ -3272,8 +3272,8 @@
 
 
         /* =========================================
-                                                                                   REVIEW
-                                                                                ========================================= */
+                                                                                           REVIEW
+                                                                                        ========================================= */
 
         .testimonial-text {
             min-width: 0;
@@ -3295,8 +3295,8 @@
 
 
         /* =========================================
-                                                                                   STARS
-                                                                                ========================================= */
+                                                                                           STARS
+                                                                                        ========================================= */
 
         .testimonial-stars {
             margin-top: 4px;
@@ -3310,8 +3310,8 @@
 
 
         /* =========================================
-                                                                                   CUSTOMER INFO
-                                                                                ========================================= */
+                                                                                           CUSTOMER INFO
+                                                                                        ========================================= */
 
         .customer-info {
             margin-top: 2px;
@@ -3357,8 +3357,8 @@
 
 
         /* =========================================
-                                                                                   ARROWS
-                                                                                ========================================= */
+                                                                                           ARROWS
+                                                                                        ========================================= */
 
         .testimonial-arrow {
             flex-shrink: 0;
@@ -3434,8 +3434,8 @@
         }
 
         /* =========================================
-                                                                                   TABLET
-                                                                                ========================================= */
+                                                                                           TABLET
+                                                                                        ========================================= */
 
         @media (max-width: 900px) {
 
@@ -3471,12 +3471,12 @@
 
 
         /* =========================================
-                                                                                   MOBILE
-                                                                                ========================================= */
+                                                                                           MOBILE
+                                                                                        ========================================= */
 
         /* =========================================================
-                                        TESTIMONIALS - MOBILE RESPONSIVE
-                                     ========================================================= */
+                                                TESTIMONIALS - MOBILE RESPONSIVE
+                                             ========================================================= */
 
         @media (max-width: 600px) {
 
@@ -3499,8 +3499,8 @@
             }
 
             /* =====================================================
-                                            CUSTOMER GALLERY
-                                         ===================================================== */
+                                                    CUSTOMER GALLERY
+                                                 ===================================================== */
 
             .customer-gallery {
                 width: 100%;
@@ -3572,8 +3572,8 @@
             }
 
             /* =====================================================
-                                            TESTIMONIAL CONTENT
-                                         ===================================================== */
+                                                    TESTIMONIAL CONTENT
+                                                 ===================================================== */
 
             .testimonial-content {
                 width: 100%;
@@ -3617,8 +3617,8 @@
             }
 
             /* =====================================================
-                                            TESTIMONIAL CARD
-                                         ===================================================== */
+                                                    TESTIMONIAL CARD
+                                                 ===================================================== */
 
             .testimonial-card {
                 width: 100%;
@@ -3702,8 +3702,8 @@
             }
 
             /* =====================================================
-                                            NEXT BUTTON
-                                         ===================================================== */
+                                                    NEXT BUTTON
+                                                 ===================================================== */
 
             .testimonial-next {
                 position: absolute;
@@ -3743,8 +3743,8 @@
 
 
         /* =========================================================
-                                        VERY SMALL MOBILE
-                                     ========================================================= */
+                                                VERY SMALL MOBILE
+                                             ========================================================= */
 
         @media (max-width: 380px) {
 
@@ -3787,244 +3787,294 @@
     </style>
 
 
+    <style>
+        /* Restaurant name on product card */
+        .product-restaurant {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 8px;
+            color: #E85D04;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .product-restaurant i {
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .product-restaurant span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+
+
     <!-- =========================================================
-                                                                                     BESTSELLER SECTION
-                                                                                ========================================================= -->
+                                                                                             BESTSELLER SECTION
+                                                                                        ========================================================= -->
 
-<section class="bestseller-section">
+    <section class="bestseller-section">
 
-    {{-- HEADER --}}
-    <div class="bestseller-header">
+        {{-- HEADER --}}
+        <div class="bestseller-header">
 
-        <div class="bestseller-title-wrap">
+            <div class="bestseller-title-wrap">
 
-            <div class="sun-icon">
-                ☀
-            </div>
-
-            <div>
-
-                <div class="trending-label">
-                    <span>♨</span>
-                    TRENDING NOW
+                <div class="sun-icon">
+                    ☀
                 </div>
 
-                <h2>
-                    Bestselling Foods
-                </h2>
+                <div>
 
-                <p>
-                    Loved by food lovers, freshly prepared for you
-                </p>
+                    <div class="trending-label">
+                        <span>♨</span>
+                        TRENDING NOW
+                    </div>
+
+                    <h2>
+                        Bestselling Foods
+                    </h2>
+
+                    <p>
+                        Loved by food lovers, freshly prepared for you
+                    </p>
+
+                </div>
+
+            </div>
+
+            {{-- FILTER BUTTONS --}}
+            <div class="bestseller-filters">
+
+                <button type="button" class="filter-btn active" data-category="all">
+                    All
+                </button>
+
+                <button type="button" class="filter-btn" data-category="biryani">
+                    Biryani
+                </button>
+
+                <button type="button" class="filter-btn" data-category="burger">
+                    Burgers
+                </button>
+
+                <button type="button" class="filter-btn" data-category="pizza">
+                    Pizzas
+                </button>
+
+                <button type="button" class="filter-btn" data-category="dessert">
+                    Desserts
+                </button>
+
+                <a href="{{ route('shop') }}" class="view-all">
+                    View All
+                    <span>→</span>
+                </a>
 
             </div>
 
         </div>
 
-        {{-- FILTER BUTTONS --}}
-        <div class="bestseller-filters">
+        {{-- ALL PRODUCTS SLIDER --}}
+        <div class="bestseller-slider swiper" id="bestseller-all">
 
-            <button type="button" class="filter-btn active" data-category="all">
-                All
-            </button>
+            <div class="swiper-wrapper">
 
-            <button type="button" class="filter-btn" data-category="biryani">
-                Biryani
-            </button>
+                @forelse($products as $product)
 
-            <button type="button" class="filter-btn" data-category="burger">
-                Burgers
-            </button>
+                    @php
 
-            <button type="button" class="filter-btn" data-category="pizza">
-                Pizzas
-            </button>
+                        // VARIANT
+                        $variant = $product->variant;
 
-            <button type="button" class="filter-btn" data-category="dessert">
-                Desserts
-            </button>
+                        // PRICE
+                        $sellingPrice = $variant?->price;
+                        $actualPrice = $variant?->actual_price;
 
-            <a href="{{ route('shop') }}" class="view-all">
-                View All
-                <span>→</span>
-            </a>
+                        // DISCOUNT
+                        $discount = 0;
 
-        </div>
+                        if (
+                            is_numeric($actualPrice) &&
+                            is_numeric($sellingPrice) &&
+                            $actualPrice > 0 &&
+                            $actualPrice > $sellingPrice
+                        ) {
+                            $discount = round(
+                                (($actualPrice - $sellingPrice) / $actualPrice) * 100
+                            );
+                        }
 
-    </div>
+                        // PRODUCT IMAGE
+                        $productImage = null;
 
-    {{-- ALL PRODUCTS SLIDER --}}
-    <div class="bestseller-slider swiper" id="bestseller-all">
+                        if ($variant && !empty($variant->image)) {
 
-        <div class="swiper-wrapper">
+                            $productImage = $variant->image;
 
-            @forelse($products as $product)
+                        } elseif (!empty($product->image)) {
 
-                @php
+                            $productImage = $product->image;
 
-                    // VARIANT
-                    $variant = $product->variant;
+                        }
 
-                    // PRICE
-                    $sellingPrice = $variant?->price;
-                    $actualPrice = $variant?->actual_price;
-
-                    // DISCOUNT
-                    $discount = 0;
-
-                    if (
-                        is_numeric($actualPrice) &&
-                        is_numeric($sellingPrice) &&
-                        $actualPrice > 0 &&
-                        $actualPrice > $sellingPrice
-                    ) {
-                        $discount = round(
-                            (($actualPrice - $sellingPrice) / $actualPrice) * 100
+                        // CATEGORY FILTER
+                        $categoryTitle = strtolower(
+                            $product->category?->title ?? ''
                         );
-                    }
 
-                    // PRODUCT IMAGE
-                    $productImage = null;
+                        $categorySlug = strtolower(
+                            $product->category?->slug ?? ''
+                        );
 
-                    if ($variant && !empty($variant->image)) {
+                        $filterText =
+                            $categoryTitle . ' ' .
+                            $categorySlug . ' ' .
+                            strtolower($product->title ?? '');
 
-                        $productImage = $variant->image;
+                        // BADGE
+                        $badge = null;
 
-                    } elseif (!empty($product->image)) {
+                        if ($loop->iteration <= 2) {
+                            $badge = 'Bestseller';
+                        }
 
-                        $productImage = $product->image;
+                    @endphp
 
-                    }
+                    <div class="swiper-slide bestseller-product-slide" data-category="{{ $filterText }}">
 
-                    // CATEGORY FILTER
-                    $categoryTitle = strtolower(
-                        $product->category?->title ?? ''
-                    );
+                        <article class="product-card">
 
-                    $categorySlug = strtolower(
-                        $product->category?->slug ?? ''
-                    );
+                            {{-- PRODUCT IMAGE --}}
+                            <div class="product-image">
 
-                    $filterText =
-                        $categoryTitle . ' ' .
-                        $categorySlug . ' ' .
-                        strtolower($product->title ?? '');
+                                <a href="{{ route('productdetails', ['slug' => $product->slug]) }}">
 
-                    // BADGE
-                    $badge = null;
+                                    @if($productImage)
 
-                    if ($loop->iteration <= 2) {
-                        $badge = 'Bestseller';
-                    }
+                                        <img src="{{ asset($productImage) }}" alt="{{ $product->title }}">
 
-                @endphp
+                                    @else
 
-                <div
-                    class="swiper-slide bestseller-product-slide"
-                    data-category="{{ $filterText }}"
-                >
+                                        <img src="{{ asset('website/images/product-placeholder.png') }}"
+                                            alt="{{ $product->title }}">
 
-                    <article class="product-card">
+                                    @endif
 
-                        {{-- PRODUCT IMAGE --}}
-                        <div class="product-image">
+                                </a>
 
-                            <a href="{{ route('productdetails', ['slug' => $product->slug]) }}">
+                                @if($badge)
 
-                                @if($productImage)
-
-                                    <img
-                                        src="{{ asset($productImage) }}"
-                                        alt="{{ $product->title }}"
-                                    >
-
-                                @else
-
-                                    <img
-                                        src="{{ asset('website/images/product-placeholder.png') }}"
-                                        alt="{{ $product->title }}"
-                                    >
+                                    <span class="product-badge bestseller">
+                                        {{ $badge }}
+                                    </span>
 
                                 @endif
 
-                            </a>
+                                {{-- WISHLIST --}}
+                                <button type="button"
+                                    class="wishlist {{ $variant && in_array($variant->id, $wishlistVariantIds ?? []) ? 'active' : '' }}"
+                                    data-variant-id="{{ $variant?->id }}" onclick="event.stopPropagation();">
 
-                            @if($badge)
+                                    <span class="wishlist-icon">
+                                        {{ $variant && in_array($variant->id, $wishlistVariantIds ?? []) ? '♥' : '♡' }}
+                                    </span>
 
-                                <span class="product-badge bestseller">
-                                    {{ $badge }}
-                                </span>
+                                </button>
 
-                            @endif
+                                {{-- QUICK ADD --}}
+                                <button type="button" class="quick-add" data-product-id="{{ $product->id }}"
+                                    data-variant-id="{{ $product->variant?->id }}" onclick="event.stopPropagation();">
+                                    +
+                                </button>
 
-                            {{-- WISHLIST --}}
-                            <button
-                                type="button"
-                                class="wishlist {{ $variant && in_array($variant->id, $wishlistVariantIds ?? []) ? 'active' : '' }}"
-                                data-variant-id="{{ $variant?->id }}"
-                                onclick="event.stopPropagation();"
-                            >
+                            </div>
 
-                                <span class="wishlist-icon">
-                                    {{ $variant && in_array($variant->id, $wishlistVariantIds ?? []) ? '♥' : '♡' }}
-                                </span>
+                            {{-- PRODUCT DETAILS --}}
+                            <div class="product-details">
 
-                            </button>
+                                <a href="{{ route('productdetails', ['slug' => $product->slug]) }}" class="product-title-link">
 
-                            {{-- QUICK ADD --}}
-                            <button
-                                type="button"
-                                class="quick-add"
-                                data-product-id="{{ $product->id }}"
-                                data-variant-id="{{ $product->variant?->id }}"
-                                onclick="event.stopPropagation();"
-                            >
-                                +
-                            </button>
+                                    <h3>
+                                        {{ $product->title }}
+                                    </h3>
 
-                        </div>
+                                </a>
 
-                        {{-- PRODUCT DETAILS --}}
-                        <div class="product-details">
+                                {{-- CATEGORY --}}
+                                @if($product->category)
 
-                            <a
-                                href="{{ route('productdetails', ['slug' => $product->slug]) }}"
-                                class="product-title-link"
-                            >
+                                    <span class="fabric-tag">
+                                        {{ $product->category->title }}
+                                    </span>
 
-                                <h3>
-                                    {{ $product->title }}
-                                </h3>
+                                @endif
 
-                            </a>
+                                {{-- RESTAURANT NAME --}}
+                                @if($product->restaurant)
+                                    <div class="product-restaurant">
+                                        <i class="fa fa-cutlery" aria-hidden="true"></i>
+                                        <span>{{ $product->restaurant->name }}</span>
+                                    </div>
+                                @endif
 
-                            {{-- CATEGORY --}}
-                            @if($product->category)
+                                {{-- PRODUCT META --}}
+                                <div class="product-meta">
 
-                                <span class="fabric-tag">
-                                    {{ $product->category->title }}
-                                </span>
+                                    <div class="stars">
+                                        ★★★★★
+                                    </div>
 
-                            @endif
+                                    <span class="rating">
+                                        Customer Favourite
+                                    </span>
 
-                            {{-- PRODUCT META --}}
-                            <div class="product-meta">
+                                    <div class="color-dots">
 
-                                <div class="stars">
-                                    ★★★★★
+                                        @if($variant)
+
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+
+                                        @endif
+
+                                    </div>
+
                                 </div>
 
-                                <span class="rating">
-                                    Customer Favourite
-                                </span>
+                                {{-- PRICE --}}
+                                <div class="price-row">
 
-                                <div class="color-dots">
+                                    @if(is_numeric($sellingPrice))
 
-                                    @if($variant)
+                                        <strong>
+                                            ₹{{ number_format((float) $sellingPrice, 0) }}
+                                        </strong>
 
-                                        <i></i>
-                                        <i></i>
-                                        <i></i>
+                                    @endif
+
+                                    @if(
+                                            is_numeric($actualPrice) &&
+                                            is_numeric($sellingPrice) &&
+                                            $actualPrice > $sellingPrice
+                                        )
+
+                                        <del>
+                                            ₹{{ number_format((float) $actualPrice, 0) }}
+                                        </del>
+
+                                    @endif
+
+                                    @if($discount > 0)
+
+                                        <span class="discount">
+                                            {{ $discount }}% OFF
+                                        </span>
 
                                     @endif
 
@@ -4032,284 +4082,244 @@
 
                             </div>
 
-                            {{-- PRICE --}}
-                            <div class="price-row">
+                        </article>
 
-                                @if(is_numeric($sellingPrice))
+                    </div>
 
-                                    <strong>
-                                        ₹{{ number_format((float) $sellingPrice, 0) }}
-                                    </strong>
+                @empty
 
-                                @endif
+                    <div class="no-products">
 
-                                @if(
-                                    is_numeric($actualPrice) &&
-                                    is_numeric($sellingPrice) &&
-                                    $actualPrice > $sellingPrice
-                                )
+                        <p>
+                            No food products available right now.
+                        </p>
 
-                                    <del>
-                                        ₹{{ number_format((float) $actualPrice, 0) }}
-                                    </del>
+                    </div>
 
-                                @endif
+                @endforelse
 
-                                @if($discount > 0)
+            </div>
 
-                                    <span class="discount">
-                                        {{ $discount }}% OFF
-                                    </span>
+            {{-- SLIDER CONTROLS --}}
+            <div class="bestseller-slider-footer">
 
-                                @endif
+                <div class="bestseller-progress">
 
-                            </div>
+                    <div class="swiper-scrollbar bestseller-scrollbar" style="width: 92%;"></div>
+
+                </div>
+
+                <div class="bestseller-navigation">
+
+                    <div class="swiper-button-prev bestseller-prev"></div>
+
+                    <div class="swiper-button-next bestseller-next"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- 
+        <section class="why-sudheera">
+
+                {{-- Decorative elements --}}
+                <div class="why-decoration why-decoration-left">
+                    ✦
+                </div>
+
+                <div class="why-decoration why-decoration-right">
+                    ✧
+                </div>
+
+                {{-- Heading --}}
+                <div class="why-header">
+
+                    <h2>
+                        Why Choose BAKASURAN?
+                    </h2>
+
+                    <p>
+                        Great food, great service, unforgettable moments
+                    </p>
+
+                </div>
+
+                {{-- Features --}}
+                <div class="why-features">
+
+                    {{-- Fresh Food --}}
+                    <div class="why-card">
+
+                        <div class="why-icon">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+
+                        <div class="why-content">
+
+                            <h3>
+                                Fresh & Delicious
+                            </h3>
+
+                            <p>
+                                Made fresh, served with love
+                            </p>
 
                         </div>
 
-                    </article>
+                    </div>
+
+                    {{-- Restaurant Variety --}}
+                    <div class="why-card">
+
+                        <div class="why-icon">
+                            <i class="fa-solid fa-bowl-food"></i>
+                        </div>
+
+                        <div class="why-content">
+
+                            <h3>
+                                Multiple Cuisines
+                            </h3>
+
+                            <p>
+                                Explore flavours from everywhere
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {{-- Easy Ordering --}}
+                    <div class="why-card">
+
+                        <div class="why-icon">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+
+                        <div class="why-content">
+
+                            <h3>
+                                Easy Online Ordering
+                            </h3>
+
+                            <p>
+                                Your favourite food in a few clicks
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {{-- Fast Delivery --}}
+                    <div class="why-card">
+
+                        <div class="why-icon">
+                            <i class="fa-solid fa-motorcycle"></i>
+                        </div>
+
+                        <div class="why-content">
+
+                            <h3>
+                                Fast Food Delivery
+                            </h3>
+
+                            <p>
+                                Deliciousness delivered to your door
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {{-- Secure Payments --}}
+                    <div class="why-card">
+
+                        <div class="why-icon">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+
+                        <div class="why-content">
+
+                            <h3>
+                                Secure Payments
+                            </h3>
+
+                            <p>
+                                Convenient and secure checkout
+                            </p>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-            @empty
-
-                <div class="no-products">
-
-                    <p>
-                        No food products available right now.
-                    </p>
-
-                </div>
-
-            @endforelse
-
-        </div>
-
-        {{-- SLIDER CONTROLS --}}
-        <div class="bestseller-slider-footer">
-
-            <div class="bestseller-progress">
-
-                <div
-                    class="swiper-scrollbar bestseller-scrollbar"
-                    style="width: 92%;"
-                ></div>
-
-            </div>
-
-            <div class="bestseller-navigation">
-
-                <div class="swiper-button-prev bestseller-prev"></div>
-
-                <div class="swiper-button-next bestseller-next"></div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- 
-    <section class="why-sudheera">
-
-        {{-- Decorative elements --}}
-        <div class="why-decoration why-decoration-left">
-            ✦
-        </div>
-
-        <div class="why-decoration why-decoration-right">
-            ✧
-        </div>
-
-        {{-- Heading --}}
-        <div class="why-header">
-
-            <h2>
-                Why Choose BAKASURAN?
-            </h2>
-
-            <p>
-                Great food, great service, unforgettable moments
-            </p>
-
-        </div>
-
-        {{-- Features --}}
-        <div class="why-features">
-
-            {{-- Fresh Food --}}
-            <div class="why-card">
-
-                <div class="why-icon">
-                    <i class="fa-solid fa-utensils"></i>
-                </div>
-
-                <div class="why-content">
-
-                    <h3>
-                        Fresh & Delicious
-                    </h3>
-
-                    <p>
-                        Made fresh, served with love
-                    </p>
-
-                </div>
-
-            </div>
-
-            {{-- Restaurant Variety --}}
-            <div class="why-card">
-
-                <div class="why-icon">
-                    <i class="fa-solid fa-bowl-food"></i>
-                </div>
-
-                <div class="why-content">
-
-                    <h3>
-                        Multiple Cuisines
-                    </h3>
-
-                    <p>
-                        Explore flavours from everywhere
-                    </p>
-
-                </div>
-
-            </div>
-
-            {{-- Easy Ordering --}}
-            <div class="why-card">
-
-                <div class="why-icon">
-                    <i class="fa-solid fa-mobile-screen-button"></i>
-                </div>
-
-                <div class="why-content">
-
-                    <h3>
-                        Easy Online Ordering
-                    </h3>
-
-                    <p>
-                        Your favourite food in a few clicks
-                    </p>
-
-                </div>
-
-            </div>
-
-            {{-- Fast Delivery --}}
-            <div class="why-card">
-
-                <div class="why-icon">
-                    <i class="fa-solid fa-motorcycle"></i>
-                </div>
-
-                <div class="why-content">
-
-                    <h3>
-                        Fast Food Delivery
-                    </h3>
-
-                    <p>
-                        Deliciousness delivered to your door
-                    </p>
-
-                </div>
-
-            </div>
-
-            {{-- Secure Payments --}}
-            <div class="why-card">
-
-                <div class="why-icon">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-
-                <div class="why-content">
-
-                    <h3>
-                        Secure Payments
-                    </h3>
-
-                    <p>
-                        Convenient and secure checkout
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section> -->
+        </section> -->
 
 
     <section class="bakasuran-why-section" aria-label="Why Choose BAKASURAN">
 
-    <img
-        src="{{ asset('website/images/whychoose.png') }}"
-        alt="Why Choose BAKASURAN — Fresh and delicious food, multiple cuisines, easy online ordering, fast food delivery and secure payments."
-        class="bakasuran-why-banner"
-        loading="lazy"
-    >
+        <img src="{{ asset('website/images/whychoose.png') }}"
+            alt="Why Choose BAKASURAN — Fresh and delicious food, multiple cuisines, easy online ordering, fast food delivery and secure payments."
+            class="bakasuran-why-banner" loading="lazy">
 
-</section>
+    </section>
 
-<style>
-/* ==========================================
-   BAKASURAN CINEMATIC WHY CHOOSE SECTION
-========================================== */
+    <style>
+        /* ==========================================
+           BAKASURAN CINEMATIC WHY CHOOSE SECTION
+        ========================================== */
 
 
-.bakasuran-why-section {
-    width: 90%;
-    max-width: 1400px;
-    margin: 20px auto;
-    overflow: hidden;
-    background: #080202;
-    border-radius: 12px;
-    /* height: 360px; */
-}
+        .bakasuran-why-section {
+            width: 90%;
+            max-width: 1400px;
+            margin: 20px auto;
+            overflow: hidden;
+            background: #080202;
+            border-radius: 12px;
+            /* height: 360px; */
+        }
 
-.bakasuran-why-banner {
-    display: block;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-}
+        .bakasuran-why-banner {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
 
-/* Tablet */
-@media (max-width: 991px) {
-    .bakasuran-why-section {
-        width: 95%;
-    }
-}
+        /* Tablet */
+        @media (max-width: 991px) {
+            .bakasuran-why-section {
+                width: 95%;
+            }
+        }
 
-/* Mobile */
-@media (max-width: 576px) {
-    .bakasuran-why-section {
-        width: 100%;
-        margin: 10px auto;
-        border-radius: 0;
-    }
-}
-
-</style>
+        /* Mobile */
+        @media (max-width: 576px) {
+            .bakasuran-why-section {
+                width: 100%;
+                margin: 10px auto;
+                border-radius: 0;
+            }
+        }
+    </style>
 
 
 
+    {{-- ==========================================
+    DYNAMIC CUSTOMER TESTIMONIALS
+    ========================================== --}}
 
     <section class="testimonials-section">
-
         <div class="testimonials-container">
 
-            {{-- LEFT : CUSTOMER FOOD PHOTOS --}}
+            {{-- LEFT: CUSTOMER PHOTOS --}}
             <div class="customer-gallery">
 
                 <button class="testimonial-arrow gallery-prev" type="button" aria-label="Previous customers">
@@ -4318,88 +4328,62 @@
 
                 <div class="customer-photos">
 
-                    <div class="customer-photo active">
-                        <img src="{{ asset('website/images/customer-biryani.jpg') }}"
-                            alt="Customer enjoying delicious biryani">
-                    </div>
+                    @foreach($testimonials as $index => $testimonial)
+                        <div class="customer-photo {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}">
 
-                    <div class="customer-photo">
-                        <img src="{{ asset('website/images/customer-pizza.jpg') }}" alt="Freshly baked pizza">
-                    </div>
+                            @if($testimonial->image)
+                                <img src="{{ asset($testimonial->image) }}" alt="{{ $testimonial->name }}" loading="lazy">
+                            @else
+                                <div class="testimonial-photo-placeholder">
+                                    {{ strtoupper(substr($testimonial->name, 0, 1)) }}
+                                </div>
+                            @endif
 
-                    <div class="customer-photo">
-                        <img src="{{ asset('website/images/customer-burger.jpg') }}" alt="Juicy gourmet burger">
-                    </div>
-
-                    <div class="customer-photo">
-                        <img src="{{ asset('website/images/customer-fried-chicken.jpg') }}" alt="Crispy fried chicken">
-                    </div>
-
-                    <div class="customer-photo">
-                        <img src="{{ asset('website/images/customer-couple.jpg') }}" alt="Happy couple enjoying their meal">
-                    </div>
-
-                    <div class="customer-photo">
-                        <img src="{{ asset('website/images/customer-meal.jpg') }}" alt="Delicious desserts">
-                    </div>
+                        </div>
+                    @endforeach
 
                 </div>
-
             </div>
 
-
-            {{-- CENTER / RIGHT : CUSTOMER REVIEWS --}}
+            {{-- CENTER / RIGHT: CUSTOMER REVIEWS --}}
             <div class="testimonial-content">
 
                 <div class="testimonial-heading">
-
-                    <span class="heading-heart">
-                        ♥
-                    </span>
-
-                    <h2>
-                        Our Happy Foodies
-                    </h2>
-
+                    <span class="heading-heart">♥</span>
+                    <h2>Our Happy Foodies</h2>
                 </div>
 
                 <div class="testimonial-card">
 
-                    <div class="quote-mark">
-                        “
-                    </div>
+                    <div class="quote-mark">“</div>
 
                     <div class="testimonial-text">
 
                         <p id="testimonialText">
-                            The biryani was absolutely delicious! The
-                            flavours were rich, the chicken was tender,
-                            and everything arrived fresh. BAKASURAN
-                            made my meal truly special!
+                            {{ $testimonials->first()->description ?? 'Our customers make BAKASURAN special. Be the first to share your experience!' }}
                         </p>
 
-                        <div class="testimonial-stars">
-                            ★★★★★
+                        <div class="testimonial-stars" id="testimonialStars" aria-label="Customer rating">
+                            @if($testimonials->isNotEmpty())
+                                {{ str_repeat('★', (int) $testimonials->first()->rating) }}
+                            @endif
                         </div>
 
                         <div class="customer-info">
 
                             <strong id="customerName">
-                                Happy Foodie
+                                {{ $testimonials->first()->name ?? 'Our Customer' }}
                             </strong>
 
                             <span id="customerLocation">
-                                Bangalore
+                                {{ $testimonials->first()->city ?? '' }}
                             </span>
 
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
-
 
             {{-- NEXT ARROW --}}
             <button class="testimonial-arrow testimonial-next" type="button" aria-label="Next testimonial">
@@ -4407,15 +4391,14 @@
             </button>
 
         </div>
-
     </section>
 
 
 
 
     <!-- =========================
-                                                                                     SWIPER JS
-                                                                                ========================= -->
+                                                                                             SWIPER JS
+                                                                                        ========================= -->
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
@@ -4683,408 +4666,168 @@
         });
     </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
 
-            const testimonials = [
-                {
-                    text: '"The chicken biryani was full of flavour! The rice was perfectly cooked, the chicken was tender, and everything arrived fresh. Definitely ordering again!"',
-                    name: "Happy Foodie",
-                    location: "Bangalore"
-                },
-                {
-                    text: '"Absolutely loved the burger! It was juicy, fresh, and loaded with delicious toppings. BAKASURAN is my new favourite food spot!"',
-                    name: "Burger Lover",
-                    location: "Chennai"
-                },
-                {
-                    text: '"The pizza was amazing, with a crispy crust and plenty of cheese. Perfect for sharing with friends. Loved every bite!"',
-                    name: "Pizza Fan",
-                    location: "Hyderabad"
-                },
-                {
-                    text: '"The fried chicken was crispy on the outside and tender inside. The taste was fantastic, and the packaging was great!"',
-                    name: "Chicken Lover",
-                    location: "Coimbatore"
-                },
-                {
-                    text: '"Ordered a full meal and everything was delicious. Great flavours, generous portions, and a satisfying experience!"',
-                    name: "Food Explorer",
-                    location: "Kochi"
-                },
-                {
-                    text: '"Had a wonderful food experience with BAKASURAN. Great food for sharing, a welcoming atmosphere, and plenty of tasty options!"',
-                    name: "Foodie Couple",
-                    location: "Mumbai"
-                }
-            ];
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load testimonial data prepared by PageControllers.php
+            const testimonials = {{ Illuminate\Support\Js::from($testimonialCarousel) }};
 
             let currentTestimonial = 0;
-            let autoSlide;
+            let autoSlide = null;
 
-            const testimonialText =
-                document.getElementById("testimonialText");
+            const testimonialText = document.getElementById('testimonialText');
+            const customerName = document.getElementById('customerName');
+            const customerLocation = document.getElementById('customerLocation');
+            const testimonialStars = document.getElementById('testimonialStars');
 
-            const customerName =
-                document.getElementById("customerName");
+            const customerPhotos = Array.from(
+                document.querySelectorAll('.customer-photo')
+            );
 
-            const customerLocation =
-                document.getElementById("customerLocation");
+            const nextButton = document.querySelector('.testimonial-next');
+            const prevButton = document.querySelector('.gallery-prev');
 
-            const customerPhotos =
-                document.querySelectorAll(".customer-photo");
+            // Hide arrows only when there are no testimonials.
+            if (testimonials.length === 0) {
+                if (nextButton) nextButton.style.display = 'none';
+                if (prevButton) prevButton.style.display = 'none';
 
-            const nextButton =
-                document.querySelector(".testimonial-next");
+                if (testimonialText) {
+                    testimonialText.textContent =
+                        'No approved customer reviews available yet.';
+                }
 
-            const prevButton =
-                document.querySelector(".gallery-prev");
+                if (customerName) customerName.textContent = 'BAKASURAN';
+                if (customerLocation) customerLocation.textContent = '';
+                if (testimonialStars) testimonialStars.textContent = '';
 
+                customerPhotos.forEach(function (photo) {
+                    photo.classList.remove('active');
+                });
 
-            // SHOW TESTIMONIAL
+                return;
+            }
+
+            // Show arrows when there are testimonials.
+            if (nextButton) nextButton.style.display = '';
+            if (prevButton) prevButton.style.display = '';
+
+            // Update the currently displayed testimonial.
             function showTestimonial(index, shouldScroll = false) {
+                if (testimonials.length === 0) return;
 
+                // Wrap around at the beginning and end.
                 currentTestimonial =
                     (index + testimonials.length) % testimonials.length;
 
                 const item = testimonials[currentTestimonial];
 
-                // Fade testimonial text
-                testimonialText.style.opacity = "0";
-
-                setTimeout(function () {
-
-                    testimonialText.textContent = item.text;
-                    customerName.textContent = item.name;
-                    customerLocation.textContent = item.location;
-
-                    testimonialText.style.opacity = "1";
-
-                }, 180);
-
-
-                // Update active customer image
-                customerPhotos.forEach(function (photo, i) {
-
-                    photo.classList.toggle(
-                        "active",
-                        i === currentTestimonial
-                    );
-
-                });
-
-
-                // Scroll only when a user clicks an arrow or image
-                if (shouldScroll && customerPhotos[currentTestimonial]) {
-
-                    customerPhotos[currentTestimonial].scrollIntoView({
-                        behavior: "smooth",
-                        block: "nearest",
-                        inline: "center"
-                    });
-
+                if (testimonialText) {
+                    testimonialText.style.opacity = '0';
                 }
 
-            }
-
-
-            // NEXT BUTTON
-            if (nextButton) {
-
-                nextButton.addEventListener("click", function () {
-
-                    showTestimonial(currentTestimonial + 1, true);
-                    restartAutoSlide();
-
-                });
-
-            }
-
-
-            // PREVIOUS BUTTON
-            if (prevButton) {
-
-                prevButton.addEventListener("click", function () {
-
-                    showTestimonial(currentTestimonial - 1, true);
-                    restartAutoSlide();
-
-                });
-
-            }
-
-
-            // CUSTOMER IMAGE CLICK
-            customerPhotos.forEach(function (photo, index) {
-
-                photo.addEventListener("click", function () {
-
-                    showTestimonial(index, true);
-                    restartAutoSlide();
-
-                });
-
-            });
-
-
-            // FADE EFFECT
-            if (testimonialText) {
-                testimonialText.style.transition = "opacity 0.18s ease";
-            }
-
-
-            // AUTO SLIDE
-            function startAutoSlide() {
-
-                autoSlide = setInterval(function () {
-
-                    // Do not scroll the page during automatic changes
-                    showTestimonial(currentTestimonial + 1, false);
-
-                }, 5000);
-
-            }
-
-
-            // RESTART TIMER AFTER MANUAL NAVIGATION
-            function restartAutoSlide() {
-
-                clearInterval(autoSlide);
-                startAutoSlide();
-
-            }
-
-
-            // INITIAL LOAD
-            showTestimonial(0, false);
-            startAutoSlide();
-
-        });
-    </script>
-
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            document.querySelectorAll('.quick-add').forEach(function (button) {
-
-                button.addEventListener('click', function (event) {
-
-                    event.stopPropagation();
-
-                    const currentButton = this;
-
-                    const variantId =
-                        currentButton.getAttribute('data-variant-id');
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Check Variant
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (!variantId) {
-
-                        alert('Product variant not available.');
-
-                        return;
+                window.setTimeout(function () {
+                    if (testimonialText) {
+                        testimonialText.textContent = item.text || '';
+                        testimonialText.style.opacity = '1';
                     }
 
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Save Original Button
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const originalText =
-                        currentButton.innerHTML;
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Loading
-                    |--------------------------------------------------------------------------
-                    */
-
-                    currentButton.disabled = true;
-
-                    currentButton.innerHTML =
-                        '<i class="fa-solid fa-spinner fa-spin"></i>';
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Add To Cart
-                    |--------------------------------------------------------------------------
-                    */
-
-                    fetch("{{ route('cart.add') }}", {
-
-                        method: 'POST',
-
-                        headers: {
-
-                            'Content-Type': 'application/json',
-
-                            'Accept': 'application/json',
-
-                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
-
-                        },
-
-                        body: JSON.stringify({
-
-                            product_variant_id: variantId,
-
-                            quantity: 1
-
-                        })
-
-                    })
-
-                        .then(async function (response) {
-
-                            const data =
-                                await response.json();
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Login Required
-                            |--------------------------------------------------------------------------
-                            */
-
-                            if (response.status === 401) {
-
-                                alert(
-                                    data.message ||
-                                    'Please login first.'
-                                );
-
-                                window.location.href =
-                                    "{{ route('login') }}";
-
-                                return null;
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Server Error
-                            |--------------------------------------------------------------------------
-                            */
-
-                            if (!response.ok) {
-
-                                throw new Error(
-                                    data.message ||
-                                    'Unable to add product to cart.'
-                                );
-
-                            }
-
-
-                            return data;
-
-                        })
-
-                        .then(function (data) {
-
-                            if (!data) {
-                                return;
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | SUCCESS
-                            |--------------------------------------------------------------------------
-                            */
-
-                            if (data.status) {
-
-                                currentButton.innerHTML = '✓';
-
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | Update Cart Count
-                                |--------------------------------------------------------------------------
-                                */
-
-                                document
-                                    .querySelectorAll('.cart-count')
-                                    .forEach(function (element) {
-
-                                        element.textContent =
-                                            data.cart_count;
-
-                                    });
-
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | Restore Button
-                                |--------------------------------------------------------------------------
-                                */
-
-                                setTimeout(function () {
-
-                                    currentButton.innerHTML =
-                                        originalText;
-
-                                    currentButton.disabled =
-                                        false;
-
-                                }, 1200);
-
-
-                            } else {
-
-                                currentButton.innerHTML =
-                                    originalText;
-
-                                currentButton.disabled =
-                                    false;
-
-                                alert(
-                                    data.message ||
-                                    'Unable to add product to cart.'
-                                );
-
-                            }
-
-                        })
-
-                        .catch(function (error) {
-
-                            console.error(
-                                'Quick add cart error:',
-                                error
-                            );
-
-
-                            currentButton.innerHTML =
-                                originalText;
-
-                            currentButton.disabled =
-                                false;
-
-
-                            alert(
-                                error.message ||
-                                'Something went wrong. Please try again.'
-                            );
-
-                        });
-
+                    if (customerName) {
+                        customerName.textContent = item.name || 'Customer';
+                    }
+
+                    if (customerLocation) {
+                        customerLocation.textContent = item.location || '';
+                    }
+
+                    if (testimonialStars) {
+                        const rating = Math.max(
+                            0,
+                            Math.min(5, Number(item.rating) || 0)
+                        );
+
+                        testimonialStars.textContent = '★'.repeat(rating);
+                        testimonialStars.setAttribute(
+                            'aria-label',
+                            rating + ' out of 5 stars'
+                        );
+                    }
+                }, 180);
+
+                // Highlight the matching customer photo, if available.
+                customerPhotos.forEach(function (photo, photoIndex) {
+                    photo.classList.toggle(
+                        'active',
+                        photoIndex === currentTestimonial
+                    );
                 });
 
+                // Scroll the selected photo into view after manual navigation.
+                if (shouldScroll && customerPhotos[currentTestimonial]) {
+                    customerPhotos[currentTestimonial].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                        inline: 'center'
+                    });
+                }
+            }
+
+            // Start or restart the automatic carousel.
+            function startAutoSlide() {
+                window.clearInterval(autoSlide);
+                autoSlide = null;
+
+                if (testimonials.length > 1) {
+                    autoSlide = window.setInterval(function () {
+                        showTestimonial(currentTestimonial + 1);
+                    }, 5000);
+                }
+            }
+
+            function restartAutoSlide() {
+                startAutoSlide();
+            }
+
+            // Next arrow.
+            if (nextButton) {
+                nextButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    showTestimonial(currentTestimonial + 1, true);
+                    restartAutoSlide();
+                });
+            }
+
+            // Previous arrow.
+            if (prevButton) {
+                prevButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    showTestimonial(currentTestimonial - 1, true);
+                    restartAutoSlide();
+                });
+            }
+
+            // Click a customer photo to display that customer's review.
+            customerPhotos.forEach(function (photo, index) {
+                photo.style.cursor = 'pointer';
+
+                photo.addEventListener('click', function () {
+                    if (index < testimonials.length) {
+                        showTestimonial(index, true);
+                        restartAutoSlide();
+                    }
+                });
             });
 
+            if (testimonialText) {
+                testimonialText.style.transition = 'opacity 0.18s ease';
+            }
+
+            // Display the first testimonial and start auto-sliding.
+            showTestimonial(0);
+            startAutoSlide();
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 

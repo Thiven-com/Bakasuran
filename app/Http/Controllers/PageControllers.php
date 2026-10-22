@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Blog;
@@ -17,11 +18,13 @@ use App\Models\ShippingZone;
 use Illuminate\Support\Facades\Auth;
 use App\Models\WishlistItem;
 use App\Models\Order;
+use App\Models\Testimonial;
 
 
 class PageControllers extends Controller
 {
     //
+
     public function home()
     {
         $now = Carbon::now();
@@ -46,6 +49,7 @@ class PageControllers extends Controller
         $products = Product::with([
             'category',
             'variant',
+            'restaurant',
         ])
             ->where('status', 'show')
             ->whereHas('variant')
@@ -62,7 +66,6 @@ class PageControllers extends Controller
         $wishlistVariantIds = [];
 
         if (Auth::guard('customer')->check()) {
-
             $userId = Auth::guard('customer')->id();
 
             $wishlistVariantIds = WishlistItem::where('user_id', $userId)
@@ -70,16 +73,36 @@ class PageControllers extends Controller
                 ->toArray();
         }
 
-        return view(
-            'website.home',
-            compact(
-                'banners',
-                'categories',
-                'products',
-                'wishlistVariantIds'
-            )
-        );
+        /*
+       /*
+    |--------------------------------------------------------------------------
+    | Approved Testimonials
+    |--------------------------------------------------------------------------
+    */
+
+        $testimonials = Testimonial::where('status', 'approved')
+            ->latest()
+            ->get();
+
+        $testimonialCarousel = $testimonials->map(function ($testimonial) {
+            return [
+                'text' => $testimonial->description,
+                'name' => $testimonial->name,
+                'location' => $testimonial->city ?? '',
+                'rating' => (int) $testimonial->rating,
+            ];
+        })->values();
+
+        return view('website.home', compact(
+            'banners',
+            'categories',
+            'products',
+            'wishlistVariantIds',
+            'testimonials',
+            'testimonialCarousel'
+        ));
     }
+
 
     public function shop(Request $request)
     {
@@ -105,6 +128,7 @@ class PageControllers extends Controller
         $productsQuery = Product::with([
             'category',
             'variant',
+            'restaurant',
         ])
             ->where('status', 'show')
             ->whereHas('variant');
@@ -326,6 +350,8 @@ class PageControllers extends Controller
         $product = Product::with([
             'category',
             'brand',
+            'restaurant',
+
 
             // Product variants with dynamic attributes
             'variants.attributeMappings.attribute',
@@ -464,9 +490,11 @@ class PageControllers extends Controller
             'wishlistVariantIds'
         ));
     }
+
     public function blog()
     {
-        $blogs = Blog::where('status', 'show')
+        $blogs = Blog::with(['category', 'restaurant'])
+            ->where('status', 'show')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -476,19 +504,23 @@ class PageControllers extends Controller
 
         return view('website.blog', compact('blogs', 'blogCategories'));
     }
+
+
     public function blog_details($slug)
     {
-        $blog = Blog::where('slug', $slug)
+        $blog = Blog::with(['category', 'restaurant'])
+            ->where('slug', $slug)
             ->where('status', 'show')
             ->firstOrFail();
 
         $blogCategory = BlogCategory::where('id', $blog->category_id)
             ->first();
 
-        $relatedBlogs = Blog::where('status', 'show')
+        $relatedBlogs = Blog::with(['category', 'restaurant'])
+            ->where('status', 'show')
             ->where('id', '!=', $blog->id)
             ->where('category_id', $blog->category_id)
-            ->orderBy('created_at', 'desc')
+            ->inRandomOrder()
             ->take(3)
             ->get();
 
@@ -498,10 +530,11 @@ class PageControllers extends Controller
 
             $remaining = 3 - $relatedBlogs->count();
 
-            $additionalBlogs = Blog::where('status', 'show')
+            $additionalBlogs = Blog::with(['category', 'restaurant'])
+                ->where('status', 'show')
                 ->where('id', '!=', $blog->id)
                 ->whereNotIn('id', $relatedBlogs->pluck('id'))
-                ->orderBy('created_at', 'desc')
+                ->inRandomOrder()
                 ->take($remaining)
                 ->get();
 
@@ -522,6 +555,7 @@ class PageControllers extends Controller
             'relatedCategories'
         ));
     }
+
     public function aboutus()
     {
         return view('website.aboutus');
@@ -541,13 +575,16 @@ class PageControllers extends Controller
 
         $customerId = Auth::guard('customer')->id();
 
+
         $cartItems = \App\Models\CartItem::with([
-            'variant.product:id,title,slug,image',
+            'variant.product:id,title,slug,image,restaurant_id',
+            'variant.product.restaurant:id,name',
             'variant.attributeValues.attribute'
         ])
             ->where('user_id', $customerId)
             ->latest()
             ->get();
+
 
         $subtotal = $cartItems->sum(function ($item) {
             return (float) $item->unit_price * (int) $item->quantity;
@@ -579,6 +616,7 @@ class PageControllers extends Controller
             'cartCount'
         ));
     }
+
     public function wishlist()
     {
         if (!Auth::guard('customer')->check()) {
@@ -589,13 +627,12 @@ class PageControllers extends Controller
 
         $wishlistItems = WishlistItem::with([
             'variant' => function ($query) {
-
                 $query->with([
                     'product.category',
+                    'product.restaurant',
                     'category',
                     'media'
                 ]);
-
             }
         ])
             ->where('user_id', $userId)
@@ -607,6 +644,7 @@ class PageControllers extends Controller
             compact('wishlistItems')
         );
     }
+
     public function contactus()
     {
         return view('website.contactus');
@@ -715,6 +753,7 @@ class PageControllers extends Controller
             'category',
             'primaryMedia',
             'variants.category',
+            'restaurant',
         ])
             ->where('is_feature', 1)
             ->inRandomOrder()
@@ -741,124 +780,243 @@ class PageControllers extends Controller
 
 
 
-    public function checkout(Request $request)
-    {
-        // Change this guard if your website uses a different customer guard.
-        $user = auth('customer')->user();
 
-        if (!$user) {
-            return redirect()->route('login')
-                ->with('error', 'Please log in to continue checkout.');
+public function checkout(Request $request)
+{
+    $user = auth('customer')->user();
+
+    if (!$user) {
+        return redirect()->route('login')
+            ->with('error', 'Please log in to continue checkout.');
+    }
+
+    $mode = $request->query('mode');
+    $isBuyNow = $mode === 'buy_now';
+    $orderType = $request->query('order_type', 'order');
+
+    /*
+    |--------------------------------------------------------------------------
+    | 1. LOAD BUY NOW ITEM OR NORMAL CART ITEMS
+    |--------------------------------------------------------------------------
+    */
+    if ($isBuyNow) {
+        $buyNow = session('buy_now');
+
+        if (
+            !$buyNow ||
+            empty($buyNow['product_variant_id']) ||
+            !isset($buyNow['quantity']) ||
+            (int) $buyNow['quantity'] < 1
+        ) {
+            return redirect()->route('shop')
+                ->with('error', 'Please select a product to order.');
         }
 
-        $orderType = $request->query('order_type', 'order');
+        $variant = ProductVariant::with([
+            'product.restaurant',
+            'media',
+            'attributeValues.attribute',
+        ])->find($buyNow['product_variant_id']);
 
+        if (!$variant || !$variant->product) {
+            session()->forget('buy_now');
+
+            return redirect()->route('shop')
+                ->with('error', 'Product not found.');
+        }
+
+        $quantity = (int) $buyNow['quantity'];
+
+        if ($variant->status !== 'show') {
+    return redirect()->route('shop')
+        ->with('error', 'This product is not available.');
+}
+
+        if ($quantity > (int) $variant->stock) {
+            return redirect()->route('shop')
+                ->with(
+                    'error',
+                    'Only ' . $variant->stock . ' items are available.'
+                );
+        }
+
+        if (
+            $variant->product_min_order &&
+            $quantity < (int) $variant->product_min_order
+        ) {
+            return redirect()->route('shop')
+                ->with('error', 'Minimum order quantity is ' .
+                    $variant->product_min_order . '.');
+        }
+
+        if (
+            $variant->product_max_order &&
+            $quantity > (int) $variant->product_max_order
+        ) {
+            return redirect()->route('shop')
+                ->with('error', 'Maximum order quantity is ' .
+                    $variant->product_max_order . '.');
+        }
+
+        // Temporary item for the existing checkout Blade template.
+        // This does not insert anything into cart_items.
+        $cartItems = collect([
+            (object) [
+                'id' => null,
+                'user_id' => $user->id,
+                'product_variant_id' => $variant->id,
+                'variant' => $variant,
+                'quantity' => $quantity,
+                'unit_price' => $variant->price,
+                'is_buy_now' => true,
+            ],
+        ]);
+    } else {
         $cartItems = CartItem::with([
-            'variant.product',
+            'variant.product.restaurant',
             'variant.media',
             'variant.attributeValues.attribute',
         ])
             ->where('user_id', $user->id)
-            ->where('type', $orderType)
             ->get();
 
         if ($cartItems->isEmpty()) {
-            return redirect()->back()
+            return redirect()->route('cart')
                 ->with('error', 'Your cart is empty.');
         }
+    }
 
-        $addresses = Address::where('customer_id', $user->id)
-            ->orderByDesc('default')
-            ->orderByDesc('id')
-            ->get();
+    /*
+    |--------------------------------------------------------------------------
+    | 2. ADDRESSES
+    |--------------------------------------------------------------------------
+    */
+    $addresses = Address::where('customer_id', $user->id)
+        ->orderByDesc('default')
+        ->orderByDesc('id')
+        ->get();
 
-        $defaultAddress = $addresses->first();
+    $defaultAddress = $addresses->first();
 
-        // Calculate subtotal and weight from current cart data.
-        $subtotal = 0;
-        $totalWeight = 0;
+    /*
+    |--------------------------------------------------------------------------
+    | 3. SUBTOTAL AND WEIGHT
+    |--------------------------------------------------------------------------
+    */
+    $subtotal = 0;
+    $totalWeight = 0;
 
-        foreach ($cartItems as $item) {
-            $variant = $item->variant;
+    foreach ($cartItems as $item) {
+        $variant = $item->variant;
 
-            $subtotal += (float) ($variant?->price ?? 0)
-                * (int) $item->quantity;
+        $subtotal += (float) ($variant?->price ?? 0)
+            * (int) $item->quantity;
 
-            $totalWeight += (float) ($variant?->weight ?? 0)
-                * (int) $item->quantity;
-        }
+        $totalWeight += (float) ($variant?->weight ?? 0)
+            * (int) $item->quantity;
+    }
 
-        // Calculate shipping using your existing shipping zone and freight tables.
-        $shipping = 0;
+    /*
+    |--------------------------------------------------------------------------
+    | 4. SHIPPING
+    |--------------------------------------------------------------------------
+    */
+    $shipping = 0;
 
-        if ($defaultAddress && $defaultAddress->state) {
-            $zone = ShippingZone::whereJsonContains(
-                'regions',
-                $defaultAddress->state
-            )->first();
+    if ($defaultAddress && $defaultAddress->state) {
+        $zone = ShippingZone::whereJsonContains(
+            'regions',
+            $defaultAddress->state
+        )->first();
 
-            if ($zone && $zone->free_shipping !== 'yes') {
-                $charge = FreightCharge::where('shipping_zone_id', $zone->id)
-                    ->where('min_weight', '<=', $totalWeight)
-                    ->where('max_weight', '>=', $totalWeight)
-                    ->first();
-
-                if ($charge) {
-                    $shipping = (float) $charge->charge;
-                } else {
-                    $latestCharge = FreightCharge::where(
-                        'shipping_zone_id',
-                        $zone->id
-                    )->orderByDesc('id')->first();
-
-                    if ($latestCharge && $totalWeight > $latestCharge->max_weight) {
-                        $shipping = (float) $latestCharge->charge + 30;
-                    }
-                }
-            }
-        }
-
-        $shipping = round($shipping);
-
-        // Optional coupon from the URL, for example /checkout?code=SAVE10
-        $discount = 0;
-        $couponCode = trim((string) $request->query('code', ''));
-
-        if ($couponCode !== '') {
-            $coupon = Coupon::where('code', $couponCode)
-                ->where('status', 'active')
+        if ($zone && $zone->free_shipping !== 'yes') {
+            $charge = FreightCharge::where(
+                'shipping_zone_id',
+                $zone->id
+            )
+                ->where('min_weight', '<=', $totalWeight)
+                ->where('max_weight', '>=', $totalWeight)
                 ->first();
 
-            if (
-                $coupon &&
-                (!$coupon->expiry_date ||
-                    Carbon::parse($coupon->expiry_date)->endOfDay()->isFuture()) &&
-                (!$coupon->minimum_purchase ||
-                    $subtotal >= $coupon->minimum_purchase)
-            ) {
-                if ($coupon->type === 'fixed') {
-                    $discount = min((float) $coupon->discount, $subtotal);
-                } else {
-                    $discount = round(
-                        ($subtotal * (float) $coupon->discount) / 100
-                    );
+            if ($charge) {
+                $shipping = (float) $charge->charge;
+            } else {
+                $latestCharge = FreightCharge::where(
+                    'shipping_zone_id',
+                    $zone->id
+                )->orderByDesc('id')->first();
+
+                if (
+                    $latestCharge &&
+                    $totalWeight > $latestCharge->max_weight
+                ) {
+                    $shipping = (float) $latestCharge->charge + 30;
                 }
             }
         }
-
-        $total = max(0, $subtotal + $shipping - $discount);
-
-        return view('website.checkout', compact(
-            'cartItems',
-            'addresses',
-            'defaultAddress',
-            'subtotal',
-            'shipping',
-            'discount',
-            'total',
-            'couponCode',
-            'orderType'
-        ));
     }
+
+    $shipping = round($shipping);
+
+    /*
+    |--------------------------------------------------------------------------
+    | 5. COUPON
+    |--------------------------------------------------------------------------
+    */
+    $discount = 0;
+    $couponCode = trim((string) $request->query('code', ''));
+
+    if ($couponCode !== '') {
+        $coupon = Coupon::where('code', $couponCode)
+            ->where('status', 'active')
+            ->first();
+
+        if (
+            $coupon &&
+            (
+                !$coupon->expiry_date ||
+                Carbon::parse($coupon->expiry_date)
+                    ->endOfDay()->isFuture()
+            ) &&
+            (
+                !$coupon->minimum_purchase ||
+                $subtotal >= $coupon->minimum_purchase
+            )
+        ) {
+            if ($coupon->type === 'fixed') {
+                $discount = min(
+                    (float) $coupon->discount,
+                    $subtotal
+                );
+            } else {
+                $discount = round(
+                    ($subtotal * (float) $coupon->discount) / 100
+                );
+            }
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 6. TOTAL
+    |--------------------------------------------------------------------------
+    */
+    $total = max(0, $subtotal + $shipping - $discount);
+
+    return view('website.checkout', compact(
+        'cartItems',
+        'addresses',
+        'defaultAddress',
+        'subtotal',
+        'shipping',
+        'discount',
+        'total',
+        'couponCode',
+        'orderType',
+        'mode',
+        'isBuyNow'
+    ));
+}
+
 
 }

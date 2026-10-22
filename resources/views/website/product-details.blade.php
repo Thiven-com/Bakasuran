@@ -4,8 +4,8 @@
 
     <style>
         /* =========================================================
-                   PRODUCT DETAILS PAGE
-                ========================================================= */
+                                                   PRODUCT DETAILS PAGE
+                                                ========================================================= */
 
         :root {
             --sudheera-maroon: #650019;
@@ -24,8 +24,8 @@
 
 
         /* =========================================================
-                   BREADCRUMB
-                ========================================================= */
+                                                   BREADCRUMB
+                                                ========================================================= */
 
         .product-breadcrumb {
             padding: 35px 0 20px;
@@ -66,8 +66,8 @@
 
 
         /* =========================================================
-                   MAIN PRODUCT AREA
-                ========================================================= */
+                                                   MAIN PRODUCT AREA
+                                                ========================================================= */
 
         .product-details-wrapper {
             display: grid;
@@ -78,8 +78,8 @@
 
 
         /* =========================================================
-                   PRODUCT GALLERY
-                ========================================================= */
+                                                   PRODUCT GALLERY
+                                                ========================================================= */
 
         .product-gallery {
             position: sticky;
@@ -144,8 +144,8 @@
 
 
         /* =========================================================
-                   IMAGE BADGES
-                ========================================================= */
+                                                   IMAGE BADGES
+                                                ========================================================= */
 
         .product-image-badge {
             position: absolute;
@@ -201,8 +201,8 @@
 
 
         /* =========================================================
-                   PRODUCT INFO
-                ========================================================= */
+                                                   PRODUCT INFO
+                                                ========================================================= */
 
         .product-information {
             padding-top: 5px;
@@ -298,8 +298,8 @@
 
 
         /* =========================================================
-                   SHORT DESCRIPTION
-                ========================================================= */
+                                                   SHORT DESCRIPTION
+                                                ========================================================= */
 
         .product-short-description {
             font-size: 14px;
@@ -313,8 +313,8 @@
 
 
         /* =========================================================
-                   PRODUCT OPTIONS
-                ========================================================= */
+                                                   PRODUCT OPTIONS
+                                                ========================================================= */
 
         .product-option {
             padding: 20px 0;
@@ -383,8 +383,8 @@
 
 
         /* =========================================================
-                   QUANTITY + CART
-                ========================================================= */
+                                                   QUANTITY + CART
+                                                ========================================================= */
 
         .purchase-area {
             padding-top: 24px;
@@ -477,8 +477,8 @@
 
 
         /* =========================================================
-                   DELIVERY
-                ========================================================= */
+                                                   DELIVERY
+                                                ========================================================= */
 
         .delivery-box {
             margin-top: 25px;
@@ -549,8 +549,8 @@
 
 
         /* =========================================================
-                   SERVICE FEATURES
-                ========================================================= */
+                                                   SERVICE FEATURES
+                                                ========================================================= */
 
         .product-features {
             display: grid;
@@ -587,8 +587,8 @@
 
 
         /* =========================================================
-                   PRODUCT INFORMATION TABS
-                ========================================================= */
+                                                   PRODUCT INFORMATION TABS
+                                                ========================================================= */
 
         .product-extra-section {
             margin-top: 75px;
@@ -705,8 +705,8 @@
 
 
         /* =========================================================
-                   RESPONSIVE
-                ========================================================= */
+                                                   RESPONSIVE
+                                                ========================================================= */
 
         @media (max-width: 991px) {
 
@@ -833,14 +833,31 @@
         }
     </style>
 
+    <style>
+        /* Restaurant Name */
+        .product-restaurant-details {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 16px;
+            color: #E85D04;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .product-restaurant-details i {
+            font-size: 15px;
+        }
+    </style>
+
 
     <!-- =========================================================
-                 PRODUCT DETAILS PAGE
-            ========================================================= -->
+                                                 PRODUCT DETAILS PAGE
+                                            ========================================================= -->
 
     <!-- =========================================================
-                 PRODUCT DETAILS PAGE
-            ========================================================= -->
+                                                 PRODUCT DETAILS PAGE
+                                            ========================================================= -->
 
     <section class="product-details-page" style="margin-left: 20px; margin-right: 20px;">
 
@@ -852,9 +869,9 @@
 
             <!-- =====================================================
 
-                         BREADCRUMB
+                                                         BREADCRUMB
 
-                    ====================================================== -->
+                                                    ====================================================== -->
 
 
 
@@ -946,9 +963,9 @@
 
             <!-- =====================================================
 
-                         MAIN PRODUCT
+                                                         MAIN PRODUCT
 
-                    ====================================================== -->
+                                                    ====================================================== -->
 
 
 
@@ -960,9 +977,9 @@
 
                 <!-- =================================================
 
-                             LEFT - PRODUCT GALLERY
+                                                             LEFT - PRODUCT GALLERY
 
-                        ================================================= -->
+                                                        ================================================= -->
 
 
 
@@ -978,9 +995,9 @@
 
                         <!-- =================================================
 
-                                     THUMBNAILS
+                                                                     THUMBNAILS
 
-                                ================================================= -->
+                                                                ================================================= -->
 
 
 
@@ -996,11 +1013,11 @@
 
                                 <div class="product-thumb active" onclick="changeProductImage(
 
-                                                            this,
+                                                                                                                            this,
 
-                                                            '{{ asset($productImage) }}'
+                                                                                                                            '{{ asset($productImage) }}'
 
-                                                        )">
+                                                                                                                        )">
 
 
 
@@ -1034,11 +1051,11 @@
 
                                 <div class="product-thumb" onclick="changeProductImage(
 
-                                                            this,
+                                                                                                                            this,
 
-                                                            '{{ asset($product->image) }}'
+                                                                                                                            '{{ asset($product->image) }}'
 
-                                                        )">
+                                                                                                                        )">
 
 
 
@@ -1076,13 +1093,14 @@
 
 
 
-                                    <div class="product-thumb" onclick="changeProductImage(
+                                    <div class="product-thumb"
+                                        onclick="changeProductImage(
 
-                                                                            this,
+                                                                                                                                                                            this,
 
-                                                                            '{{ asset($productVariant->image) }}'
+                                                                                                                                                                            '{{ asset($productVariant->image) }}'
 
-                                                                        )">
+                                                                                                                                                                        )">
 
 
 
@@ -1113,7 +1131,6 @@
 
 
                                     <img src="{{ asset('website/images/product-placeholder.png') }}"
-
                                         alt="{{ $product->title }}">
 
 
@@ -1134,9 +1151,9 @@
 
                         <!-- =================================================
 
-                                     MAIN IMAGE
+                                                                     MAIN IMAGE
 
-                                ================================================= -->
+                                                                ================================================= -->
 
 
 
@@ -1168,16 +1185,13 @@
 
 
 
-                             <button
-
+                            <button
                                 class="product-image-wishlist {{ in_array($variant?->id, $wishlistVariantIds ?? []) ? 'active' : '' }}"
-
                                 title="Add to Wishlist" type="button" data-variant-id="{{ $variant?->id }}">
 
 
 
                                 <i
-
                                     class="{{ in_array($variant?->id, $wishlistVariantIds ?? []) ? 'fa-solid' : 'fa-regular' }} fa-heart"></i>
 
 
@@ -1201,7 +1215,6 @@
 
 
                                 <img id="mainProductImage" src="{{ asset('website/images/product-placeholder.png') }}"
-
                                     alt="{{ $product->title }}">
 
 
@@ -1226,9 +1239,9 @@
 
                 <!-- =================================================
 
-                             RIGHT - PRODUCT INFORMATION
+                                                             RIGHT - PRODUCT INFORMATION
 
-                        ================================================= -->
+                                                        ================================================= -->
 
 
 
@@ -1290,15 +1303,23 @@
 
                     </h1>
 
+                    {{-- Restaurant Name --}}
+                    @if($product->restaurant)
+                        <div class="product-restaurant-details">
+                            <i class="fa-solid fa-utensils"></i>
+                            <span>By {{ $product->restaurant->name }}</span>
+                        </div>
+                    @endif
+
 
 
 
 
                     <!-- =================================================
 
-                                 RATING / ORDERS
+                                                                 RATING / ORDERS
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -1384,9 +1405,9 @@
 
                     <!-- =================================================
 
-                                 PRICE
+                                                                 PRICE
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -1490,9 +1511,9 @@
 
                     <!-- =================================================
 
-                                 SHORT DESCRIPTION
+                                                                 SHORT DESCRIPTION
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -1536,9 +1557,9 @@
 
                     <!-- =================================================
 
-                                 VARIANTS
+                                                                 VARIANTS
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -1633,17 +1654,11 @@
 
 
                                     <button type="button"
-
                                         class="variant-option {{ $productVariant->id === $variant?->id ? 'active' : '' }}"
-
                                         data-variant-id="{{ $productVariant->id }}" data-variant-name="{{ $variantName }}"
-
                                         data-variant-image="{{ !empty($productVariant->image) ? asset($productVariant->image) : '' }}"
-
                                         data-variant-price="{{ $productVariant->price }}"
-
                                         data-variant-actual-price="{{ $productVariant->actual_price }}"
-
                                         data-variant-sku="{{ $productVariant->sku }}">
 
 
@@ -1676,9 +1691,9 @@
 
                     <!-- =================================================
 
-                                 PRODUCT INFORMATION FROM DATABASE
+                                                                 PRODUCT INFORMATION FROM DATABASE
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -1770,9 +1785,9 @@
 
                     <!-- =================================================
 
-                                 PURCHASE
+                                                                 PURCHASE
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -1833,7 +1848,6 @@
 
 
                             <button type="button" class="add-cart-button" data-product-id="{{ $product->id }}"
-
                                 data-variant-id="{{ $variant?->id }}">
 
 
@@ -1860,17 +1874,33 @@
 
 
 
-                        <button type="button" class="buy-now-button" data-product-id="{{ $product->id }}"
-
-                            data-variant-id="{{ $variant?->id }}">
-
-
-
-                            ORDER NOW
+                        <!-- <button type="button" class="buy-now-button" data-product-id="{{ $product->id }}"
+                                                        data-variant-id="{{ $variant?->id }}">
 
 
 
-                        </button>
+                                                        ORDER NOW
+
+
+
+                                                    </button> -->
+
+                        <!-- <button type="button" class="buy-now-button" data-product-id="{{ $product->id }}"
+                                                data-variant-id="{{ $variant?->id }}" data-url="{{ route('customer.order-now') }}">
+                                                ORDER NOW
+                                            </button> -->
+
+                        <form id="buyNowForm" action="{{ route('customer.order-now') }}" method="POST">
+                            @csrf
+
+                            <input type="hidden" name="product_variant_id" value="{{ $variant?->id }}">
+
+                            <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
+
+                            <button type="submit" class="buy-now-button" {{ !$variant ? 'disabled' : '' }}>
+                                ORDER NOW
+                            </button>
+                        </form>
 
 
 
@@ -1884,9 +1914,9 @@
 
                     <!-- =================================================
 
-                                 DELIVERY
+                                                                 DELIVERY
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -1917,7 +1947,6 @@
 
 
                             <input type="text" class="pincode-input" id="pincodeInput" placeholder="Enter Pincode"
-
                                 maxlength="6">
 
 
@@ -1944,13 +1973,13 @@
 
                         <div id="pincodeMessage" style="
 
-                                        margin-top:8px;
+                                                                        margin-top:8px;
 
-                                        font-size:12px;
+                                                                        font-size:12px;
 
-                                        color:#777;
+                                                                        color:#777;
 
-                                    "></div>
+                                                                    "></div>
 
 
 
@@ -1962,9 +1991,9 @@
 
                     <!-- =================================================
 
-                                 FEATURES
+                                                                 FEATURES
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -2052,9 +2081,9 @@
 
             <!-- =====================================================
 
-                         PRODUCT INFORMATION
+                                                         PRODUCT INFORMATION
 
-                    ===================================================== -->
+                                                    ===================================================== -->
 
 
 
@@ -2116,9 +2145,9 @@
 
                     <!-- =================================================
 
-                                 DESCRIPTION
+                                                                 DESCRIPTION
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -2180,9 +2209,9 @@
 
                     <!-- =================================================
 
-                                 FOOD DETAILS
+                                                                 FOOD DETAILS
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -2442,9 +2471,9 @@
 
                     <!-- =================================================
 
-                                 SHIPPING
+                                                                 SHIPPING
 
-                            ================================================= -->
+                                                            ================================================= -->
 
 
 
@@ -2504,897 +2533,312 @@
 
 
 
-    <script>
 
-        /*
-        |--------------------------------------------------------------------------
-        | Product Image
-        |--------------------------------------------------------------------------
-        */
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
-        function changeProductImage(element, image) {
+    // =========================================================
+    // PRODUCT IMAGE
+    // =========================================================
+    window.changeProductImage = function (element, image) {
+        if (!image) return;
 
-            if (!image) {
-                return;
-            }
+        const mainImage = document.getElementById('mainProductImage');
 
-            const mainImage =
-                document.getElementById('mainProductImage');
+        if (mainImage) mainImage.src = image;
 
-            if (mainImage) {
+        document.querySelectorAll('.product-thumb').forEach(function (thumb) {
+            thumb.classList.remove('active');
+        });
 
-                mainImage.src = image;
+        if (element) element.classList.add('active');
+    };
 
-            }
+    // =========================================================
+    // QUANTITY
+    // =========================================================
+    let quantity = 1;
 
+    window.changeQuantity = function (value) {
+        quantity = Math.max(1, quantity + Number(value));
 
-            document
-                .querySelectorAll('.product-thumb')
-                .forEach(function (thumb) {
+        const display = document.getElementById('quantityValue');
+        const buyQuantity = document.getElementById('buyNowQuantity');
 
-                    thumb.classList.remove('active');
+        if (display) display.textContent = quantity;
+        if (buyQuantity) buyQuantity.value = quantity;
+    };
 
-                });
-
-
-            if (element) {
-
-                element.classList.add('active');
-
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Quantity
-        |--------------------------------------------------------------------------
-        */
-
-        let quantity = 1;
-
-
-        function changeQuantity(value) {
-
-            quantity += value;
-
-
-            if (quantity < 1) {
-
-                quantity = 1;
-
-            }
-
-
-            document
-                .getElementById('quantityValue')
-                .textContent = quantity;
-
-        }
-
-
-          /*
-    |--------------------------------------------------------------------------
-    | Wishlist Data
-    |--------------------------------------------------------------------------
-    */
-
-    const wishlistVariantIds =
-        @json($wishlistVariantIds ?? []);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Wishlist Icon
-    |--------------------------------------------------------------------------
-    */
+    // =========================================================
+    // WISHLIST
+    // =========================================================
+    const wishlistVariantIds = (@json($wishlistVariantIds ?? [])).map(Number);
 
     function updateWishlistIcon(variantId) {
+        const button = document.querySelector('.product-image-wishlist');
+        if (!button) return;
 
-        const wishlistButton =
-            document.querySelector('.product-image-wishlist');
+        const icon = button.querySelector('i');
+        const selected = wishlistVariantIds.includes(Number(variantId));
 
-        if (!wishlistButton) {
-            return;
-        }
+        button.classList.toggle('active', selected);
 
-        const icon =
-            wishlistButton.querySelector('i');
-
-        if (!icon) {
-            return;
-        }
-
-        const numericVariantId =
-            Number(variantId);
-
-        const isWishlisted =
-            wishlistVariantIds.includes(numericVariantId);
-
-        if (isWishlisted) {
-
-            wishlistButton.classList.add('active');
-
-            icon.classList.remove(
-                'fa-regular'
-            );
-
-            icon.classList.add(
-                'fa-solid'
-            );
-
-        } else {
-
-            wishlistButton.classList.remove('active');
-
-            icon.classList.remove(
-                'fa-solid'
-            );
-
-            icon.classList.add(
-                'fa-regular'
-            );
+        if (icon) {
+            icon.classList.toggle('fa-solid', selected);
+            icon.classList.toggle('fa-regular', !selected);
         }
     }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Product Variants
-        |--------------------------------------------------------------------------
-        */
+    // =========================================================
+    // VARIANT SELECTION
+    // =========================================================
+    document.querySelectorAll('.variant-option[data-variant-id]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const variantId = this.dataset.variantId;
+            const parent = this.closest('.variant-options');
 
-        document
-            .querySelectorAll('.variant-option[data-variant-id]')
-            .forEach(function (button) {
-
-                button.addEventListener('click', function () {
-
-                    const parent =
-                        this.closest('.variant-options');
-
-
-                    if (parent) {
-
-                        parent
-                            .querySelectorAll('.variant-option')
-                            .forEach(function (item) {
-
-                                item.classList.remove('active');
-
-                            });
-
-                    }
-
-
-                    this.classList.add('active');
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Selected Variant
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const variantId =
-                        this.getAttribute('data-variant-id');
-
-                         /*
-                |--------------------------------------------------------------------------
-                | Update Wishlist Variant ID
-                |--------------------------------------------------------------------------
-                */
-
-                const wishlistButton =
-                    document.querySelector('.product-image-wishlist');
-
-                if (wishlistButton) {
-
-                    wishlistButton.setAttribute(
-                        'data-variant-id',
-                        variantId
-                    );
-                }
-                  /*
-                |--------------------------------------------------------------------------
-                | Update Wishlist Heart
-                |--------------------------------------------------------------------------
-                */
-
-                updateWishlistIcon(variantId);
-
-
-                    const variantSku =
-                        this.getAttribute('data-variant-sku');
-
-
-                    const variantImage =
-                        this.getAttribute('data-variant-image');
-
-
-                    const variantPrice =
-                        this.getAttribute('data-variant-price');
-
-
-                    const variantActualPrice =
-                        this.getAttribute('data-variant-actual-price');
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Update selected variant text
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const selectedVariant =
-                        document.getElementById(
-                            'selectedVariantName'
-                        );
-
-
-                    if (selectedVariant) {
-
-                        selectedVariant.textContent =
-                            variantSku || 'Selected';
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Update image
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (variantImage) {
-
-                    const mainImage =
-                        document.getElementById(
-                            'mainProductImage'
-                        );
-
-                    if (mainImage) {
-                        mainImage.src = variantImage;
-                    }
-                }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Update price
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const currentPrice =
-                        document.querySelector(
-                            '.product-current-price'
-                        );
-
-
-                    const oldPrice =
-                        document.querySelector(
-                            '.product-old-price'
-                        );
-
-
-                    if (
-                        currentPrice &&
-                        variantPrice &&
-                        !isNaN(variantPrice)
-                    ) {
-
-                        currentPrice.textContent =
-                            '₹' +
-                            Number(variantPrice)
-                                .toLocaleString('en-IN');
-
-                    }
-
-
-                    if (
-                        oldPrice &&
-                        variantActualPrice &&
-                        !isNaN(variantActualPrice)
-                    ) {
-
-                        oldPrice.textContent =
-                            '₹' +
-                            Number(variantActualPrice)
-                                .toLocaleString('en-IN');
-
-                    }
-
+            if (parent) {
+                parent.querySelectorAll('.variant-option').forEach(function (item) {
+                    item.classList.remove('active');
                 });
-
-            });
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Wishlist
-    |--------------------------------------------------------------------------
-    */
-
-    const wishlistButton =
-        document.querySelector('.product-image-wishlist');
-
-    if (wishlistButton) {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Set Initial Wishlist State
-        |--------------------------------------------------------------------------
-        */
-
-        const initialVariantId =
-            wishlistButton.getAttribute(
-                'data-variant-id'
-            );
-
-        if (initialVariantId) {
-            updateWishlistIcon(initialVariantId);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Wishlist Click
-        |--------------------------------------------------------------------------
-        */
-
-        wishlistButton.addEventListener(
-            'click',
-            function (event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                const button = this;
-
-                const variantId =
-                    button.getAttribute(
-                        'data-variant-id'
-                    );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Validate Variant
-                |--------------------------------------------------------------------------
-                */
-
-                if (!variantId) {
-
-                    alert(
-                        'Product variant not found.'
-                    );
-
-                    return;
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Send Wishlist Request
-                |--------------------------------------------------------------------------
-                */
-
-                fetch(
-                    '{{ route('wishlist.add') }}',
-                    {
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-
-                            'X-CSRF-TOKEN':
-                                '{{ csrf_token() }}',
-
-                            'Accept':
-                                'application/json'
-                        },
-
-                        body: JSON.stringify({
-                            product_variant_id:
-                                variantId
-                        })
-                    }
-                )
-
-                .then(
-                    async function (response) {
-
-                        const data =
-                            await response.json();
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Customer Not Logged In
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (
-                            response.status === 401
-                        ) {
-
-                            window.location.href =
-                                '{{ route('login') }}';
-
-                            return;
-                        }
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Server Error
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (!response.ok) {
-
-                            throw new Error(
-                                data.message ||
-                                'Something went wrong.'
-                            );
-                        }
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Success
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (data.status) {
-
-                            const numericVariantId =
-                                Number(variantId);
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Add Variant To Local Wishlist Array
-                            |--------------------------------------------------------------------------
-                            */
-
-                            if (
-                                !wishlistVariantIds.includes(
-                                    numericVariantId
-                                )
-                            ) {
-
-                                wishlistVariantIds.push(
-                                    numericVariantId
-                                );
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Update Heart
-                            |--------------------------------------------------------------------------
-                            */
-
-                            updateWishlistIcon(
-                                numericVariantId
-                            );
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Success Message
-                            |--------------------------------------------------------------------------
-                            */
-
-                            alert(
-                                data.message
-                            );
-
-                        } else {
-
-                            alert(
-                                data.message ||
-                                'Unable to add to wishlist.'
-                            );
-                        }
-
-                    }
-                )
-
-                .catch(
-                    function (error) {
-
-                        console.error(
-                            'Wishlist Error:',
-                            error
-                        );
-
-                        alert(
-                            error.message ||
-                            'Something went wrong.'
-                        );
-
-                    }
-                );
-
             }
-        );
 
+            this.classList.add('active');
+
+            // Keep both purchase buttons synchronized.
+            const buyVariant = document.querySelector(
+                '#buyNowForm input[name="product_variant_id"]'
+            );
+            const cartButton = document.querySelector('.add-cart-button');
+            const wishlistButton = document.querySelector('.product-image-wishlist');
+
+            if (buyVariant) buyVariant.value = variantId;
+            if (cartButton) cartButton.dataset.variantId = variantId;
+            if (wishlistButton) wishlistButton.dataset.variantId = variantId;
+
+            updateWishlistIcon(variantId);
+
+            const selectedName = document.getElementById('selectedVariantName');
+            if (selectedName) {
+                selectedName.textContent =
+                    this.dataset.variantName || this.dataset.variantSku || 'Selected';
+            }
+
+            if (this.dataset.variantImage) {
+                const mainImage = document.getElementById('mainProductImage');
+                if (mainImage) mainImage.src = this.dataset.variantImage;
+            }
+
+            const currentPrice = document.querySelector('.product-current-price');
+            const oldPrice = document.querySelector('.product-old-price');
+
+            if (currentPrice && this.dataset.variantPrice !== '') {
+                currentPrice.textContent =
+                    '₹' + Number(this.dataset.variantPrice).toLocaleString('en-IN');
+            }
+
+            if (oldPrice && this.dataset.variantActualPrice !== '') {
+                oldPrice.textContent =
+                    '₹' + Number(this.dataset.variantActualPrice).toLocaleString('en-IN');
+            }
+        });
+    });
+
+    const initialWishlistButton = document.querySelector('.product-image-wishlist');
+    if (initialWishlistButton?.dataset.variantId) {
+        updateWishlistIcon(initialWishlistButton.dataset.variantId);
     }
 
+    if (initialWishlistButton) {
+        initialWishlistButton.addEventListener('click', async function (event) {
+            event.preventDefault();
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Add To Cart - Database
-    |--------------------------------------------------------------------------
-    */
-
-    const addCartButton = document.querySelector('.add-cart-button');
-
-    if (addCartButton) {
-
-        addCartButton.addEventListener('click', function () {
-
-            const currentButton = this;
-
-            /*
-            |--------------------------------------------------------------------------
-            | Get Selected Variant
-            |--------------------------------------------------------------------------
-            */
-
-            let variantId = currentButton.getAttribute('data-variant-id');
-
-            /*
-            |--------------------------------------------------------------------------
-            | Get Quantity
-            |--------------------------------------------------------------------------
-            */
-
-            let selectedQuantity = quantity || 1;
-
-            if (selectedQuantity < 1) {
-                selectedQuantity = 1;
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Validate Variant
-            |--------------------------------------------------------------------------
-            */
+            const variantId = this.dataset.variantId;
 
             if (!variantId) {
-
                 alert('Please select a product variant.');
-
                 return;
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Button Loading
-            |--------------------------------------------------------------------------
-            */
-
-            const originalText = currentButton.innerHTML;
-
-            currentButton.disabled = true;
-
-            currentButton.innerHTML =
-                '<i class="fa-solid fa-spinner fa-spin me-2"></i> ADDING...';
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Send To Database
-            |--------------------------------------------------------------------------
-            */
-
-            fetch("{{ route('cart.add') }}", {
-
-                method: 'POST',
-
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-
-                body: JSON.stringify({
-
-                    product_variant_id: variantId,
-
-                    quantity: selectedQuantity
-
-                })
-
-            })
-
-            .then(async function (response) {
+            try {
+                const response = await fetch(@json(route('wishlist.add')), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': @json(csrf_token())
+                    },
+                    body: JSON.stringify({
+                        product_variant_id: variantId
+                    })
+                });
 
                 const data = await response.json();
 
-                /*
-                |--------------------------------------------------------------------------
-                | Login Required
-                |--------------------------------------------------------------------------
-                */
-
                 if (response.status === 401) {
-
-                    alert(
-                        data.message ||
-                        'Please login first.'
-                    );
-
-                    window.location.href =
-                        "{{ route('login') }}";
-
-                    return null;
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Validation / Server Error
-                |--------------------------------------------------------------------------
-                */
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        data.message ||
-                        'Unable to add product to cart.'
-                    );
-
-                }
-
-
-                return data;
-
-            })
-
-            .then(function (data) {
-
-                if (!data) {
+                    window.location.href = @json(route('login'));
                     return;
                 }
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | Success
-                |--------------------------------------------------------------------------
-                */
-
-                if (data.status) {
-
-                    currentButton.innerHTML =
-                        '<i class="fa-solid fa-check me-2"></i> ADDED TO CART';
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Update Cart Count
-                    |--------------------------------------------------------------------------
-                    */
-
-                    document
-                        .querySelectorAll('.cart-count')
-                        .forEach(function (element) {
-
-                            element.textContent =
-                                data.cart_count;
-
-                        });
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Restore Button
-                    |--------------------------------------------------------------------------
-                    */
-
-                    setTimeout(function () {
-
-                        currentButton.innerHTML =
-                            originalText;
-
-                        currentButton.disabled =
-                            false;
-
-                    }, 1500);
-
-                } else {
-
-                    currentButton.innerHTML =
-                        originalText;
-
-                    currentButton.disabled =
-                        false;
-
-                    alert(
-                        data.message ||
-                        'Unable to add product to cart.'
-                    );
-
+                if (!response.ok || !data.status) {
+                    throw new Error(data.message || 'Unable to update wishlist.');
                 }
 
-            })
+                const id = Number(variantId);
+                if (!wishlistVariantIds.includes(id)) {
+                    wishlistVariantIds.push(id);
+                }
 
-            .catch(function (error) {
+                updateWishlistIcon(id);
+                alert(data.message || 'Wishlist updated.');
 
-                console.error(
-                    'Add to cart error:',
-                    error
-                );
-
-                currentButton.innerHTML =
-                    originalText;
-
-                currentButton.disabled =
-                    false;
-
-                alert(
-                    error.message ||
-                    'Something went wrong. Please try again.'
-                );
-
-            });
-
+            } catch (error) {
+                console.error('Wishlist error:', error);
+                alert(error.message || 'Something went wrong.');
+            }
         });
-
     }
 
+    // =========================================================
+    // ADD TO CART
+    // =========================================================
+    const addCartButton = document.querySelector('.add-cart-button');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Buy Now - Visual State
-        |--------------------------------------------------------------------------
-        */
+    if (addCartButton) {
+        addCartButton.addEventListener('click', async function () {
+            const button = this;
+            const variantId = button.dataset.variantId;
+            const selectedQuantity = Math.max(1, quantity);
+            const originalText = button.innerHTML;
 
-        const buyNowButton =
-            document.querySelector(
-                '.buy-now-button'
-            );
+            if (!variantId) {
+                alert('Please select a product variant.');
+                return;
+            }
 
+            button.disabled = true;
+            button.textContent = 'ADDING...';
 
-        if (buyNowButton) {
+            try {
+                const response = await fetch(@json(route('cart.add')), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': @json(csrf_token())
+                    },
+                    body: JSON.stringify({
+                        product_variant_id: variantId,
+                        quantity: selectedQuantity
+                    })
+                });
 
-            buyNowButton.addEventListener(
-                'click',
-                function () {
+                const data = await response.json();
 
-                    const originalText =
-                        this.innerHTML;
-
-
-                    this.innerHTML =
-                        'PROCESSING...';
-
-
-                    this.disabled = true;
-
-
-                    const currentButton =
-                        this;
-
-
-                    setTimeout(function () {
-
-                        currentButton.innerHTML =
-                            originalText;
-
-                        currentButton.disabled =
-                            false;
-
-                    }, 1000);
-
+                if (response.status === 401) {
+                    window.location.href = @json(route('login'));
+                    return;
                 }
+
+                if (!response.ok || !data.status) {
+                    throw new Error(data.message || 'Unable to add product to cart.');
+                }
+
+                document.querySelectorAll('.cart-count').forEach(function (element) {
+                    element.textContent = data.cart_count ?? '';
+                });
+
+                button.textContent = 'ADDED TO CART';
+
+                setTimeout(function () {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1500);
+
+            } catch (error) {
+                console.error('Add to cart error:', error);
+                alert(error.message || 'Unable to add product to cart.');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+    }
+
+    // =========================================================
+    // ORDER NOW — SUBMIT FORM TO LARAVEL
+    // =========================================================
+    const buyNowForm = document.getElementById('buyNowForm');
+
+    if (buyNowForm) {
+        buyNowForm.addEventListener('submit', function (event) {
+            const variantInput = buyNowForm.querySelector(
+                'input[name="product_variant_id"]'
             );
+            const quantityInput = buyNowForm.querySelector(
+                'input[name="quantity"]'
+            );
+            const button = buyNowForm.querySelector('button[type="submit"]');
 
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Pincode
-        |--------------------------------------------------------------------------
-        */
-
-        function checkPincode() {
-
-            const input =
-                document.getElementById(
-                    'pincodeInput'
-                );
-
-
-            const message =
-                document.getElementById(
-                    'pincodeMessage'
-                );
-
-
-            if (!input || !message) {
+            if (!variantInput || !variantInput.value) {
+                event.preventDefault();
+                alert('Please select a product variant.');
                 return;
             }
 
+            quantityInput.value = Math.max(1, quantity);
 
-            const pincode =
-                input.value.trim();
-
-
-            if (!/^[0-9]{6}$/.test(pincode)) {
-
-                message.textContent =
-                    'Please enter a valid 6-digit pincode.';
-
-                message.style.color =
-                    '#b00020';
-
-                return;
-
+            // Prevent double-clicks without cancelling form submission.
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'PROCESSING...';
             }
+        });
+    }
 
+    // =========================================================
+    // PINCODE
+    // =========================================================
+    window.checkPincode = function () {
+        const input = document.getElementById('pincodeInput');
+        const message = document.getElementById('pincodeMessage');
 
-            message.textContent =
-                'Delivery availability will be checked for this pincode.';
+        if (!input || !message) return;
 
-            message.style.color =
-                '#497d45';
+        const pincode = input.value.trim();
 
+        if (!/^[0-9]{6}$/.test(pincode)) {
+            message.textContent = 'Please enter a valid 6-digit pincode.';
+            message.style.color = '#b00020';
+            return;
         }
 
+        message.textContent =
+            'Delivery availability will be checked for this pincode.';
+        message.style.color = '#497d45';
+    };
 
-        /*
-        |--------------------------------------------------------------------------
-        | Tabs
-        |--------------------------------------------------------------------------
-        */
+    // =========================================================
+    // PRODUCT TABS
+    // =========================================================
+    window.openTab = function (event, tabId) {
+        document.querySelectorAll('.tab-panel').forEach(function (panel) {
+            panel.classList.remove('active');
+        });
 
-        function openTab(event, tabId) {
+        document.querySelectorAll('.product-tab').forEach(function (tab) {
+            tab.classList.remove('active');
+        });
 
-            document
-                .querySelectorAll('.tab-panel')
-                .forEach(function (panel) {
+        const panel = document.getElementById(tabId);
+        if (panel) panel.classList.add('active');
 
-                    panel.classList.remove('active');
-
-                });
-
-
-            document
-                .querySelectorAll('.product-tab')
-                .forEach(function (tab) {
-
-                    tab.classList.remove('active');
-
-                });
-
-
-            const selectedPanel =
-                document.getElementById(tabId);
-
-
-            if (selectedPanel) {
-
-                selectedPanel.classList.add('active');
-
-            }
-
-
-            if (event && event.currentTarget) {
-
-                event.currentTarget.classList.add('active');
-
-            }
-
+        if (event?.currentTarget) {
+            event.currentTarget.classList.add('active');
         }
+    };
 
-    </script>
+});
+</script>
+
 
 @endsection

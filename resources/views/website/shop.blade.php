@@ -4,8 +4,8 @@
 
     <style>
         /* =========================================================
-                                           SUDHEERA SHOP PAGE
-                                        ========================================================= */
+                                                   SUDHEERA SHOP PAGE
+                                                ========================================================= */
 
         .sudheera-shop {
             background: #fffdf9;
@@ -89,8 +89,8 @@
         }
 
         /* =========================================================
-                                           SIDEBAR
-                                        ========================================================= */
+                                                   SIDEBAR
+                                                ========================================================= */
 
         .shop-sidebar {
             background: #fff;
@@ -201,8 +201,8 @@
         }
 
         /* =========================================================
-                                           TOOLBAR
-                                        ========================================================= */
+                                                   TOOLBAR
+                                                ========================================================= */
 
         .shop-toolbar {
             min-height: 52px;
@@ -268,8 +268,8 @@
         }
 
         /* =========================================================
-                                           PRODUCT GRID
-                                        ========================================================= */
+                                                   PRODUCT GRID
+                                                ========================================================= */
 
         .sudheera-product-grid {
             display: grid;
@@ -435,8 +435,8 @@
         }
 
         /* =========================================================
-                                           MOBILE FILTER
-                                        ========================================================= */
+                                                   MOBILE FILTER
+                                                ========================================================= */
 
         .mobile-filter-panel {
             display: none;
@@ -448,8 +448,8 @@
         }
 
         /* =========================================================
-                                           RESPONSIVE
-                                        ========================================================= */
+                                                   RESPONSIVE
+                                                ========================================================= */
 
         @media (max-width: 1199px) {
 
@@ -630,8 +630,8 @@
     <div class="sudheera-shop">
 
         <!-- =====================================================
-                                             BREADCRUMB
-                                        ====================================================== -->
+                                                     BREADCRUMB
+                                                ====================================================== -->
 
         <section class="shop-breadcrumb">
             <div class="container">
@@ -653,8 +653,8 @@
 
 
         <!-- =====================================================
-                                             SHOP MAIN
-                                        ====================================================== -->
+                                                     SHOP MAIN
+                                                ====================================================== -->
 
         <section class="shop-main">
 
@@ -664,8 +664,8 @@
 
 
                     <!-- =================================================
-                                                         SIDEBAR
-                                                    ================================================== -->
+                                                                 SIDEBAR
+                                                            ================================================== -->
 
                     <aside class="shop-sidebar">
 
@@ -759,8 +759,8 @@
 
 
                     <!-- =================================================
-                                                         PRODUCTS
-                                                    ================================================== -->
+                                                                 PRODUCTS
+                                                            ================================================== -->
 
                     <div class="shop-products-area">
 
@@ -776,8 +776,8 @@
                                 </button>
                                 <style>
                                     /* =========================================
-       FILTER MODAL
-    ========================================= */
+               FILTER MODAL
+            ========================================= */
 
                                     .filter-modal-overlay {
                                         position: fixed;
@@ -932,6 +932,30 @@
                                         .filter-modal-footer {
                                             padding: 14px 16px 16px;
                                         }
+                                    }
+                                </style>
+
+                                <style>
+                                    .product-restaurant {
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 7px;
+                                        margin: 7px 0;
+                                        color: #E85D04;
+                                        font-size: 12px;
+                                        font-weight: 600;
+                                        line-height: 1.5;
+                                    }
+
+                                    .product-restaurant i {
+                                        flex-shrink: 0;
+                                        font-size: 13px;
+                                    }
+
+                                    .product-restaurant span {
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
                                     }
                                 </style>
                                 <!-- Filter Modal -->
@@ -1107,8 +1131,8 @@
                         </div>
 
                         <!-- =================================================
-                                                             PRODUCT GRID
-                                                        ================================================== -->
+                                                                     PRODUCT GRID
+                                                                ================================================== -->
 
 
                         <div class="sudheera-product-grid">
@@ -1257,6 +1281,14 @@
 
                                         @endif
 
+                                        {{-- RESTAURANT NAME --}}
+                                        @if($product->restaurant)
+                                            <div class="product-restaurant">
+                                                <i class="fa fa-cutlery" aria-hidden="true"></i>
+                                                <span>{{ $product->restaurant->name }}</span>
+                                            </div>
+                                        @endif
+
 
                                         <a href="{{ route('productdetails', ['slug' => $product->slug]) }}"
                                             class="sudheera-product-card-link">
@@ -1353,22 +1385,22 @@
 
                             @empty
 
-                                            <div style="
-                                    grid-column: 1 / -1;
-                                    text-align:center;
-                                    padding:60px 20px;
-                                    color:#777;
-                                ">
+                                <div style="
+                                                    grid-column: 1 / -1;
+                                                    text-align:center;
+                                                    padding:60px 20px;
+                                                    color:#777;
+                                                ">
 
-                                                <h3>
-                                                    No products found
-                                                </h3>
+                                    <h3>
+                                        No products found
+                                    </h3>
 
-                                                <p>
-                                                    Try changing your filters or browse another category.
-                                                </p>
+                                    <p>
+                                        Try changing your filters or browse another category.
+                                    </p>
 
-                                            </div>
+                                </div>
 
                             @endforelse
 

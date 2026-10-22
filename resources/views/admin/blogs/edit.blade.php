@@ -66,6 +66,22 @@
                                                     </select>
                                                 </div>
                                             </div>
+
+                                            <div class="col-lg-4 col-sm-6 col-12">
+                                                <div class="mb-3 add-blog">
+                                                    <label class="form-label">Restaurant</label>
+
+                                                    <select class="select" name="restaurant_id">
+                                                        <option value="">Choose Restaurant</option>
+
+                                                        @foreach ($restaurants as $restaurant)
+                                                            <option value="{{ $restaurant->id }}" {{ old('restaurant_id', $blog->restaurant_id) == $restaurant->id ? 'selected' : '' }}>
+                                                                {{ $restaurant->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
 
 
@@ -86,8 +102,8 @@
                                         <div class="col-lg-12">
                                             <div class="input-blocks summer-description-box transfer mb-3">
                                                 <label>Description<span style="color:red;">*</span></label>
-                                                <textarea class="form-control h-100" id="summernote" name="description"
-                                                    >{{ old('description', $blog->description ?? '') }}</textarea>
+                                                <textarea class="form-control h-100" id="summernote"
+                                                    name="description">{{ old('description', $blog->description ?? '') }}</textarea>
                                                 <p class="mt-1">Maximum 60 Characters</p>
                                             </div>
                                         </div>
@@ -142,8 +158,8 @@
                                                                                         <div class="profile-pic brand-pic"
                                                                                             id="imagePreview"
                                                                                             style="background-image: url('{{ isset($blog->image) ? asset($blog->image) : '' }}');
-                                                                                                                background-size: cover;
-                                                                                                                background-position: center;">
+                                                                                                                    background-size: cover;
+                                                                                                                    background-position: center;">
 
                                                                                             @if(empty($blog->image))
                                                                                                 <span id="uploadText">
@@ -172,8 +188,8 @@
                                                                                         <div class="profile-pic brand-pic"
                                                                                             id="bannerPreview"
                                                                                             style="background-image: url('{{ isset($blog->banner) ? asset($blog->banner) : '' }}');
-                                                                                                                background-size: cover;
-                                                                                                                background-position: center;">
+                                                                                                                    background-size: cover;
+                                                                                                                    background-position: center;">
 
                                                                                             @if(empty($blog->banner))
                                                                                                 <span id="uploadText2">
