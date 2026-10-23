@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerApp\CheckoutController;
+use App\Http\Controllers\CustomerApp\RestaurantController;
 use App\Http\Controllers\CustomerApp\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,9 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
     Route::get('my_locations', 'ProfileController@my_locations');
     Route::get('location/{id}/delete', 'AddressController@destroy');
     Route::any('firebase_token', 'ProfileController@firebase_token');
+
+    Route::get('restaurants', [RestaurantController::class, 'index']);
+    Route::get('restaurants/{id}', [RestaurantController::class, 'show']);
 
     // routes/api.php
 

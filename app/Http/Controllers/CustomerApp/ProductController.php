@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductReviewCollection;
+use App\Http\Resources\ProductsCollection;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
@@ -17,20 +18,20 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage    = (int) $request->get('per_page', 12);
-        $search     = trim((string) $request->get('search', ''));
+        $perPage = (int) $request->get('per_page', 12);
+        $search = trim((string) $request->get('search', ''));
         $categoryId = $request->get('category_id');
-        $minPrice   = $request->get('min_price');
-        $maxPrice   = $request->get('max_price');
-        $inStock    = filter_var($request->get('in_stock'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        $sortInput  = $request->get('sort', 'newest'); // newest|price_asc|price_desc|title_asc|title_desc|name_asc|name_desc
-        $attrSlugs  = (array) $request->get('attributes', []); // e.g. attributes[color][]=red
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+        $inStock = filter_var($request->get('in_stock'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $sortInput = $request->get('sort', 'newest'); // newest|price_asc|price_desc|title_asc|title_desc|name_asc|name_desc
+        $attrSlugs = (array) $request->get('attributes', []); // e.g. attributes[color][]=red
 
         // Map legacy 'name_*' to 'title_*' if client still sends old keys
         $sort = match ($sortInput) {
-            'name_asc'  => 'title_asc',
+            'name_asc' => 'title_asc',
             'name_desc' => 'title_desc',
-            default     => $sortInput,
+            default => $sortInput,
         };
 
         // 1) Resolve attribute/value slugs -> IDs (cached)
@@ -49,7 +50,8 @@ class ProductController extends Controller
 
             foreach ($attrSlugs as $attrSlug => $valueSlugList) {
                 $attrSlugKey = strtolower($attrSlug);
-                if (!isset($attrMap[$attrSlugKey])) continue;
+                if (!isset($attrMap[$attrSlugKey]))
+                    continue;
 
                 $attributeId = (int) $attrMap[$attrSlugKey]->id;
                 $valueIds = [];
@@ -97,8 +99,10 @@ class ProductController extends Controller
         // 5) Price range via variants
         if ($minPrice !== null || $maxPrice !== null) {
             $query->whereHas('variants', function ($q) use ($minPrice, $maxPrice) {
-                if ($minPrice !== null) $q->where('price', '>=', (float) $minPrice);
-                if ($maxPrice !== null) $q->where('price', '<=', (float) $maxPrice);
+                if ($minPrice !== null)
+                    $q->where('price', '>=', (float) $minPrice);
+                if ($maxPrice !== null)
+                    $q->where('price', '<=', (float) $maxPrice);
             });
         }
 
@@ -140,14 +144,14 @@ class ProductController extends Controller
         // 10) Return collection
         return new ProductCollection($paginated, [
             'applied_filters' => [
-                'search'      => $search ?: null,
-                'category_id' => $categoryId ? (int)$categoryId : null,
-                'min_price'   => $minPrice !== null ? (float)$minPrice : null,
-                'max_price'   => $maxPrice !== null ? (float)$maxPrice : null,
-                'in_stock'    => $inStock,
-                'attributes'  => $attrSlugs,
-                'sort'        => $sort,
-                'per_page'    => $perPage,
+                'search' => $search ?: null,
+                'category_id' => $categoryId ? (int) $categoryId : null,
+                'min_price' => $minPrice !== null ? (float) $minPrice : null,
+                'max_price' => $maxPrice !== null ? (float) $maxPrice : null,
+                'in_stock' => $inStock,
+                'attributes' => $attrSlugs,
+                'sort' => $sort,
+                'per_page' => $perPage,
             ],
         ]);
     }
@@ -214,6 +218,96 @@ class ProductController extends Controller
             'success' => 1,
             'data' => $data,
             'message' => 'Data Fetched Succesdfully.'
+        ]);
+    }
+    public function product(Request $request)
+    {
+        $products = Product::with([
+            'category:id,title',
+            'restaurant:id,name',
+            'media' => function ($query) {
+                $query->orderByDesc('is_primary')
+                    ->orderBy('sort_order');
+            },
+            'variants',
+            'variants.attributeValues',
+            'variants.attributeValues.attribute',
+        ]);
+
+        // Search products by title or description
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $products->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category_id')) {
+            $products->where('category_id', $request->category_id);
+        }
+
+        // Filter by minimum and maximum price
+        if ($request->filled('min_price') || $request->filled('max_price')) {
+            $products->whereHas('variants', function ($query) use ($request) {
+                if ($request->filled('min_price')) {
+                    $query->where('price', '>=', (float) $request->min_price);
+                }
+
+                if ($request->filled('max_price')) {
+                    $query->where('price', '<=', (float) $request->max_price);
+                }
+            });
+        }
+
+        // Filter products that are in stock
+        if ($request->boolean('in_stock')) {
+            $products->whereHas('variants', function ($query) {
+                $query->where('stock', '>', 0);
+            });
+        }
+
+        // Sorting
+        switch ($request->get('sort', 'newest')) {
+            case 'price_asc':
+                $products->withMin('variants', 'price')
+                    ->orderBy('variants_min_price', 'asc');
+                break;
+
+            case 'price_desc':
+                $products->withMin('variants', 'price')
+                    ->orderBy('variants_min_price', 'desc');
+                break;
+
+            case 'title_asc':
+                $products->orderBy('title', 'asc');
+                break;
+
+            case 'title_desc':
+                $products->orderBy('title', 'desc');
+                break;
+
+            default:
+                $products->latest('id');
+                break;
+        }
+
+        $perPage = max(1, min((int) $request->get('per_page', 12), 100));
+
+        $paginatedProducts = $products->paginate($perPage);
+
+        return new ProductsCollection($paginatedProducts, [
+            'applied_filters' => [
+                'search' => $request->get('search'),
+                'category_id' => $request->get('category_id'),
+                'min_price' => $request->get('min_price'),
+                'max_price' => $request->get('max_price'),
+                'in_stock' => $request->get('in_stock'),
+                'sort' => $request->get('sort', 'newest'),
+                'per_page' => $perPage,
+            ],
         ]);
     }
 }
