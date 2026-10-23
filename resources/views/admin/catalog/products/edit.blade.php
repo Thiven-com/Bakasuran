@@ -43,11 +43,33 @@
                                     <div class="accordion-body">
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Product Name</label>
-                                                    <input type="text" class="form-control" name="title"
-                                                        value="{{ $product->title }}" required>
-                                                </div>
+                                                
+<div class="mb-3">
+    <label class="form-label">Product Name</label>
+
+    <input type="text"
+        class="form-control"
+        name="title"
+        id="productName"
+        value="{{ old('title', $product->title) }}"
+        required>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Product Slug</label>
+
+    <input type="text"
+        class="form-control"
+        name="slug"
+        id="productSlug"
+        value="{{ old('slug', $product->slug ?? '') }}"
+        readonly>
+
+    <small class="text-muted">
+        Automatically generated from product name.
+    </small>
+</div>
+
                                             </div>
                                             <div class="col-lg-6">
                                                 <label class="form-label">Brand</label>
@@ -1000,4 +1022,43 @@ $(document).on('click', '.remove-selected-file', function () {
     btn.hide();
 });
 </script>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const productName = document.getElementById("productName");
+    const productSlug = document.getElementById("productSlug");
+
+    if (!productName || !productSlug) {
+        console.error("Product name or slug input not found");
+        return;
+    }
+
+    function generateSlug(value) {
+        return value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+    }
+
+    function updateSlug() {
+        productSlug.value = generateSlug(productName.value);
+    }
+
+    // Generate slug when product name changes
+    productName.addEventListener("input", updateSlug);
+
+    // Generate slug when page loads
+    updateSlug();
+
+});
+</script>
+
+
 @endsection

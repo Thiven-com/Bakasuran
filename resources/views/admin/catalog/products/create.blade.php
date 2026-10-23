@@ -56,12 +56,41 @@
                                     <div class="accordion-body">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6 col-sm-6">
-                                                <div class="mb-3 add-product">
-                                                    <label class="form-label">Product Name</label>
-                                                    <input type="text" class="form-control" name="title"
-                                                        value="{{ old('title') ?? '' }}" required>
-                                                </div>
-                                            </div>
+                                            
+<div class="mb-3 add-product">
+    <label class="form-label">Product Name</label>
+
+    <input
+        type="text"
+        class="form-control"
+        name="title"
+        id="productName"
+        value="{{ old('title') ?? '' }}"
+        placeholder="Enter product name"
+        required
+    >
+</div>
+
+<div class="mb-3 add-product">
+    <label class="form-label">Product Slug</label>
+
+    <input
+        type="text"
+        class="form-control"
+        name="slug"
+        id="productSlug"
+        value="{{ old('slug') ?? '' }}"
+        placeholder="Auto-generated product slug"
+        readonly
+    >
+
+    <small class="text-muted">
+        Automatically generated from product name.
+    </small>
+</div>
+</div>
+
+
                                             <div class="col-lg-6 col-md-6 col-sm-6">
                                                 <div class="mb-3 add-product">
                                                     <div class="add-newplus">
@@ -851,5 +880,34 @@
     $('#bulkUpdateModal').modal('hide');
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const productName = document.getElementById("productName");
+    const productSlug = document.getElementById("productSlug");
+
+    function generateSlug(value) {
+
+        return value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+    }
+
+    productName.addEventListener("input", function () {
+
+        const slug = generateSlug(this.value);
+
+        productSlug.value = slug;
+
+    });
+
+});
+</script>
+
 
 @endsection

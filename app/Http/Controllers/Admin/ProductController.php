@@ -282,23 +282,35 @@ class ProductController extends Controller
      */
 
     public function update(Request $request, string $id)
-    {
-        $product = Product::findOrFail($id);
-        $request->validate([
-            'restaurant_id' => 'nullable|integer|exists:restaurants,id',
-        ]);
-        $product->title = $request->title;
-        if ($product->title != $request->title) {
-            $product->slug = $this->slugGenerate($request->title, 0);
-        }
-        $product->description = $request->description;
-        $product->short_description = $request->short_description;
-        $product->category_id = $request->category_id ?? 0;
-        $product->brand_id = $request->brand_id ?? 0;
-        $product->restaurant_id = $request->restaurant_id ?: null;
-        $product->status = $request->status;
-        // $product->hsn_code = $request->hsn_code;
-        $product->is_feature = $request->has('is_feature') ? 'yes' : 'no';
+{
+    $product = Product::findOrFail($id);
+
+    $request->validate([
+        'restaurant_id' => 'nullable|integer|exists:restaurants,id',
+    ]);
+
+    // Generate slug only when product title changes
+    if ($product->title !== $request->title) {
+        $product->slug = $this->slugGenerate(
+            $request->title,
+            $product->id
+        );
+    }
+
+    // Update product title
+    $product->title = $request->title;
+
+    $product->description = $request->description;
+    $product->short_description = $request->short_description;
+    $product->category_id = $request->category_id ?? 0;
+    $product->brand_id = $request->brand_id ?? 0;
+    $product->restaurant_id = $request->restaurant_id ?: null;
+    $product->status = $request->status;
+
+    $product->is_feature = $request->has('is_feature')
+        ? 'yes'
+        : 'no';
+
 
         $manager = new ImageManager(new Driver());
 
@@ -759,30 +771,24 @@ class ProductController extends Controller
         }
     }
 
-    private function slugGenerate($name, $count)
-    {
+    private function slugGenerate($name, $productId = 0)
+{
+    $slug = Str::slug($name, '-');
 
-        if (preg_match("/[\/\\\^£$%&*()}{@#~?><>,|=_+¬-]/", $name)) {
-            $name = str_replace(']', '_', $name);
-            $name = str_replace('[', '_', $name);
-            $name = str_replace("'", '_', $name);
-            $pattern = "/[\/\\\^£$%&*()}{@#~?><>,|=_+¬-]/";
-            $replacement = "_";
+    $originalSlug = $slug;
+    $count = 1;
 
-            // Replace special characters with underscores
-            $name = preg_replace($pattern, $replacement, $name);
-        }
-        $slug = ($count == 0) ? strtolower(str_replace(' ', '_', $name)) : strtolower(str_replace(' ', '_', $name)) . $count;
-
-        // Check for uniqueness
-        $checkSlug = Product::where('slug', $slug)->exists();
-        if (!$checkSlug) {
-            return $slug;
-        } else {
-            // Increment count and retry
-            return $this->slugGenerate($name, $count + 1);
-        }
+    while (
+        Product::where('slug', $slug)
+            ->where('id', '!=', $productId)
+            ->exists()
+    ) {
+        $slug = $originalSlug . '-' . $count;
+        $count++;
     }
+
+    return $slug;
+}
 
     public function getAttributeValues($unitId)
     {
