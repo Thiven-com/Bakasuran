@@ -310,4 +310,35 @@ class ProductController extends Controller
             ],
         ]);
     }
+
+
+    public function productDetails($id)
+    {
+        $product = Product::with([
+            'category:id,title',
+            'restaurant:id,name',
+            'media' => function ($query) {
+                $query->orderByDesc('is_primary')
+                    ->orderBy('sort_order');
+            },
+            'variants',
+            'variants.attributeValues',
+            'variants.attributeValues.attribute',
+        ])->find($id);
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product details retrieved successfully.',
+            'data' => $product,
+        ]);
+    }
+
+
 }

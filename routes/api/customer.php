@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerApp\CheckoutController;
+use App\Http\Controllers\CustomerApp\ProductController;
 use App\Http\Controllers\CustomerApp\RestaurantController;
 use App\Http\Controllers\CustomerApp\WebhookController;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ Route::post('resendOtp', 'AccountController@resendOtp');
 Route::get('categories', 'CategoryController@categories');
 Route::get('featured_categories', 'ProductController@featured_categories');
 Route::any('product', 'ProductController@product');
+Route::get('product/{id}', [ProductController::class, 'productDetails']);
 Route::get('states', 'AddressController@states');
 
 Route::any('webhook/razorpay/capture', 'WebhookController@razorpay');

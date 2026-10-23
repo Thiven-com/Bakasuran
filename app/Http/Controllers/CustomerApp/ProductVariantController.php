@@ -20,17 +20,17 @@ class ProductVariantController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage    = 12;
-        $search     = trim((string) $request->get('search', ''));
+        $perPage = 12;
+        $search = trim((string) $request->get('search', ''));
         $categoryId = $request->get('category_id');
-        $minPrice   = $request->get('min_price');
-        $maxPrice   = $request->get('max_price');
-        $type       = $request->get('type');
-        $offer_type       = $request->get('offer_type');
-        $inStock    = $request->boolean('in_stock', false);
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+        $type = $request->get('type');
+        $offer_type = $request->get('offer_type');
+        $inStock = $request->boolean('in_stock', false);
         // $sort       = $request->get('sort');
-        $sort       = $request->get('sort', default: 'newest');
-        $attrSlugs  = (array) $request->get('attributes', []);
+        $sort = $request->get('sort', default: 'newest');
+        $attrSlugs = (array) $request->get('attributes', []);
 
         // Resolve attribute/value slugs -> IDs (cached)
         $attrMap = Cache::remember('attr_slug_to_id', 3600, function () {
@@ -48,17 +48,19 @@ class ProductVariantController extends Controller
 
             foreach ($attrSlugs as $attrSlug => $valueSlugList) {
                 $attrKey = strtolower($attrSlug);
-                if (!isset($attrMap[$attrKey])) continue;
+                if (!isset($attrMap[$attrKey]))
+                    continue;
 
-                $attributeId = (int)$attrMap[$attrKey]->id;
+                $attributeId = (int) $attrMap[$attrKey]->id;
                 $ids = [];
                 foreach ((array) $valueSlugList as $vSlug) {
                     $vk = strtolower($vSlug);
                     if (isset($valMap[$attributeId][$vk])) {
-                        $ids[] = (int)$valMap[$attributeId][$vk]->id;
+                        $ids[] = (int) $valMap[$attributeId][$vk]->id;
                     }
                 }
-                if ($ids) $attributeFilters[$attributeId] = $ids;
+                if ($ids)
+                    $attributeFilters[$attributeId] = $ids;
             }
         }
 
@@ -92,12 +94,13 @@ class ProductVariantController extends Controller
         // }
 
         if (!empty($categoryId)) {
-            $query->whereHas('product', fn($q) => $q->where('category_id', (int)$categoryId));
+            $query->whereHas('product', fn($q) => $q->where('category_id', (int) $categoryId));
         }
 
-        $query->when($minPrice !== null, fn($q) => $q->whereRaw('CAST(price AS DECIMAL(10,2)) >= ?', [(float)$minPrice]));
-        $query->when($maxPrice !== null, fn($q) => $q->whereRaw('CAST(price AS DECIMAL(10,2)) <= ?', [(float)$maxPrice]));
-        if ($inStock) $query->where('stock', '>', 0);
+        $query->when($minPrice !== null, fn($q) => $q->whereRaw('CAST(price AS DECIMAL(10,2)) >= ?', [(float) $minPrice]));
+        $query->when($maxPrice !== null, fn($q) => $q->whereRaw('CAST(price AS DECIMAL(10,2)) <= ?', [(float) $maxPrice]));
+        if ($inStock)
+            $query->where('stock', '>', 0);
 
         foreach ($attributeFilters as $attributeId => $valueIds) {
             $query->whereHas('attributeValues', fn($q) => $q->where('attribute_values.attribute_id', $attributeId)
@@ -157,18 +160,18 @@ class ProductVariantController extends Controller
 
         return new VariantCollection($variants, [
             'applied_filters' => [
-                'search'      => $search ?: null,
-                'category_id' => $categoryId ? (int)$categoryId : null,
-                'min_price'   => $minPrice !== null ? (float)$minPrice : null,
-                'max_price'   => $maxPrice !== null ? (float)$maxPrice : null,
-                'in_stock'    => $inStock,
-                'attributes'  => $attrSlugs,
-                'sort'        => $sort,
-                'per_page'    => $perPage,
+                'search' => $search ?: null,
+                'category_id' => $categoryId ? (int) $categoryId : null,
+                'min_price' => $minPrice !== null ? (float) $minPrice : null,
+                'max_price' => $maxPrice !== null ? (float) $maxPrice : null,
+                'in_stock' => $inStock,
+                'attributes' => $attrSlugs,
+                'sort' => $sort,
+                'per_page' => $perPage,
             ],
         ]);
     }
-    public function show($id)
+    public function show($slug)
     {
         $user = auth('sanctum')->user();
 
@@ -178,9 +181,11 @@ class ProductVariantController extends Controller
             'media',
             'attributeValues.attribute',
             'product.variants.attributeValues.attribute',
-        ])->findOrFail($id);
+        ])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-        return (new VariantResource($variant));
+        return new VariantResource($variant);
     }
 
     public function attributes(Request $request)
@@ -196,15 +201,15 @@ class ProductVariantController extends Controller
 
     public function oldIndex(Request $request)
     {
-        $perPage    = 12;
-        $search     = trim((string) $request->get('search', ''));
+        $perPage = 12;
+        $search = trim((string) $request->get('search', ''));
         $categoryId = $request->get('category_id');
-        $minPrice   = $request->get('min_price');
-        $maxPrice   = $request->get('max_price');
-        $type   = $request->get('type');
-        $inStock    = $request->boolean('in_stock', false);
-        $sort       = $request->get('sort', default: 'newest'); // newest|price_asc|price_desc|title_asc|title_desc
-        $attrSlugs  = (array) $request->get('attributes', []); // e.g. attributes[color][]=red&attributes[size][]=m
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+        $type = $request->get('type');
+        $inStock = $request->boolean('in_stock', false);
+        $sort = $request->get('sort', default: 'newest'); // newest|price_asc|price_desc|title_asc|title_desc
+        $attrSlugs = (array) $request->get('attributes', []); // e.g. attributes[color][]=red&attributes[size][]=m
 
         // Resolve attribute/value slugs -> IDs (cached)
         $attrMap = Cache::remember('attr_slug_to_id', 3600, function () {
@@ -222,17 +227,19 @@ class ProductVariantController extends Controller
 
             foreach ($attrSlugs as $attrSlug => $valueSlugList) {
                 $attrKey = strtolower($attrSlug);
-                if (!isset($attrMap[$attrKey])) continue;
+                if (!isset($attrMap[$attrKey]))
+                    continue;
 
-                $attributeId = (int)$attrMap[$attrKey]->id;
+                $attributeId = (int) $attrMap[$attrKey]->id;
                 $ids = [];
                 foreach ((array) $valueSlugList as $vSlug) {
                     $vk = strtolower($vSlug);
                     if (isset($valMap[$attributeId][$vk])) {
-                        $ids[] = (int)$valMap[$attributeId][$vk]->id;
+                        $ids[] = (int) $valMap[$attributeId][$vk]->id;
                     }
                 }
-                if ($ids) $attributeFilters[$attributeId] = $ids;
+                if ($ids)
+                    $attributeFilters[$attributeId] = $ids;
             }
         }
 
@@ -263,7 +270,7 @@ class ProductVariantController extends Controller
 
         // Category filter on parent product
         if (!empty($categoryId)) {
-            $query->whereHas('product', fn($q) => $q->where('category_id', (int)$categoryId));
+            $query->whereHas('product', fn($q) => $q->where('category_id', (int) $categoryId));
         }
 
         // Price range on variant price
@@ -277,14 +284,15 @@ class ProductVariantController extends Controller
         //     $query->where('price', '<=', (float)$maxPrice);
 
         $query->when($minPrice !== null, function ($q) use ($minPrice) {
-            $q->whereRaw('CAST(price AS DECIMAL(10,2)) >= ?', [(float)$minPrice]);
+            $q->whereRaw('CAST(price AS DECIMAL(10,2)) >= ?', [(float) $minPrice]);
         });
 
         $query->when($maxPrice !== null, function ($q) use ($maxPrice) {
-            $q->whereRaw('CAST(price AS DECIMAL(10,2)) <= ?', [(float)$maxPrice]);
+            $q->whereRaw('CAST(price AS DECIMAL(10,2)) <= ?', [(float) $maxPrice]);
         });
         // In-stock
-        if ($inStock) $query->where('stock', '>', 0);
+        if ($inStock)
+            $query->where('stock', '>', 0);
 
         // home_products
 
@@ -340,14 +348,14 @@ class ProductVariantController extends Controller
 
         return new VariantCollection($variants, [
             'applied_filters' => [
-                'search'      => $search ?: null,
-                'category_id' => $categoryId ? (int)$categoryId : null,
-                'min_price'   => $minPrice !== null ? (float)$minPrice : null,
-                'max_price'   => $maxPrice !== null ? (float)$maxPrice : null,
-                'in_stock'    => $inStock,
-                'attributes'  => $attrSlugs,
-                'sort'        => $sort,
-                'per_page'    => $perPage,
+                'search' => $search ?: null,
+                'category_id' => $categoryId ? (int) $categoryId : null,
+                'min_price' => $minPrice !== null ? (float) $minPrice : null,
+                'max_price' => $maxPrice !== null ? (float) $maxPrice : null,
+                'in_stock' => $inStock,
+                'attributes' => $attrSlugs,
+                'sort' => $sort,
+                'per_page' => $perPage,
             ],
         ]);
     }
