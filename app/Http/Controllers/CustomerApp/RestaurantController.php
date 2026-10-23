@@ -14,7 +14,35 @@ class RestaurantController extends Controller
     public function index(Request $request)
     {
         $restaurants = Restaurant::query()
-            ->withCount('products');
+            ->withCount('products')
+            ->with([
+                'products' => function ($query) {
+                    $query->select([
+                        'id',
+                        'restaurant_id',
+                        'title',
+                        'slug',
+                        'category_id',
+                        'brand_id',
+                        'image',
+                        'hover_image',
+                        'short_description',
+                        'description',
+                        'tax_id',
+                        'hsn_code',
+                        'status',
+                        'is_feature',
+                        'orders',
+                        'created_at',
+                        'updated_at',
+                    ])->with([
+                                'category:id,title',
+                                'variants',
+                                'variants.attributeValues',
+                                'variants.attributeValues.attribute',
+                            ]);
+                },
+            ]);
 
         // Optional search by restaurant name, cuisine, or city
         if ($request->filled('search')) {
@@ -86,6 +114,34 @@ class RestaurantController extends Controller
     public function show($id)
     {
         $restaurant = Restaurant::withCount('products')
+            ->with([
+                'products' => function ($query) {
+                    $query->select([
+                        'id',
+                        'restaurant_id',
+                        'title',
+                        'slug',
+                        'category_id',
+                        'brand_id',
+                        'image',
+                        'hover_image',
+                        'short_description',
+                        'description',
+                        'tax_id',
+                        'hsn_code',
+                        'status',
+                        'is_feature',
+                        'orders',
+                        'created_at',
+                        'updated_at',
+                    ])->with([
+                                'category:id,title',
+                                'variants',
+                                'variants.attributeValues',
+                                'variants.attributeValues.attribute',
+                            ]);
+                },
+            ])
             ->find($id);
 
         if (!$restaurant) {
@@ -141,6 +197,67 @@ class RestaurantController extends Controller
             'is_open' => (bool) $restaurant->is_open,
 
             'products_count' => $restaurant->products_count,
+
+            'products' => $restaurant->products->map(function ($product) use ($restaurant) {
+                return [
+                    // Restaurant details
+                    'restaurant' => [
+                        'id' => $restaurant->id,
+                        'name' => $restaurant->name,
+                        'slug' => $restaurant->slug,
+                        'cuisine_type' => $restaurant->cuisine_type,
+                        'description' => $restaurant->description,
+                        'logo' => $restaurant->logo ? asset($restaurant->logo) : null,
+                        'cover_image' => $restaurant->cover_image
+                            ? asset($restaurant->cover_image)
+                            : null,
+                        'address' => $restaurant->address,
+                        'city' => $restaurant->city,
+                        'state' => $restaurant->state,
+                        'pincode' => $restaurant->pincode,
+                        'latitude' => $restaurant->latitude,
+                        'longitude' => $restaurant->longitude,
+                        'phone' => $restaurant->phone,
+                        'email' => $restaurant->email,
+                        'opening_time' => $restaurant->opening_time,
+                        'closing_time' => $restaurant->closing_time,
+                        'delivery_time' => $restaurant->delivery_time,
+                        'delivery_fee' => $restaurant->delivery_fee,
+                        'minimum_order' => $restaurant->minimum_order,
+                        'average_rating' => $restaurant->average_rating,
+                        'is_active' => (bool) $restaurant->is_active,
+                        'is_open' => (bool) $restaurant->is_open,
+                    ],
+
+                    // Product details
+                    'id' => $product->id,
+                    'name' => $product->title,
+                    'slug' => $product->slug,
+                    'category_id' => $product->category_id,
+                    'brand_id' => $product->brand_id,
+                    'image' => $product->image ? asset($product->image) : null,
+                    'hover_image' => $product->hover_image
+                        ? asset($product->hover_image)
+                        : null,
+                    'short_description' => $product->short_description,
+                    'description' => $product->description,
+                    'tax_id' => $product->tax_id,
+                    'hsn_code' => $product->hsn_code,
+                    'status' => $product->status,
+                    'is_feature' => $product->is_feature,
+                    'orders' => $product->orders,
+                    'created_at' => $product->created_at?->toDateTimeString(),
+                    'updated_at' => $product->updated_at?->toDateTimeString(),
+
+                    // Lowest variant price
+                    'price' => $product->variants->min('price'),
+
+                    // All variants
+                    'variants' => $product->variants->map(function ($variant) {
+                        return $variant->toArray();
+                    })->values(),
+                ];
+            })->values(),
 
             'created_at' => $restaurant->created_at?->toDateTimeString(),
             'updated_at' => $restaurant->updated_at?->toDateTimeString(),

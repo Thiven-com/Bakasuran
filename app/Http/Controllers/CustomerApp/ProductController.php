@@ -315,14 +315,15 @@ class ProductController extends Controller
     public function productDetails($id)
     {
         $product = Product::with([
-            'category:id,title',
-            'restaurant:id,name',
+            'category',
+            'brand',
+            'restaurant',
+            'subcategories',
             'media' => function ($query) {
                 $query->orderByDesc('is_primary')
                     ->orderBy('sort_order');
             },
-            'variants',
-            'variants.attributeValues',
+            'primaryMedia',
             'variants.attributeValues.attribute',
         ])->find($id);
 
