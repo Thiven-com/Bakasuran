@@ -11,13 +11,157 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Http\Resources\VariantCollection;
 use App\Http\Resources\VariantResource;
+use App\Models\Category;
 use App\Models\HomeOffer;
+use App\Models\Restaurant;
 use App\Models\Section;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductVariantController extends Controller
 {
+
+
+    /**
+     * GET: Get categories that have available products.
+     */
+    public function categories()
+    {
+        $categories = Category::whereHas('products', function ($query) {
+            $query->where('status', 'show');
+        })
+            ->select('id', 'title', 'slug')
+            ->orderBy('title')
+            ->get();
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'Categories retrieved successfully',
+            'data' => $categories,
+        ]);
+    }
+
+    /**
+     * GET: Get restaurants that have products in the selected category.
+     */
+    public function restaurantsByCategory($categoryId)
+    {
+        $category = Category::find($categoryId);
+
+        if (!$category) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Category not found',
+            ], 404);
+        }
+
+        $restaurants = Restaurant::whereHas('products', function ($query) use ($categoryId) {
+            $query->where('category_id', $categoryId)
+                ->where('status', 'show');
+        })
+            ->withCount([
+                'products as category_products_count' => function ($query) use ($categoryId) {
+                    $query->where('category_id', $categoryId)
+                        ->where('status', 'show');
+                },
+            ])
+            ->where('is_active', 1)
+            ->orderBy('name')
+            ->get([
+                'id',
+                'name',
+                'slug',
+                'cuisine_type',
+                'logo',
+                'cover_image',
+                'address',
+                'city',
+                'average_rating',
+                'is_open',
+            ]);
+
+        $restaurants->transform(function ($restaurant) {
+            $restaurant->logo = $restaurant->logo
+                ? asset($restaurant->logo)
+                : null;
+
+            $restaurant->cover_image = $restaurant->cover_image
+                ? asset($restaurant->cover_image)
+                : null;
+
+            return $restaurant;
+        });
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'Restaurants retrieved successfully',
+            'category' => [
+                'id' => $category->id,
+                'title' => $category->title,
+            ],
+            'data' => $restaurants,
+        ]);
+    }
+
+    /**
+     * GET: Get category products for a selected restaurant.
+     */
+    public function productsByCategoryAndRestaurant(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'required|integer|exists:categories,id',
+            'restaurant_id' => 'required|integer|exists:restaurants,id',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $categoryId = (int) $request->category_id;
+        $restaurantId = (int) $request->restaurant_id;
+        $perPage = (int) $request->get('per_page', 12);
+
+        $query = ProductVariant::query()
+            ->select('product_variants.*')
+            ->join(
+                DB::raw('(
+                SELECT product_id, MIN(id) as min_id
+                FROM product_variants
+                GROUP BY product_id
+            ) as first_variant'),
+                'product_variants.id',
+                '=',
+                'first_variant.min_id'
+            )
+            ->whereHas('product', function ($query) use ($categoryId, $restaurantId) {
+                $query->where('category_id', $categoryId)
+                    ->where('restaurant_id', $restaurantId)
+                    ->where('status', 'show');
+            })
+            ->with([
+                'product:id,title,slug,category_id,restaurant_id,image,description,short_description,hsn_code',
+                'product.category:id,title',
+                'attributeValues:id,attribute_id,name',
+                'attributeValues.attribute:id,name',
+                'media:id,product_variant_id,product_id,type,url,thumbnail_url,sort_order,is_primary',
+                'product.media:id,product_id,type,url,thumbnail_url,sort_order,is_primary',
+            ])
+            ->orderByDesc('product_variants.id');
+
+        $variants = $query->paginate($perPage);
+
+        return new VariantCollection($variants, [
+            'category_id' => $categoryId,
+            'restaurant_id' => $restaurantId,
+        ]);
+    }
+
     public function index(Request $request)
     {
         $perPage = 12;

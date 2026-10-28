@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerApp\CheckoutController;
 use App\Http\Controllers\CustomerApp\ProductController;
+use App\Http\Controllers\CustomerApp\ProductVariantController;
 use App\Http\Controllers\CustomerApp\RestaurantController;
 use App\Http\Controllers\CustomerApp\RestaurantTableBookingController;
 use App\Http\Controllers\CustomerApp\TableBookingController;
@@ -57,6 +58,12 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
     Route::get('ratings', 'ProductController@ratings');
 
     //RestaurantTableBooking
+
+    // Step 3: Check available tables for the selected date/time
+    Route::get(
+        'restaurant-available-tables',
+        [RestaurantTableBookingController::class, 'availableTables']
+    );
     Route::post('restaurant-table-bookings', [
         RestaurantTableBookingController::class,
         'store'
@@ -76,6 +83,21 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
         'restaurant-tables',
         [RestaurantTableBookingController::class, 'tables']
     );
+
+    Route::get('restaurant-categories', [
+        ProductVariantController::class,
+        'categories'
+    ]);
+
+    Route::get('categories/{categoryId}/restaurants', [
+        ProductVariantController::class,
+        'restaurantsByCategory'
+    ]);
+
+    Route::get('restaurant-category-products', [
+        ProductVariantController::class,
+        'productsByCategoryAndRestaurant'
+    ]);
 
 
     Route::get('locations', 'AddressController@index');

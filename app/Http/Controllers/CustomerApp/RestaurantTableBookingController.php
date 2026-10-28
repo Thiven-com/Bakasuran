@@ -32,6 +32,99 @@ class RestaurantTableBookingController extends Controller
         ]);
     }
 
+    /**
+     * GET: Get available tables for a restaurant and time slot.
+     */
+    public function availableTables(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'restaurant_id' => 'required|integer|exists:restaurants,id',
+            'booking_date' => 'required|date_format:Y-m-d|after_or_equal:today',
+            'booking_time' => 'required|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i|after:booking_time',
+            'guest_count' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $data = $validator->validated();
+
+        // Default booking duration: 2 hours
+        $startTime = $data['booking_time'];
+
+        $endTime = $data['end_time'] ?? date(
+            'H:i:s',
+            strtotime($startTime) + 7200
+        );
+
+        // Prevent booking a past time today
+        if (
+            $data['booking_date'] === now()->toDateString()
+            && $startTime <= now()->format('H:i')
+        ) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Please select a future booking time',
+                'data' => [],
+            ], 422);
+        }
+
+        // Find tables already booked during this time slot
+        $bookedTableIds = RestaurantTableBooking::where(
+            'restaurant_id',
+            $data['restaurant_id']
+        )
+            ->where('booking_date', $data['booking_date'])
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('booking_time', '<', $endTime)
+            ->where('end_time', '>', $startTime)
+            ->pluck('restaurant_table_id')
+            ->unique()
+            ->values()
+            ->all();
+
+        // Get available active tables
+        $tables = RestaurantTable::where(
+            'restaurant_id',
+            $data['restaurant_id']
+        )
+            ->where('status', 1)
+            ->where('seating_capacity', '>=', $data['guest_count'])
+            ->whereNotIn('id', $bookedTableIds)
+            ->orderBy('seating_capacity')
+            ->orderBy('table_number')
+            ->get([
+                'id',
+                'restaurant_id',
+                'table_name',
+                'table_number',
+                'seating_capacity',
+                'status',
+            ]);
+
+        return response()->json([
+            'success' => 1,
+            'message' => $tables->isEmpty()
+                ? 'No tables available for the selected date and time'
+                : 'Available tables retrieved successfully',
+            'booking_details' => [
+                'restaurant_id' => (int) $data['restaurant_id'],
+                'booking_date' => $data['booking_date'],
+                'booking_time' => $startTime,
+                'end_time' => $endTime,
+                'guest_count' => (int) $data['guest_count'],
+            ],
+            'data' => $tables,
+        ]);
+    }
+
+
     // POST: Create restaurant table booking
     public function store(Request $request)
     {
