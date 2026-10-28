@@ -50,7 +50,14 @@ class CartCollection extends ResourceCollection
                     'discount_percent' => (
                         isset($v->actual_price, $v->price) && $v->actual_price > 0 && $v->price < $v->actual_price
                     ) ? round((($v->actual_price - $v->price) / $v->actual_price) * 100, 2) : 0.0,
-                    'image' => $v->image ? asset($v->image) : null,
+                    'image' => $v->image
+                        ? asset($v->image)
+                        : (
+                            $v->media->firstWhere('is_primary', 1)?->thumbnail_url
+                            ?? $v->media->firstWhere('is_primary', 1)?->url
+                            ?? $v->media->first()?->thumbnail_url
+                            ?? $v->media->first()?->url
+                        ),
                     'stock' => (int) $v->stock,
                     'preorder_stock' => (int) $v->preorder_stock,
                     'attrs' => $v->attributeValues->map(fn($val) => [

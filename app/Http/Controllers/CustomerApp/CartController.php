@@ -24,6 +24,8 @@ class CartController extends Controller
         $user = auth('sanctum')->user();
 
         $items = CartItem::with([
+            'variant.media',
+            'variant:id,product_id,sku,slug,image,price,actual_price,stock,preorder_stock,product_min_order,product_max_order',
             'variant.product:id,title,slug',
             'variant.attributeValues.attribute'
         ])
@@ -97,6 +99,14 @@ class CartController extends Controller
         $qty = min($qty, $availableStock);
 
         $price = $this->getEffectivePrice($variant);
+        $user = auth('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Please Login'
+            ], 401);
+        }
 
         $item = CartItem::where('user_id', $user->id)
             ->where('product_variant_id', $variant->id)
@@ -125,6 +135,7 @@ class CartController extends Controller
         }
 
         $items = CartItem::with([
+            'variant.media',
             'variant.product:id,title,slug',
             'variant.attributeValues.attribute'
         ])

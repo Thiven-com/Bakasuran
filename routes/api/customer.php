@@ -3,6 +3,8 @@
 use App\Http\Controllers\CustomerApp\CheckoutController;
 use App\Http\Controllers\CustomerApp\ProductController;
 use App\Http\Controllers\CustomerApp\RestaurantController;
+use App\Http\Controllers\CustomerApp\RestaurantTableBookingController;
+use App\Http\Controllers\CustomerApp\TableBookingController;
 use App\Http\Controllers\CustomerApp\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +40,7 @@ Route::any('webhook/razorpay/capture', 'WebhookController@razorpay');
 
 Route::group(['middelware' => 'auth:sanctum'], function () {
     // Route::group(['middleware' => 'verification'], function () {
-    Route::get('logout', 'AccountController@logout');
+    Route::post('logout', 'AccountController@logout');
     Route::get('profile', 'ProfileController@profile');
     Route::get('banners', 'ProfileController@banners');
     Route::get('notifications', 'AppNotificationController@index');
@@ -53,6 +55,27 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
     //productRating
     Route::post('productRating', 'ProductController@productRating');
     Route::get('ratings', 'ProductController@ratings');
+
+    //RestaurantTableBooking
+    Route::post('restaurant-table-bookings', [
+        RestaurantTableBookingController::class,
+        'store'
+    ]);
+
+    Route::get('restaurant-table-bookings', [
+        RestaurantTableBookingController::class,
+        'index'
+    ]);
+
+    Route::get('restaurant-table-bookings/{id}', [
+        RestaurantTableBookingController::class,
+        'show'
+    ]);
+
+    Route::get(
+        'restaurant-tables',
+        [RestaurantTableBookingController::class, 'tables']
+    );
 
 
     Route::get('locations', 'AddressController@index');

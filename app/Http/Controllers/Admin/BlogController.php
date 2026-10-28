@@ -28,15 +28,15 @@ class BlogController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
-    $blog_categories = BlogCategory::get();
-    $restaurants = Restaurant::orderBy('name')->get();
+    {
+        $blog_categories = BlogCategory::get();
+        $restaurants = Restaurant::orderBy('name')->get();
 
-    return view('admin.blogs.create', compact(
-        'blog_categories',
-        'restaurants'
-    ));
-}
+        return view('admin.blogs.create', compact(
+            'blog_categories',
+            'restaurants'
+        ));
+    }
 
 
     public function store(Request $request)
@@ -57,7 +57,7 @@ class BlogController extends Controller
         }
         $blog->slug = $request->slug;
         $blog->short_description = $request->short_description;
-        $blog->description = $request->description;
+        $blog->description = strip_tags($request->description);
         $blog->tags = $request->tags;
         $blog->status = $request->status;
         $blog->facebook = $request->facebook;
@@ -119,17 +119,17 @@ class BlogController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-{
-    $blog = Blog::findOrFail($id);
-    $blog_categories = BlogCategory::get();
-    $restaurants = Restaurant::orderBy('name')->get();
+    {
+        $blog = Blog::findOrFail($id);
+        $blog_categories = BlogCategory::get();
+        $restaurants = Restaurant::orderBy('name')->get();
 
-    return view('admin.blogs.edit', compact(
-        'blog',
-        'blog_categories',
-        'restaurants'
-    ));
-}
+        return view('admin.blogs.edit', compact(
+            'blog',
+            'blog_categories',
+            'restaurants'
+        ));
+    }
 
     /**
      * Update the specified resource in storage.
@@ -151,7 +151,7 @@ class BlogController extends Controller
         $blog->title = $request->title;
         $blog->slug = $request->slug;
         $blog->short_description = $request->short_description;
-        $blog->description = $request->description;
+        $blog->description = strip_tags($request->description);
         $blog->tags = $request->tags;
         $blog->status = $request->status;
         $blog->facebook = $request->facebook;

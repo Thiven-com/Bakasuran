@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CustomerApp;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use App\Models\RestaurantTable;
 
 class RestaurantController extends Controller
 {
@@ -197,6 +198,17 @@ class RestaurantController extends Controller
             'is_open' => (bool) $restaurant->is_open,
 
             'products_count' => $restaurant->products_count,
+            'tables' => RestaurantTable::where('restaurant_id', $restaurant->id)
+                ->get()
+                ->map(function ($table) {
+                    return [
+                        'id' => $table->id,
+                        'table_name' => $table->table_name,
+                        'table_number' => $table->table_number,
+                        'seating_capacity' => $table->seating_capacity,
+                        'status' => $table->status,
+                    ];
+                })->values(),
 
             'products' => $restaurant->products->map(function ($product) use ($restaurant) {
                 return [
