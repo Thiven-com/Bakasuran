@@ -33,47 +33,71 @@ class AccountController extends Controller
     public function sendOtp(Request $request)
     {
         $request->validate([
-            'mobile' => 'required'
+            'mobile' => 'required|digits:10',
         ]);
-        // Default OTP for all mobile numbers
-        $otp = 1234;
 
-        // $otp = rand(1000, 9999);
-        if ($request->mobile == 9154193014) {
+        try {
+
             $otp = 1234;
-        }
-        $check = Customer::where('mobile', $request->mobile)->first();
-        if (!empty($check->id)) {
-            $user = Customer::where('mobile', $request->mobile)->first();
-            $user->otp = $otp;
+
+            $user = Customer::firstOrNew([
+                'mobile' => $request->mobile
+            ]);
+
+            $user->otp = (string) $otp;
             $user->save();
-        } else {
-            $user = new Customer();
-            $user->mobile = $request->mobile;
-            $user->otp = $otp;
-            $user->save();
-        }
-        if ($request->mobile != 9154193014) {
-            $data = $this->sendWhatsAppMessage(
-                $user->mobile,
-                'login_verification',
-                [
-                    'field_1' => $otp,
-                ]
-            );
-            try {
-                $whatsappService = new WhatsAppService();
-                $result = $whatsappService->sendTemplateMessage($data);
-                Log::info($result);
-            } catch (\Exception $e) {
-                $result = false;
-                Log::info($e->getMessage());
+
+            // Send WhatsApp OTP except testing number
+            if ($request->mobile != '9154193014') {
+
+                try {
+
+                    $data = $this->sendWhatsAppMessage(
+                        $user->mobile,
+                        'login_verification',
+                        [
+                            'field_1' => $otp,
+                        ]
+                    );
+
+                    $whatsappService = new WhatsAppService();
+
+                    $result = $whatsappService->sendTemplateMessage($data);
+
+                    Log::info('WhatsApp OTP Response', [
+                        'mobile' => $user->mobile,
+                        'response' => $result
+                    ]);
+
+                } catch (\Throwable $e) {
+
+                    Log::error('WhatsApp OTP Error', [
+                        'mobile' => $user->mobile,
+                        'error' => $e->getMessage()
+                    ]);
+
+                    // Do not fail login request because of WhatsApp error
+                }
             }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'OTP sent successfully',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            Log::error('Send OTP Error', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to send OTP. Please try again.'
+            ], 500);
         }
-        return response()->json([
-            'status' => true,
-            'message' => 'OTP sent successfully',
-        ]);
     }
 
     // 2. VERIFY OTP
@@ -90,8 +114,11 @@ class AccountController extends Controller
             return response()->json(['status' => false, 'message' => 'Customer not found']);
         }
 
-        if ($user->otp !== $request->otp) {
-            return response()->json(['status' => false, 'message' => 'Invalid OTP']);
+        if ((string) $user->otp !== (string) $request->otp) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid OTP'
+            ]);
         }
 
         // LOGIN USER
