@@ -38,17 +38,25 @@ class AccountController extends Controller
 
         try {
 
-            $otp = 1234;
+            // Default OTP
+            $otp = '1234';
 
+            // Find or create customer
             $user = Customer::firstOrNew([
                 'mobile' => $request->mobile
             ]);
 
-            $user->otp = (string) $otp;
+            // Save OTP first
+            $user->otp = $otp;
             $user->save();
 
-            // Send WhatsApp OTP except testing number
-            if ($request->mobile != '9154193014') {
+            Log::info('Default OTP saved successfully', [
+                'mobile' => $user->mobile,
+                'otp' => $otp
+            ]);
+
+            // Skip WhatsApp for testing mobile number
+            if ($user->mobile != '9154193014') {
 
                 try {
 
@@ -71,23 +79,26 @@ class AccountController extends Controller
 
                 } catch (\Throwable $e) {
 
-                    Log::error('WhatsApp OTP Error', [
+                    Log::error('WhatsApp OTP Failed', [
                         'mobile' => $user->mobile,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
                     ]);
 
-                    // Do not fail login request because of WhatsApp error
+                    // Do not stop login if WhatsApp fails
                 }
             }
 
             return response()->json([
                 'status' => true,
                 'message' => 'OTP sent successfully',
-            ]);
+            ], 200);
 
         } catch (\Throwable $e) {
 
             Log::error('Send OTP Error', [
+                'mobile' => $request->mobile,
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
@@ -104,14 +115,17 @@ class AccountController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'mobile' => 'required',
-            'otp' => 'required'
+            'mobile' => 'required|digits:10',
+            'otp' => 'required|digits:4',
         ]);
 
         $user = Customer::where('mobile', $request->mobile)->first();
 
         if (!$user) {
-            return response()->json(['status' => false, 'message' => 'Customer not found']);
+            return response()->json([
+                'status' => false,
+                'message' => 'Customer not found'
+            ]);
         }
 
         if ((string) $user->otp !== (string) $request->otp) {
@@ -121,16 +135,18 @@ class AccountController extends Controller
             ]);
         }
 
-        // LOGIN USER
+        // Login customer
         Auth::guard('customer')->login($user);
-        // clear OTP
+
+        // Clear OTP after successful verification
         $user->update([
             'otp' => null,
         ]);
 
         return response()->json([
             'status' => true,
-            'message' => 'Login successful'
+            'message' => 'Login successful',
+            'redirect' => url('/')
         ]);
     }
 
