@@ -10,11 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->unsignedBigInteger('restaurant_id')
-                ->nullable()
-                ->after('category_id');
-        });
+        if (!Schema::hasColumn('products', 'restaurant_id')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->unsignedBigInteger('restaurant_id')
+                    ->nullable()
+                    ->after('category_id');
+            });
+        }
     }
 
     /**
