@@ -1,30 +1,39 @@
+
 <?php
 
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
+use Symfony\Component\HttpFoundation\Response;
 
 class Admin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::guard('admin')->check()) {
+        $guard = Auth::guard('admin');
+
+        // Check admin authentication
+        if (!$guard->check()) {
             return redirect()->route('admin.login');
         }
-        $user = Auth::guard('admin')->user();
-        if (isset($user->id) && $user->status == 'inactive') {
-            Alert::toast('Your Account Is Not Active Please Contact Admin', 'warning');
+
+        $user = $guard->user();
+
+        // Check admin account status
+        if ($user->status === 'inactive') {
+            Auth::guard('admin')->logout();
+
+            Alert::toast(
+                'Your Account Is Not Active. Please Contact Admin.',
+                'warning'
+            );
+
             return redirect()->route('admin.login');
         }
+
         return $next($request);
     }
 }
