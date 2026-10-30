@@ -72,6 +72,15 @@ class CartCollection extends ResourceCollection
                     'slug' => $product?->slug,
                     'category' => $product?->category?->name,
                 ],
+                'restaurant' => [
+                    'id' => $item->variant->product->restaurant->id ?? null,
+                    'name' => $item->variant->product->restaurant->name ?? null,
+                ],
+
+                'category' => [
+                    'id' => $item->variant->product->category->id ?? null,
+                    'name' => $item->variant->product->category->title ?? null,
+                ],
 
                 'added_at' => optional($item->created_at)?->toDateTimeString(),
             ];

@@ -110,8 +110,8 @@ class ProductVariantController extends Controller
     public function productsByCategoryAndRestaurant(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category_id' => 'required|integer|exists:categories,id',
-            'restaurant_id' => 'required|integer|exists:restaurants,id',
+            'category_id' => 'nullable',
+            'restaurant_id' => 'nullable',
             'per_page' => 'nullable|integer|min:1|max:100',
         ]);
 
@@ -123,30 +123,49 @@ class ProductVariantController extends Controller
             ], 422);
         }
 
-        $categoryId = (int) $request->category_id;
-        $restaurantId = (int) $request->restaurant_id;
-        $perPage = (int) $request->get('per_page', 12);
+        $categoryId = $request->input('category_id');
+        $restaurantId = $request->input('restaurant_id');
 
+        $categoryId = (
+            $categoryId === null ||
+            strtolower(trim((string) $categoryId)) === 'all'
+        ) ? null : (int) $categoryId;
+
+        $restaurantId = (
+            $restaurantId === null ||
+            strtolower(trim((string) $restaurantId)) === 'all'
+        ) ? null : (int) $restaurantId;
+
+        $perPage = max(1, min((int) $request->input('per_page', 12), 100));
+
+        // Fetch all restaurants
+        $restaurants = Restaurant::query()
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        // Fetch products with the selected filters
         $query = ProductVariant::query()
-            ->select('product_variants.*')
-            ->join(
-                DB::raw('(
-                SELECT product_id, MIN(id) as min_id
-                FROM product_variants
-                GROUP BY product_id
-            ) as first_variant'),
-                'product_variants.id',
-                '=',
-                'first_variant.min_id'
-            )
-            ->whereHas('product', function ($query) use ($categoryId, $restaurantId) {
-                $query->where('category_id', $categoryId)
-                    ->where('restaurant_id', $restaurantId)
-                    ->where('status', 'show');
+            ->whereIn('product_variants.id', function ($q) {
+                $q->selectRaw('MIN(id)')
+                    ->from('product_variants')
+                    ->groupBy('product_id');
+            })
+            ->whereHas('product', function ($q) use ($categoryId, $restaurantId) {
+                $q->where('status', 'show');
+
+                if ($categoryId !== null) {
+                    $q->where('category_id', $categoryId);
+                }
+
+                if ($restaurantId !== null) {
+                    $q->where('restaurant_id', $restaurantId);
+                }
             })
             ->with([
                 'product:id,title,slug,category_id,restaurant_id,image,description,short_description,hsn_code',
                 'product.category:id,title',
+                'product.restaurant:id,name',
                 'attributeValues:id,attribute_id,name',
                 'attributeValues.attribute:id,name',
                 'media:id,product_variant_id,product_id,type,url,thumbnail_url,sort_order,is_primary',
@@ -156,9 +175,16 @@ class ProductVariantController extends Controller
 
         $variants = $query->paginate($perPage);
 
-        return new VariantCollection($variants, [
-            'category_id' => $categoryId,
-            'restaurant_id' => $restaurantId,
+        return response()->json([
+            'success' => 1,
+            'message' => 'Restaurants and products fetched successfully',
+
+            'restaurants' => $restaurants,
+
+            'products' => new VariantCollection($variants, [
+                'category_id' => $categoryId ?? 'all',
+                'restaurant_id' => $restaurantId ?? 'all',
+            ]),
         ]);
     }
 

@@ -25,8 +25,17 @@ class CartController extends Controller
 
         $items = CartItem::with([
             'variant.media',
+
             'variant:id,product_id,sku,slug,image,price,actual_price,stock,preorder_stock,product_min_order,product_max_order',
-            'variant.product:id,title,slug',
+
+            'variant.product:id,title,slug,restaurant_id,category_id',
+
+            'variant.product.restaurant:id,name',
+
+            // Use the actual category name column instead of name.
+            // Example: if your categories table uses title:
+            'variant.product.category:id,title',
+
             'variant.attributeValues.attribute'
         ])
             ->where('user_id', $user->id)
@@ -136,7 +145,9 @@ class CartController extends Controller
 
         $items = CartItem::with([
             'variant.media',
-            'variant.product:id,title,slug',
+            'variant.product:id,title,slug,restaurant_id,category_id',
+            'variant.product.restaurant:id,name',
+            'variant.product.category:id,title',
             'variant.attributeValues.attribute'
         ])
             ->where('user_id', $user->id)

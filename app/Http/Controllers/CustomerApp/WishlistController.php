@@ -38,6 +38,13 @@ class WishlistController extends Controller
     {
         $user = auth('sanctum')->user();
 
+        // Check user authentication
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Please login first',
+            ], 401);
+        }
 
         $validator = Validator::make($request->all(), [
             'variant_id' => 'required|integer|exists:product_variants,id',
@@ -48,21 +55,23 @@ class WishlistController extends Controller
                 'success' => 0,
                 'message' => $validator->errors()->first(),
                 'errors' => $validator->errors(),
-            ]);
+            ], 422);
         }
 
         $data = $validator->validated();
 
-        // ensure variant exists (and optionally in stock)
-        $variant = ProductVariant::select('id')->findOrFail($data['variant_id']);
+        $variant = ProductVariant::find($data['variant_id']);
 
-        // idempotent add (unique constraint ensures no duplicates)
         $existing = WishlistItem::where('user_id', $user->id)
             ->where('product_variant_id', $variant->id)
             ->first();
 
         if ($existing) {
-            return response()->json(['message' => 'Already in wishlist', 'id' => $existing->id]);
+            return response()->json([
+                'success' => 1,
+                'message' => 'Already in wishlist',
+                'id' => $existing->id,
+            ], 200);
         }
 
         $item = new WishlistItem();
@@ -72,27 +81,59 @@ class WishlistController extends Controller
 
         $wishlist = WishlistItem::where('user_id', $user->id)->get();
 
-        $data = new WishlistCollection($wishlist);
-
-        return response()->json(['success' => 1, 'data' => $data, 'message' => 'Added to wishlist', 'id' => $item->id], 201);
+        return response()->json([
+            'success' => 1,
+            'message' => 'Added to wishlist',
+            'id' => $item->id,
+            'data' => new WishlistCollection($wishlist),
+        ], 201);
     }
 
     /** DELETE /api/customer/wishlist/{item} */
-    public function destroy(WishlistItem $item)
+
+    public function destroy($item)
     {
         $user = auth('sanctum')->user();
-        if ($item->user_id !== $user->id) {
-            return response()->json(['message' => 'Forbidden'], 403);
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Please login first'
+            ], 401);
         }
 
-        $item->delete();
+        // Find wishlist item by ID
+        $wishlistItem = WishlistItem::find($item);
 
+        if (!$wishlistItem) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Wishlist item not found',
+                'item_id' => $item
+            ], 404);
+        }
+
+        // Verify ownership
+        if ((int) $wishlistItem->user_id !== (int) $user->id) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Forbidden'
+            ], 403);
+        }
+
+        // Delete item
+        $wishlistItem->delete();
+
+        // Fetch remaining wishlist items
         $wishlist = WishlistItem::where('user_id', $user->id)->get();
 
-        $data = new WishlistCollection($wishlist);
-
-        return response()->json(['success' => 1, 'data' => $data, 'message' => 'Removed from wishlist']);
+        return response()->json([
+            'success' => 1,
+            'data' => new WishlistCollection($wishlist),
+            'message' => 'Removed from wishlist'
+        ], 200);
     }
+
 
     /** POST /api/customer/wishlist/toggle { variant_id } */
     public function toggle(Request $request)

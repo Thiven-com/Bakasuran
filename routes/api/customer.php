@@ -99,6 +99,11 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
         'productsByCategoryAndRestaurant'
     ]);
 
+    Route::get(
+        'products-by-category-and-restaurant',
+        [ProductVariantController::class, 'productsByCategoryAndRestaurant']
+    );
+
 
     Route::get('locations', 'AddressController@index');
 
