@@ -16,6 +16,20 @@ Route::get('/', [PageControllers::class, 'home'])->name('home');
 
 Route::get('/shop', [PageControllers::class, 'shop'])->name('shop');
 
+Route::get('/restaurants', [PageControllers::class, 'restaurants'])
+    ->name('restaurants');
+    Route::get('/restaurant/{slug}', [PageControllers::class, 'restaurant_details'])
+    ->name('restaurant.details');
+
+    Route::get('/restaurant/{slug}/book-table',
+    [PageControllers::class, 'table_booking']
+)->name('restaurant.table-booking');
+
+Route::post(
+    '/restaurant/{slug}/check-availability',
+    [PageControllers::class, 'checkAvailability']
+)->name('restaurant.check-availability');
+
 Route::get('/product/{slug}', [PageControllers::class, 'product_details'])
     ->name('productdetails');
 

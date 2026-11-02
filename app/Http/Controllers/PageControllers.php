@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\WishlistItem;
 use App\Models\Order;
 use App\Models\Testimonial;
+use App\Models\Restaurant;
 
 
 class PageControllers extends Controller
@@ -781,241 +782,335 @@ class PageControllers extends Controller
 
 
 
-public function checkout(Request $request)
-{
-    $user = auth('customer')->user();
+    public function checkout(Request $request)
+    {
+        $user = auth('customer')->user();
 
-    if (!$user) {
-        return redirect()->route('login')
-            ->with('error', 'Please log in to continue checkout.');
-    }
-
-    $mode = $request->query('mode');
-    $isBuyNow = $mode === 'buy_now';
-    $orderType = $request->query('order_type', 'order');
-
-    /*
-    |--------------------------------------------------------------------------
-    | 1. LOAD BUY NOW ITEM OR NORMAL CART ITEMS
-    |--------------------------------------------------------------------------
-    */
-    if ($isBuyNow) {
-        $buyNow = session('buy_now');
-
-        if (
-            !$buyNow ||
-            empty($buyNow['product_variant_id']) ||
-            !isset($buyNow['quantity']) ||
-            (int) $buyNow['quantity'] < 1
-        ) {
-            return redirect()->route('shop')
-                ->with('error', 'Please select a product to order.');
+        if (!$user) {
+            return redirect()->route('login')
+                ->with('error', 'Please log in to continue checkout.');
         }
 
-        $variant = ProductVariant::with([
-            'product.restaurant',
-            'media',
-            'attributeValues.attribute',
-        ])->find($buyNow['product_variant_id']);
+        $mode = $request->query('mode');
+        $isBuyNow = $mode === 'buy_now';
+        $orderType = $request->query('order_type', 'order');
 
-        if (!$variant || !$variant->product) {
-            session()->forget('buy_now');
+        /*
+        |--------------------------------------------------------------------------
+        | 1. LOAD BUY NOW ITEM OR NORMAL CART ITEMS
+        |--------------------------------------------------------------------------
+        */
+        if ($isBuyNow) {
+            $buyNow = session('buy_now');
 
-            return redirect()->route('shop')
-                ->with('error', 'Product not found.');
+            if (
+                !$buyNow ||
+                empty($buyNow['product_variant_id']) ||
+                !isset($buyNow['quantity']) ||
+                (int) $buyNow['quantity'] < 1
+            ) {
+                return redirect()->route('shop')
+                    ->with('error', 'Please select a product to order.');
+            }
+
+            $variant = ProductVariant::with([
+                'product.restaurant',
+                'media',
+                'attributeValues.attribute',
+            ])->find($buyNow['product_variant_id']);
+
+            if (!$variant || !$variant->product) {
+                session()->forget('buy_now');
+
+                return redirect()->route('shop')
+                    ->with('error', 'Product not found.');
+            }
+
+            $quantity = (int) $buyNow['quantity'];
+
+            if ($variant->status !== 'show') {
+                return redirect()->route('shop')
+                    ->with('error', 'This product is not available.');
+            }
+
+            if ($quantity > (int) $variant->stock) {
+                return redirect()->route('shop')
+                    ->with(
+                        'error',
+                        'Only ' . $variant->stock . ' items are available.'
+                    );
+            }
+
+            if (
+                $variant->product_min_order &&
+                $quantity < (int) $variant->product_min_order
+            ) {
+                return redirect()->route('shop')
+                    ->with('error', 'Minimum order quantity is ' .
+                        $variant->product_min_order . '.');
+            }
+
+            if (
+                $variant->product_max_order &&
+                $quantity > (int) $variant->product_max_order
+            ) {
+                return redirect()->route('shop')
+                    ->with('error', 'Maximum order quantity is ' .
+                        $variant->product_max_order . '.');
+            }
+
+            // Temporary item for the existing checkout Blade template.
+            // This does not insert anything into cart_items.
+            $cartItems = collect([
+                (object) [
+                    'id' => null,
+                    'user_id' => $user->id,
+                    'product_variant_id' => $variant->id,
+                    'variant' => $variant,
+                    'quantity' => $quantity,
+                    'unit_price' => $variant->price,
+                    'is_buy_now' => true,
+                ],
+            ]);
+        } else {
+            $cartItems = CartItem::with([
+                'variant.product.restaurant',
+                'variant.media',
+                'variant.attributeValues.attribute',
+            ])
+                ->where('user_id', $user->id)
+                ->get();
+
+            if ($cartItems->isEmpty()) {
+                return redirect()->route('cart')
+                    ->with('error', 'Your cart is empty.');
+            }
         }
 
-        $quantity = (int) $buyNow['quantity'];
-
-        if ($variant->status !== 'show') {
-    return redirect()->route('shop')
-        ->with('error', 'This product is not available.');
-}
-
-        if ($quantity > (int) $variant->stock) {
-            return redirect()->route('shop')
-                ->with(
-                    'error',
-                    'Only ' . $variant->stock . ' items are available.'
-                );
-        }
-
-        if (
-            $variant->product_min_order &&
-            $quantity < (int) $variant->product_min_order
-        ) {
-            return redirect()->route('shop')
-                ->with('error', 'Minimum order quantity is ' .
-                    $variant->product_min_order . '.');
-        }
-
-        if (
-            $variant->product_max_order &&
-            $quantity > (int) $variant->product_max_order
-        ) {
-            return redirect()->route('shop')
-                ->with('error', 'Maximum order quantity is ' .
-                    $variant->product_max_order . '.');
-        }
-
-        // Temporary item for the existing checkout Blade template.
-        // This does not insert anything into cart_items.
-        $cartItems = collect([
-            (object) [
-                'id' => null,
-                'user_id' => $user->id,
-                'product_variant_id' => $variant->id,
-                'variant' => $variant,
-                'quantity' => $quantity,
-                'unit_price' => $variant->price,
-                'is_buy_now' => true,
-            ],
-        ]);
-    } else {
-        $cartItems = CartItem::with([
-            'variant.product.restaurant',
-            'variant.media',
-            'variant.attributeValues.attribute',
-        ])
-            ->where('user_id', $user->id)
+        /*
+        |--------------------------------------------------------------------------
+        | 2. ADDRESSES
+        |--------------------------------------------------------------------------
+        */
+        $addresses = Address::where('customer_id', $user->id)
+            ->orderByDesc('default')
+            ->orderByDesc('id')
             ->get();
 
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('cart')
-                ->with('error', 'Your cart is empty.');
+        $defaultAddress = $addresses->first();
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. SUBTOTAL AND WEIGHT
+        |--------------------------------------------------------------------------
+        */
+        $subtotal = 0;
+        $totalWeight = 0;
+
+        foreach ($cartItems as $item) {
+            $variant = $item->variant;
+
+            $subtotal += (float) ($variant?->price ?? 0)
+                * (int) $item->quantity;
+
+            $totalWeight += (float) ($variant?->weight ?? 0)
+                * (int) $item->quantity;
         }
-    }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 2. ADDRESSES
-    |--------------------------------------------------------------------------
-    */
-    $addresses = Address::where('customer_id', $user->id)
-        ->orderByDesc('default')
-        ->orderByDesc('id')
-        ->get();
+        /*
+        |--------------------------------------------------------------------------
+        | 4. SHIPPING
+        |--------------------------------------------------------------------------
+        */
+        $shipping = 0;
 
-    $defaultAddress = $addresses->first();
+        if ($defaultAddress && $defaultAddress->state) {
+            $zone = ShippingZone::whereJsonContains(
+                'regions',
+                $defaultAddress->state
+            )->first();
 
-    /*
-    |--------------------------------------------------------------------------
-    | 3. SUBTOTAL AND WEIGHT
-    |--------------------------------------------------------------------------
-    */
-    $subtotal = 0;
-    $totalWeight = 0;
-
-    foreach ($cartItems as $item) {
-        $variant = $item->variant;
-
-        $subtotal += (float) ($variant?->price ?? 0)
-            * (int) $item->quantity;
-
-        $totalWeight += (float) ($variant?->weight ?? 0)
-            * (int) $item->quantity;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 4. SHIPPING
-    |--------------------------------------------------------------------------
-    */
-    $shipping = 0;
-
-    if ($defaultAddress && $defaultAddress->state) {
-        $zone = ShippingZone::whereJsonContains(
-            'regions',
-            $defaultAddress->state
-        )->first();
-
-        if ($zone && $zone->free_shipping !== 'yes') {
-            $charge = FreightCharge::where(
-                'shipping_zone_id',
-                $zone->id
-            )
-                ->where('min_weight', '<=', $totalWeight)
-                ->where('max_weight', '>=', $totalWeight)
-                ->first();
-
-            if ($charge) {
-                $shipping = (float) $charge->charge;
-            } else {
-                $latestCharge = FreightCharge::where(
+            if ($zone && $zone->free_shipping !== 'yes') {
+                $charge = FreightCharge::where(
                     'shipping_zone_id',
                     $zone->id
-                )->orderByDesc('id')->first();
+                )
+                    ->where('min_weight', '<=', $totalWeight)
+                    ->where('max_weight', '>=', $totalWeight)
+                    ->first();
 
-                if (
-                    $latestCharge &&
-                    $totalWeight > $latestCharge->max_weight
-                ) {
-                    $shipping = (float) $latestCharge->charge + 30;
+                if ($charge) {
+                    $shipping = (float) $charge->charge;
+                } else {
+                    $latestCharge = FreightCharge::where(
+                        'shipping_zone_id',
+                        $zone->id
+                    )->orderByDesc('id')->first();
+
+                    if (
+                        $latestCharge &&
+                        $totalWeight > $latestCharge->max_weight
+                    ) {
+                        $shipping = (float) $latestCharge->charge + 30;
+                    }
                 }
             }
         }
-    }
 
-    $shipping = round($shipping);
+        $shipping = round($shipping);
 
-    /*
-    |--------------------------------------------------------------------------
-    | 5. COUPON
-    |--------------------------------------------------------------------------
-    */
-    $discount = 0;
-    $couponCode = trim((string) $request->query('code', ''));
+        /*
+        |--------------------------------------------------------------------------
+        | 5. COUPON
+        |--------------------------------------------------------------------------
+        */
+        $discount = 0;
+        $couponCode = trim((string) $request->query('code', ''));
 
-    if ($couponCode !== '') {
-        $coupon = Coupon::where('code', $couponCode)
-            ->where('status', 'active')
-            ->first();
+        if ($couponCode !== '') {
+            $coupon = Coupon::where('code', $couponCode)
+                ->where('status', 'active')
+                ->first();
 
-        if (
-            $coupon &&
-            (
-                !$coupon->expiry_date ||
-                Carbon::parse($coupon->expiry_date)
-                    ->endOfDay()->isFuture()
-            ) &&
-            (
-                !$coupon->minimum_purchase ||
-                $subtotal >= $coupon->minimum_purchase
-            )
-        ) {
-            if ($coupon->type === 'fixed') {
-                $discount = min(
-                    (float) $coupon->discount,
-                    $subtotal
-                );
-            } else {
-                $discount = round(
-                    ($subtotal * (float) $coupon->discount) / 100
-                );
+            if (
+                $coupon &&
+                (
+                    !$coupon->expiry_date ||
+                    Carbon::parse($coupon->expiry_date)
+                        ->endOfDay()->isFuture()
+                ) &&
+                (
+                    !$coupon->minimum_purchase ||
+                    $subtotal >= $coupon->minimum_purchase
+                )
+            ) {
+                if ($coupon->type === 'fixed') {
+                    $discount = min(
+                        (float) $coupon->discount,
+                        $subtotal
+                    );
+                } else {
+                    $discount = round(
+                        ($subtotal * (float) $coupon->discount) / 100
+                    );
+                }
             }
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 6. TOTAL
+        |--------------------------------------------------------------------------
+        */
+        $total = max(0, $subtotal + $shipping - $discount);
+
+        return view('website.checkout', compact(
+            'cartItems',
+            'addresses',
+            'defaultAddress',
+            'subtotal',
+            'shipping',
+            'discount',
+            'total',
+            'couponCode',
+            'orderType',
+            'mode',
+            'isBuyNow'
+        ));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 6. TOTAL
-    |--------------------------------------------------------------------------
-    */
-    $total = max(0, $subtotal + $shipping - $discount);
 
-    return view('website.checkout', compact(
-        'cartItems',
-        'addresses',
-        'defaultAddress',
-        'subtotal',
-        'shipping',
-        'discount',
-        'total',
-        'couponCode',
-        'orderType',
-        'mode',
-        'isBuyNow'
+
+public function restaurants(Request $request)
+{
+    $restaurants = Restaurant::query()
+        ->where('is_active', true);
+
+    // Search by restaurant name, cuisine, or city.
+    if ($request->filled('search')) {
+        $search = trim($request->search);
+
+        $restaurants->where(function ($query) use ($search) {
+            $query->where('name', 'LIKE', "%{$search}%")
+                ->orWhere('cuisine_type', 'LIKE', "%{$search}%")
+                ->orWhere('city', 'LIKE', "%{$search}%");
+        });
+    }
+
+    $restaurants = $restaurants
+        ->latest()
+        ->paginate(12)
+        ->withQueryString();
+
+    return view('website.restaurants', compact('restaurants'));
+}
+
+
+
+    public function restaurant_details($slug)
+    {
+        $restaurant = Restaurant::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $products = Product::with([
+            'category',
+            'variant',
+            'restaurant',
+        ])
+            ->where('restaurant_id', $restaurant->id)
+            ->where('status', 'show')
+            ->whereHas('variant')
+            ->latest()
+            ->get();
+
+        $categories = $products
+            ->filter(fn ($product) => $product->category)
+            ->groupBy(fn ($product) => $product->category->name)
+            ->map(fn ($items, $name) => [
+                'name' => $name,
+                'count' => $items->count(),
+                'icon' => '🍽️',
+            ])
+            ->values();
+
+        return view('website.restaurant-details', compact(
+            'restaurant',
+            'products',
+            'categories'
+        ));
+    }
+
+
+public function table_booking($slug)
+{
+    $restaurantName = 'Bakasuran Signature';
+
+    return view('website.table-booking', compact(
+        'slug',
+        'restaurantName'
     ));
+}
+
+public function checkAvailability(
+    \Illuminate\Http\Request $request,
+    $slug
+) {
+    $validated = $request->validate([
+        'booking_date' => 'required|date|after_or_equal:today',
+        'booking_time' => 'required|date_format:H:i',
+        'guests' => 'required|integer|min:1|max:12',
+        'seating' => 'required|in:indoor,outdoor,family,private',
+        'special_request' => 'nullable|string|max:500',
+    ]);
+
+    // Demo result only; actual restaurant availability
+    // must be checked against real booking data.
+    return back()->with([
+        'availability_checked' => true,
+        'booking_details' => $validated,
+        'booking_slug' => $slug,
+    ]);
 }
 
 

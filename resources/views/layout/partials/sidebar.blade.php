@@ -84,14 +84,46 @@
                                                 <li class="submenu">
                                                         <a href="javascript:void(0);"
                                                                 class="{{ Request::is('admin/products', 'admin/categories', 'admin/brands', 'admin/banners', 'admin/units', 'admin/attributes') ? 'active subdrop' : '' }}"><i
-                                                                        class="ti ti-article fs-16 me-2"></i><span>Inventory</span><span
+                                                                        class="ti ti-article fs-16 me-2"></i><span>Restaurant
+                                                                        Managem-<br>ent</span><span
                                                                         class="menu-arrow"></span></a>
 
                                                         <ul>
+
+                                                                <li
+                                                                        class="{{ Request::is('restaurants') ? 'active' : '' }}">
+                                                                        <a
+                                                                                href="{{ route('admin.restaurants.index') }}">
+                                                                                <i data-feather="coffee"></i>
+                                                                                <span>Restaurants</span>
+                                                                        </a>
+                                                                </li>
+
                                                                 <li
                                                                         class="{{ Request::is('admin/products') ? 'active' : '' }}">
                                                                         <a href="{{route('admin.products.index')}}"><i
                                                                                         data-feather="box"></i><span>Products</span></a>
+                                                                </li>
+
+
+                                                                <!-- Add-on Groups -->
+                                                                <li
+                                                                        class="{{ Request::is('admin/addon-groups*') ? 'active' : '' }}">
+                                                                        <a
+                                                                                href="{{ route('admin.addon-groups.index') }}">
+                                                                                <i data-feather="layers"></i>
+                                                                                <span>Add-on Groups</span>
+                                                                        </a>
+                                                                </li>
+
+                                                                <!-- Add-on Options -->
+                                                                <li
+                                                                        class="{{ Request::is('admin/addon-options*') ? 'active' : '' }}">
+                                                                        <a
+                                                                                href="{{ route('admin.addon-options.index') }}">
+                                                                                <i data-feather="plus-circle"></i>
+                                                                                <span>Add-on Options</span>
+                                                                        </a>
                                                                 </li>
                                                                 <li
                                                                         class="{{ Request::is('admin/categories') ? 'active' : '' }}">
@@ -121,14 +153,7 @@
                                                                                         class="ti ti-checklist fs-16 me-2"></i><span>Attributes</span></a>
                                                                 </li>
 
-                                                                <li
-                                                                        class="{{ Request::is('restaurants') ? 'active' : '' }}">
-                                                                        <a
-                                                                                href="{{ route('admin.restaurants.index') }}">
-                                                                                <i data-feather="coffee"></i>
-                                                                                <span>Restaurants</span>
-                                                                        </a>
-                                                                </li>
+
                                                                 <li
                                                                         class="{{ Request::is('admin/coupons') ? 'active' : '' }}">
                                                                         <a href="{{route('admin.coupons.index')}}"><i

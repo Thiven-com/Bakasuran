@@ -1,0 +1,43 @@
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('product_addon_groups', function (Blueprint $table) {
+
+            $table->id();
+
+            // Existing product reference
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->cascadeOnDelete();
+
+            // Add-on group reference
+            $table->foreignId('addon_group_id')
+                ->constrained('addon_groups')
+                ->cascadeOnDelete();
+
+            // Display order for groups on product details
+            $table->unsignedInteger('sort_order')->default(0);
+
+            $table->timestamps();
+
+            // Prevent duplicate group assignment to a product
+            $table->unique(
+                ['product_id', 'addon_group_id'],
+                'product_addon_groups_unique'
+            );
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('product_addon_groups');
+    }
+};

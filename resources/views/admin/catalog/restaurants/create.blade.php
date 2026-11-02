@@ -216,7 +216,7 @@
                     }
                 }
             </style>
-            
+
 
             <form action="{{ route('admin.restaurants.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -230,11 +230,17 @@
                         <input type="text" id="name" name="name" placeholder="Enter restaurant name" required>
                     </div>
 
-                    <div class="restaurant-form-group">
-                        <label for="cuisine_type">Cuisine Type</label>
-                        <input type="text" id="cuisine_type" name="cuisine_type"
-                            placeholder="e.g. Indian, Chinese, Italian">
-                    </div>
+                   <div class="restaurant-form-group">
+    <label for="cuisine_type">Cuisine Types</label>
+    <input
+        type="text"
+        id="cuisine_type"
+        name="cuisine_type"
+        placeholder="e.g. Indian, Chinese, Italian"
+        value="{{ old('cuisine_type') }}"
+    >
+    <small>Enter multiple cuisines separated by commas.</small>
+</div>
 
                     <div class="restaurant-form-group full-width">
                         <label for="description">Description</label>
@@ -333,6 +339,52 @@
                     <div class="restaurant-form-group">
                         <label for="minimum_order">Minimum Order (₹) *</label>
                         <input type="number" id="minimum_order" name="minimum_order" min="0" step="0.01" value="0" required>
+                    </div>
+
+                    {{-- Price for Two --}}
+                    <div class="restaurant-form-group">
+                        <label for="price_for_two">Price for Two (₹) *</label>
+                        <input type="number" id="price_for_two" name="price_for_two" min="0" step="0.01"
+                            value="{{ old('price_for_two', 0) }}" placeholder="e.g. 500" required>
+                        @error('price_for_two')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    {{-- Discount Percentage --}}
+                    <div class="restaurant-form-group">
+                        <label for="discount_percentage">Discount Percentage (%)</label>
+                        <input type="number" id="discount_percentage" name="discount_percentage" min="0" max="100" step="1"
+                            value="{{ old('discount_percentage', 0) }}" placeholder="e.g. 20">
+                        @error('discount_percentage')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    {{-- Display Order --}}
+                    <div class="restaurant-form-group">
+                        <label for="sort_order">Display Order</label>
+                        <input type="number" id="sort_order" name="sort_order" min="0" step="1"
+                            value="{{ old('sort_order', 0) }}" placeholder="e.g. 1">
+                        @error('sort_order')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    {{-- Featured Restaurant --}}
+                    <div class="restaurant-form-group">
+                        <label for="is_featured">Featured Restaurant</label>
+                        <select id="is_featured" name="is_featured">
+                            <option value="0" {{ old('is_featured', '0') == '0' ? 'selected' : '' }}>
+                                No
+                            </option>
+                            <option value="1" {{ old('is_featured') == '1' ? 'selected' : '' }}>
+                                Yes
+                            </option>
+                        </select>
+                        @error('is_featured')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
                     <div class="restaurant-form-group">

@@ -375,6 +375,22 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         {{-- Statistics --}}
         <div class="restaurant-stats">
             <div class="restaurant-stat">
@@ -488,7 +504,7 @@
 
                             <div class="restaurant-rating">
                                 <i class="fas fa-star"></i>
-                                {{ number_format((float) ($restaurant->rating ?? 0), 1) }}
+                                {{ number_format((float) ($restaurant->average_rating ?? 0), 1) }}
                             </div>
                         </div>
 

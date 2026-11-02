@@ -8,6 +8,7 @@ use App\Traits\LogsActivity;
 class Product extends Model
 {
     use LogsActivity;
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -22,6 +23,7 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariant::class);
     }
+
     public function variant()
     {
         return $this->hasOne(ProductVariant::class);
@@ -31,6 +33,7 @@ class Product extends Model
     {
         return $this->belongsToMany(Category::class, 'category_products', 'product_id', 'category_id');
     }
+
     public function media()
     {
         return $this->hasMany(ProductMedia::class)->orderBy('sort_order');
@@ -44,5 +47,19 @@ class Product extends Model
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class, 'restaurant_id');
+    }
+
+    // Product Add-on Groups
+    public function addonGroups()
+    {
+        return $this->belongsToMany(
+            AddonGroup::class,
+            'product_addon_groups',
+            'product_id',
+            'addon_group_id'
+        )
+        ->withPivot('sort_order')
+        ->withTimestamps()
+        ->orderBy('product_addon_groups.sort_order');
     }
 }

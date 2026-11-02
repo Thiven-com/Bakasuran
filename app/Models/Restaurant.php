@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Restaurant extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -32,6 +33,12 @@ class Restaurant extends Model
         'minimum_order',
         'is_active',
         'is_open',
+
+        // Restaurant display fields
+        'price_for_two',
+        'discount_percentage',
+        'is_featured',
+        'sort_order',
     ];
 
     protected function casts(): array
@@ -42,8 +49,12 @@ class Restaurant extends Model
             'average_rating' => 'decimal:2',
             'delivery_fee' => 'decimal:2',
             'minimum_order' => 'decimal:2',
+            'price_for_two' => 'decimal:2',
+            'discount_percentage' => 'integer',
             'is_active' => 'boolean',
             'is_open' => 'boolean',
+            'is_featured' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 

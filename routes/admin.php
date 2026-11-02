@@ -15,6 +15,8 @@ use App\Http\Controllers\admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\TestimonialController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AddonGroupController;
+use App\Http\Controllers\Admin\AddonOptionController;
 
 
 /*
@@ -57,6 +59,14 @@ Route::group(['middleware' => 'admin'], function () {
     Route::resource('brands', BrandController::class)->names('admin.brands');
     Route::resource('banners', BannerController::class)->names('admin.banners');
     Route::resource('products', ProductController::class)->names('admin.products');
+
+    // Add-on Groups
+Route::resource('addon-groups', AddonGroupController::class)
+    ->names('admin.addon-groups');
+
+
+Route::resource('addon-options', AddonOptionController::class)
+    ->names('admin.addon-options');
     // Restaurants
 // Restaurants
     Route::get('restaurants', [RestaurantController::class, 'index'])
