@@ -62,4 +62,24 @@ class Restaurant extends Model
     {
         return $this->hasMany(Product::class, 'restaurant_id');
     }
+
+    public function tables()
+    {
+        return $this->hasMany(RestaurantTable::class, 'restaurant_id');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(RestaurantTableBooking::class, 'restaurant_id');
+    }
+
+    public function bookingSettings()
+    {
+        return $this->hasOne(RestaurantBookingSetting::class, 'restaurant_id');
+    }
+
+    public function bookingHours()
+    {
+        return $this->hasMany(RestaurantBookingHour::class, 'restaurant_id');
+    }
 }

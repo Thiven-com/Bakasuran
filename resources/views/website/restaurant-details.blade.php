@@ -72,8 +72,7 @@
             padding: 38px clamp(18px, 4vw, 64px) 26px;
             color: #fff;
             /* background: linear-gradient(90deg, rgba(12, 12, 15, .97), rgba(12, 12, 15, .82) 55%, rgba(12, 12, 15, .32)), url('{{ $restaurantImage }}') center/cover no-repeat */
-                        background: linear-gradient(90deg, rgba(12, 12, 15, .97), rgba(12, 12, 15, .82) 55%, rgba(12, 12, 15, .32)), url('{{ $restaurantImage }}') center/cover no-repeat
-
+            background: linear-gradient(90deg, rgba(12, 12, 15, .97), rgba(12, 12, 15, .82) 55%, rgba(12, 12, 15, .32)), url('{{ $restaurantImage }}') center/cover no-repeat
         }
 
         .rd-hero-main {
@@ -141,8 +140,12 @@
         .rd-open {
             padding: 7px 11px;
             border-radius: 999px;
-            background: {{ ($restaurant->is_open ?? false) ? '#dcfce7' : '#fee2e2' }};
-            color: {{ ($restaurant->is_open ?? false) ? '#166534' : '#991b1b' }};
+            background:
+                {{ ($restaurant->is_open ?? false) ? '#dcfce7' : '#fee2e2' }}
+            ;
+            color:
+                {{ ($restaurant->is_open ?? false) ? '#166534' : '#991b1b' }}
+            ;
             font-size: 11px;
             font-weight: 800;
             white-space: nowrap
@@ -625,19 +628,93 @@
 
 
         /* Admin-managed product details */
-        .rd-product-flags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-        .rd-product-flag{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:6px;background:#f4f4f5;color:#52525b;font-size:9px;font-weight:800}
-        .rd-product-flag.recommended{background:#fff1f2;color:#c11224}
-        .rd-product-flag.available{background:#dcfce7;color:#166534}
-        .rd-product-flag.unavailable{background:#fee2e2;color:#991b1b}
-        .rd-product-flag.food{background:#fff7ed;color:#9a3412}
-        .rd-product-flag.prep{background:#eff6ff;color:#1d4ed8}
-        .rd-variant-select-wrap{margin-top:9px;max-width:250px}
-        .rd-variant-select{width:100%;padding:8px 10px;border:1px solid #e4e4e7;border-radius:8px;background:#fff;color:#27272a;font-size:11px;outline-color:#e11d2e}
-        .rd-variant-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;color:#71717a;font-size:10px}
-        .rd-dish-actions .rd-add:disabled{background:#a1a1aa;cursor:not-allowed}
-        .rd-variant-price-old{margin-left:6px;color:#a1a1aa;text-decoration:line-through;font-size:11px;font-weight:500}
-        @media(max-width:760px){.rd-variant-select-wrap{max-width:100%}}
+        .rd-product-flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0
+        }
+
+        .rd-product-flag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: #f4f4f5;
+            color: #52525b;
+            font-size: 9px;
+            font-weight: 800
+        }
+
+        .rd-product-flag.recommended {
+            background: #fff1f2;
+            color: #c11224
+        }
+
+        .rd-product-flag.available {
+            background: #dcfce7;
+            color: #166534
+        }
+
+        .rd-product-flag.unavailable {
+            background: #fee2e2;
+            color: #991b1b
+        }
+
+        .rd-product-flag.food {
+            background: #fff7ed;
+            color: #9a3412
+        }
+
+        .rd-product-flag.prep {
+            background: #eff6ff;
+            color: #1d4ed8
+        }
+
+        .rd-variant-select-wrap {
+            margin-top: 9px;
+            max-width: 250px
+        }
+
+        .rd-variant-select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            background: #fff;
+            color: #27272a;
+            font-size: 11px;
+            outline-color: #e11d2e
+        }
+
+        .rd-variant-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            color: #71717a;
+            font-size: 10px
+        }
+
+        .rd-dish-actions .rd-add:disabled {
+            background: #a1a1aa;
+            cursor: not-allowed
+        }
+
+        .rd-variant-price-old {
+            margin-left: 6px;
+            color: #a1a1aa;
+            text-decoration: line-through;
+            font-size: 11px;
+            font-weight: 500
+        }
+
+        @media(max-width:760px) {
+            .rd-variant-select-wrap {
+                max-width: 100%
+            }
+        }
 
         .rd-dish-actions {
             display: flex;
@@ -976,6 +1053,414 @@
             height: 140px;
             border-radius: 11px;
             object-fit: cover
+        }
+
+        /* Restaurant information tabs */
+        .rd-layout.rd-layout--tab-view {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .rd-layout.rd-layout--tab-view .rd-menu-area {
+            grid-column: 1 / -1;
+            min-width: 0;
+        }
+
+        .rd-extra-panel {
+            padding: clamp(18px, 3vw, 32px);
+            border: 1px solid #e9e9ef;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 10px 35px rgba(24, 24, 27, .045);
+            line-height: 1.65;
+        }
+
+        .rd-extra-panel[style*="display: block"] {
+            animation: rdPanelIn .22s ease both;
+        }
+
+        @keyframes rdPanelIn {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .rd-section-heading {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .rd-section-heading h2 {
+            margin: 0 0 4px;
+            color: #18181b;
+            font-size: clamp(21px, 2.5vw, 28px);
+            font-weight: 850;
+            letter-spacing: -.8px;
+        }
+
+        .rd-section-heading p {
+            margin: 0;
+            color: #777782;
+            font-size: 13px;
+        }
+
+        .rd-section-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 8px;
+            color: #e11d2e;
+            font-size: 10px;
+            font-weight: 850;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .rd-about-intro {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr);
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .rd-about-copy {
+            padding: 22px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #fff5f5, #fff);
+            border: 1px solid #ffe1e3;
+        }
+
+        .rd-about-copy h3 {
+            margin: 0 0 9px;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .rd-about-copy p {
+            margin: 0;
+            color: #62626c;
+            font-size: 13px;
+            line-height: 1.85;
+        }
+
+        .rd-about-highlight {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .rd-field {
+            padding: 15px;
+            border: 1px solid #ededf1;
+            border-radius: 13px;
+            background: #fff;
+        }
+
+        .rd-field small {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .45px;
+        }
+
+        .rd-field strong {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .rd-about-details {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 11px;
+            margin-top: 13px;
+        }
+
+        .rd-info-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 15px;
+            border: 1px solid #ededf1;
+            border-radius: 13px;
+            background: #fff;
+        }
+
+        .rd-info-icon {
+            display: grid;
+            flex: 0 0 36px;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            border-radius: 11px;
+            background: #fff0f1;
+            color: #e11d2e;
+            font-size: 17px;
+        }
+
+        .rd-info-line small {
+            display: block;
+            margin-bottom: 3px;
+            color: #85858e;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .rd-info-line strong {
+            display: block;
+            color: #292930;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .rd-review-summary {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr);
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .rd-rating-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            border-radius: 15px;
+            background: #fff8e9;
+            text-align: center;
+        }
+
+        .rd-rating-number {
+            color: #202027;
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .rd-rating-stars {
+            margin: 8px 0 4px;
+            color: #f59e0b;
+            font-size: 19px;
+            letter-spacing: 2px;
+        }
+
+        .rd-rating-card small {
+            color: #777782;
+            font-size: 11px;
+        }
+
+        .rd-review-note {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 22px;
+            border: 1px solid #ededf1;
+            border-radius: 15px;
+        }
+
+        .rd-review-note h3 {
+            margin: 0 0 7px;
+            font-size: 16px;
+        }
+
+        .rd-review-note p {
+            margin: 0;
+            color: #777782;
+            font-size: 13px;
+        }
+
+        .rd-empty-state {
+            padding: 28px 18px;
+            border: 1px dashed #dedee5;
+            border-radius: 14px;
+            background: #fcfcfd;
+            text-align: center;
+        }
+
+        .rd-empty-icon {
+            display: grid;
+            width: 48px;
+            height: 48px;
+            place-items: center;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            background: #fff0f1;
+            color: #e11d2e;
+            font-size: 22px;
+        }
+
+        .rd-empty-state h3 {
+            margin: 0 0 5px;
+            font-size: 15px;
+        }
+
+        .rd-empty-state p {
+            margin: 0;
+            color: #777782;
+            font-size: 12px;
+        }
+
+        .rd-photo-strip {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .rd-photo-card {
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+            border-radius: 14px;
+            background: #f1f1f4;
+        }
+
+        .rd-photo-card img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 180px;
+            object-fit: cover;
+            transition: transform .3s ease;
+        }
+
+        .rd-photo-card:hover img {
+            transform: scale(1.04);
+        }
+
+        .rd-photo-caption {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            padding: 24px 12px 11px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .72));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .rd-offer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .rd-offer-card {
+            position: relative;
+            overflow: hidden;
+            padding: 21px;
+            border: 1px solid #ffe0e3;
+            border-radius: 15px;
+            background: linear-gradient(120deg, #fff5f5, #fff 72%);
+        }
+
+        .rd-offer-card:after {
+            content: '%';
+            position: absolute;
+            right: 15px;
+            bottom: -25px;
+            color: rgba(225, 29, 46, .07);
+            font-size: 110px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .rd-offer-label {
+            display: inline-flex;
+            padding: 5px 9px;
+            border-radius: 6px;
+            background: #e11d2e;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 850;
+        }
+
+        .rd-offer-card h3 {
+            position: relative;
+            z-index: 1;
+            margin: 12px 0 5px;
+            font-size: 19px;
+            font-weight: 900;
+        }
+
+        .rd-offer-card p {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            color: #686872;
+            font-size: 12px;
+        }
+
+        .rd-offer-meta {
+            position: relative;
+            z-index: 1;
+            margin-top: 13px;
+            color: #8a5960;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .rd-offer-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .rd-offer-detail {
+            padding: 14px;
+            border: 1px solid #ededf1;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .rd-offer-detail small {
+            display: block;
+            color: #85858e;
+            font-size: 10px;
+        }
+
+        .rd-offer-detail strong {
+            display: block;
+            margin-top: 3px;
+            font-size: 13px;
+        }
+
+        @media(max-width:700px) {
+
+            .rd-about-intro,
+            .rd-review-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .rd-about-details {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .rd-photo-strip {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .rd-photo-card,
+            .rd-photo-card img {
+                min-height: 135px;
+            }
+
+            .rd-offer-grid,
+            .rd-offer-details {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media(max-width:1200px) {
@@ -1552,14 +2037,9 @@
                                     ->all();
                             @endphp
 
-                            <article class="rd-dish"
-                                data-id="{{ $item->id }}"
-                                data-name="{{ $itemName }}"
-                                data-category="{{ $itemCategory }}"
-                                data-price="{{ $itemPrice }}"
-                                data-image="{{ $itemImage }}"
-                                data-rating="{{ $itemRating }}"
-                                data-veg="{{ $itemIsVeg ? '1' : '0' }}"
+                            <article class="rd-dish" data-id="{{ $item->id }}" data-name="{{ $itemName }}"
+                                data-category="{{ $itemCategory }}" data-price="{{ $itemPrice }}" data-image="{{ $itemImage }}"
+                                data-rating="{{ $itemRating }}" data-veg="{{ $itemIsVeg ? '1' : '0' }}"
                                 data-available="{{ $itemAvailable && ($variants->isEmpty() || $activeVariants->isNotEmpty()) ? '1' : '0' }}"
                                 data-addons="{{ json_encode($addonGroupsData) }}">
 
@@ -1592,7 +2072,8 @@
                                         @if ($itemRecommended)
                                             <span class="rd-product-flag recommended">★ Recommended</span>
                                         @endif
-                                        <span class="rd-product-flag {{ $itemAvailable && ($variants->isEmpty() || $activeVariants->isNotEmpty()) ? 'available' : 'unavailable' }}">
+                                        <span
+                                            class="rd-product-flag {{ $itemAvailable && ($variants->isEmpty() || $activeVariants->isNotEmpty()) ? 'available' : 'unavailable' }}">
                                             {{ $itemAvailable && ($variants->isEmpty() || $activeVariants->isNotEmpty()) ? 'Available' : 'Currently unavailable' }}
                                         </span>
                                     </div>
@@ -1612,6 +2093,10 @@
                                                         $variantAvailable = strtolower((string) data_get($variant, 'status', 'show')) === 'show';
                                                         $variantPrice = (float) data_get($variant, 'price', 0);
                                                         $variantActualPrice = (float) data_get($variant, 'actual_price', 0);
+                                                        $variantPrepTime = data_get($variant, 'preparation_time', $itemPrepTime);
+                                                        $variantStock = (int) data_get($variant, 'stock', 0);
+                                                        $variantMinOrder = (int) data_get($variant, 'product_min_order', 1);
+                                                        $variantMaxOrder = (int) data_get($variant, 'product_max_order', 0);
                                                         $variantImageRaw = data_get($variant, 'image') ?: $rawItemImage;
                                                         $variantImage = $variantImageRaw
                                                             ? (\Illuminate\Support\Str::startsWith($variantImageRaw, ['http://', 'https://'])
@@ -1629,24 +2114,26 @@
                                                                     ? $attributeName . ': ' . $valueName
                                                                     : ($valueName ?: $attributeName);
                                                             })->filter()->implode(' / ');
-                                                        if ($attributeNames) $variantLabel = $attributeNames;
+                                                        if ($attributeNames)
+                                                            $variantLabel = $attributeNames;
                                                     @endphp
-                                                    <option value="{{ data_get($variant, 'id') }}"
-                                                        data-price="{{ $variantPrice }}"
-                                                        data-actual-price="{{ $variantActualPrice }}"
-                                                        data-image="{{ $variantImage }}"
+                                                    <option value="{{ data_get($variant, 'id') }}" data-price="{{ $variantPrice }}"
+                                                        data-actual-price="{{ $variantActualPrice }}" data-image="{{ $variantImage }}"
                                                         data-sku="{{ data_get($variant, 'sku', '') }}"
-                                                        data-prep="{{ $itemPrepTime }}"
-                                                        data-available="{{ $variantAvailable ? '1' : '0' }}"
-                                                        {{ !$variantAvailable ? 'disabled' : '' }}
-                                                        {{ $firstVariant && (string) data_get($firstVariant, 'id') === (string) data_get($variant, 'id') ? 'selected' : '' }}>
-                                                        {{ $variantLabel }} — ₹{{ number_format($variantPrice, 2) }}{{ !$variantAvailable ? ' (Unavailable)' : '' }}
+                                                        data-prep="{{ $variantPrepTime }}" data-stock="{{ $variantStock }}"
+                                                        data-min-order="{{ max(1, $variantMinOrder) }}"
+                                                        data-max-order="{{ $variantMaxOrder }}"
+                                                        data-available="{{ $variantAvailable ? '1' : '0' }}" {{ !$variantAvailable ? 'disabled' : '' }} {{ $firstVariant && (string) data_get($firstVariant, 'id') === (string) data_get($variant, 'id') ? 'selected' : '' }}>
+                                                        {{ $variantLabel }} —
+                                                        ₹{{ number_format($variantPrice, 2) }}{{ !$variantAvailable ? ' (Unavailable)' : '' }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                             <div class="rd-variant-meta">
-                                                <span class="rd-variant-sku">{{ data_get($firstVariant, 'sku') ? 'SKU: ' . data_get($firstVariant, 'sku') : '' }}</span>
-                                                <span class="rd-variant-prep">{{ $itemPrepTime ? 'Prep: ' . $itemPrepTime . ' min' : '' }}</span>
+                                                <span
+                                                    class="rd-variant-sku">{{ data_get($firstVariant, 'sku') ? 'SKU: ' . data_get($firstVariant, 'sku') : '' }}</span>
+                                                <span
+                                                    class="rd-variant-prep">{{ data_get($firstVariant, 'preparation_time', $itemPrepTime) ? 'Prep: ' . data_get($firstVariant, 'preparation_time', $itemPrepTime) . ' min' : '' }}</span>
                                             </div>
                                         </div>
                                     @endif
@@ -1661,8 +2148,7 @@
 
                                 <div class="rd-dish-actions">
                                     <button type="button" class="rd-fav" aria-label="Favourite dish">♡</button>
-                                    <button type="button" class="rd-add"
-                                        {{ !$itemAvailable || ($variants->isNotEmpty() && $activeVariants->isEmpty()) ? 'disabled' : '' }}>
+                                    <button type="button" class="rd-add" {{ !$itemAvailable || ($variants->isNotEmpty() && $activeVariants->isEmpty()) ? 'disabled' : '' }}>
                                         {{ !$itemAvailable || ($variants->isNotEmpty() && $activeVariants->isEmpty()) ? 'Unavailable' : 'Add' }}
                                     </button>
                                     <div class="rd-qty">
@@ -1689,88 +2175,173 @@
                 </div>
 
                 <section class="rd-extra-panel" data-panel="about">
-                    <h2>About {{ $restaurant->name }}</h2>
-                    <p>{{ $restaurant->description ?: 'Discover the menu and freshly prepared dishes from this restaurant.' }}
-                    </p>
-                    <div class="rd-field-grid">
-                        <div class="rd-field">
-                            <small>Cuisine</small><strong>{{ $restaurant->cuisine_type ?: 'Not specified' }}</strong></div>
-                        <div class="rd-field"><small>Delivery
-                                time</small><strong>{{ $restaurant->delivery_time ? $restaurant->delivery_time . ' mins' : 'Not available' }}</strong>
+                    <div class="rd-section-heading">
+                        <div><span class="rd-section-kicker">✦ Restaurant story</span>
+                            <h2>About {{ $restaurant->name }}</h2>
+                            <p>Get to know the restaurant, its cuisine and dining information.</p>
                         </div>
-                        <div class="rd-field"><small>Price for
-                                two</small><strong>₹{{ number_format((float) ($restaurant->price_for_two ?? 0), 0) }}</strong>
+                    </div>
+                    <div class="rd-about-intro">
+                        <div class="rd-about-copy">
+                            <h3>Welcome to {{ $restaurant->name }}</h3>
+                            <p>{{ $restaurant->description ?: 'Discover freshly prepared meals, carefully selected ingredients and delicious dishes made for you. Explore the menu to find your next favourite.' }}
+                            </p>
                         </div>
-                        <div class="rd-field"><small>Delivery
-                                fee</small><strong>{{ is_null($restaurant->delivery_fee) ? 'Not specified' : '₹' . number_format((float) $restaurant->delivery_fee, 0) }}</strong>
-                        </div>
-                        <div class="rd-field"><small>Minimum
-                                order</small><strong>{{ is_null($restaurant->minimum_order) ? 'Not specified' : '₹' . number_format((float) $restaurant->minimum_order, 0) }}</strong>
-                        </div>
-                        <div class="rd-field"><small>Opening
-                                hours</small><strong>{{ $restaurant->opening_time ? \Illuminate\Support\Carbon::parse($restaurant->opening_time)->format('g:i A') : '—' }}
-                                –
-                                {{ $restaurant->closing_time ? \Illuminate\Support\Carbon::parse($restaurant->closing_time)->format('g:i A') : '—' }}</strong>
-                        </div>
-                        @if ($restaurant->address || $restaurant->city || $restaurant->state || $restaurant->pincode)
+                        <div class="rd-about-highlight">
                             <div class="rd-field">
-                                <small>Address</small><strong>{{ collect([$restaurant->address, $restaurant->city, $restaurant->state, $restaurant->pincode])->filter()->implode(', ') }}</strong>
+                                <small>Cuisine</small><strong>{{ $restaurant->cuisine_type ?: 'Not specified' }}</strong>
                             </div>
-                        @endif
-                        @if ($restaurant->phone)
-                            <div class="rd-field"><small>Phone</small><strong><a
-                                        href="tel:{{ $restaurant->phone }}">{{ $restaurant->phone }}</a></strong></div>
-                        @endif
-                        @if ($restaurant->email)
-                            <div class="rd-field"><small>Email</small><strong><a
-                                        href="mailto:{{ $restaurant->email }}">{{ $restaurant->email }}</a></strong></div>
-                        @endif
+                            <div class="rd-field"><small>Delivery
+                                    time</small><strong>{{ $restaurant->delivery_time ? $restaurant->delivery_time . ' mins' : 'Not available' }}</strong>
+                            </div>
+                            <div class="rd-field"><small>Price for
+                                    two</small><strong>{{ $restaurant->price_for_two ? '₹' . number_format((float) $restaurant->price_for_two, 0) : 'Not specified' }}</strong>
+                            </div>
+                            <div class="rd-field"><small>Customer
+                                    rating</small><strong>{{ $restaurantRating > 0 ? number_format($restaurantRating, 1) . ' / 5' : 'Not rated yet' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rd-about-details">
+                        <div class="rd-info-line"><span class="rd-info-icon">◷</span>
+                            <div><small>Opening
+                                    hours</small><strong>{{ $restaurant->opening_time ? \Illuminate\Support\Carbon::parse($restaurant->opening_time)->format('g:i A') : '—' }}
+                                    –
+                                    {{ $restaurant->closing_time ? \Illuminate\Support\Carbon::parse($restaurant->closing_time)->format('g:i A') : '—' }}</strong>
+                            </div>
+                        </div>
+                        <div class="rd-info-line"><span class="rd-info-icon">⌖</span>
+                            <div><small>Restaurant
+                                    address</small><strong>{{ collect([$restaurant->address, $restaurant->city, $restaurant->state, $restaurant->pincode])->filter()->implode(', ') ?: 'Address not available' }}</strong>
+                            </div>
+                        </div>
+                        <div class="rd-info-line"><span class="rd-info-icon">☎</span>
+                            <div><small>Contact</small><strong>@if($restaurant->phone)<a
+                            href="tel:{{ $restaurant->phone }}">{{ $restaurant->phone }}</a>@else Not available
+                                        @endif</strong></div>
+                        </div>
+                        <div class="rd-info-line"><span class="rd-info-icon">⌁</span>
+                            <div><small>Delivery
+                                    fee</small><strong>{{ is_null($restaurant->delivery_fee) ? 'Not specified' : '₹' . number_format((float) $restaurant->delivery_fee, 0) }}</strong>
+                            </div>
+                        </div>
+                        <div class="rd-info-line"><span class="rd-info-icon">₹</span>
+                            <div><small>Minimum
+                                    order</small><strong>{{ is_null($restaurant->minimum_order) ? 'Not specified' : '₹' . number_format((float) $restaurant->minimum_order, 0) }}</strong>
+                            </div>
+                        </div>
+                        <div class="rd-info-line"><span class="rd-info-icon">✉</span>
+                            <div><small>Email</small><strong>@if($restaurant->email)<a
+                            href="mailto:{{ $restaurant->email }}">{{ $restaurant->email }}</a>@else Not
+                                        available @endif</strong></div>
+                        </div>
                     </div>
                 </section>
 
                 <section class="rd-extra-panel" data-panel="reviews">
-
-                    <h2>Customer Reviews</h2>
-
-                    <h3>★ {{ number_format((float) ($restaurant->average_rating ?? 0), 1) }} / 5</h3>
-
-                    <p>Customer reviews and feedback will appear here when connected to your review data.</p>
-
+                    <div class="rd-section-heading">
+                        <div><span class="rd-section-kicker">✦ Guest feedback</span>
+                            <h2>Customer Reviews</h2>
+                            <p>Ratings and feedback help customers choose their next meal.</p>
+                        </div>
+                    </div>
+                    <div class="rd-review-summary">
+                        <div class="rd-rating-card">
+                            <div class="rd-rating-number">
+                                {{ $restaurantRating > 0 ? number_format($restaurantRating, 1) : '—' }}</div>
+                            <div class="rd-rating-stars">{{ $restaurantRating > 0 ? '★★★★★' : '☆☆☆☆☆' }}</div>
+                            <small>Out of 5.0</small>
+                        </div>
+                        <div class="rd-review-note">
+                            <h3>Real customer experiences</h3>
+                            <p>Customer reviews will be displayed here when restaurant review records are connected. We
+                                don't show sample reviews as genuine customer feedback.</p>
+                        </div>
+                    </div>
+                    <div class="rd-empty-state">
+                        <div class="rd-empty-icon">★</div>
+                        <h3>Reviews are coming here</h3>
+                        <p>There are no customer review entries available to display right now.</p>
+                    </div>
                 </section>
 
                 <section class="rd-extra-panel" data-panel="photos">
 
-                    <h2>Restaurant Photos</h2>
+                    <div class="rd-section-heading">
+                        <div>
+                            <span class="rd-section-kicker">✦ Photo gallery</span>
+                            <h2>{{ $restaurant->name }} Photos</h2>
+                            <p>Explore delicious food from this restaurant.</p>
+                        </div>
+                    </div>
 
                     <div class="rd-photo-strip">
 
-                        <img src="https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=400&q=80"
-                            alt="Biryani">
+                        @forelse ($products as $product)
 
-                        <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=400&q=80"
-                            alt="Chicken">
+                            @php
+                                $photo = $product->primaryMedia->file_path
+                                    ?? $product->image
+                                    ?? null;
 
-                        <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=400&q=80"
-                            alt="Dessert">
+                                $photoUrl = $photo
+                                    ? (\Illuminate\Support\Str::startsWith($photo, ['http://', 'https://'])
+                                        ? $photo
+                                        : asset(ltrim($photo, '/')))
+                                    : null;
+                            @endphp
+
+                            @if ($photoUrl)
+                                <div class="rd-photo-card">
+                                    <img src="{{ $photoUrl }}" alt="{{ $product->title }}" loading="lazy"
+                                        onerror="this.closest('.rd-photo-card').style.display='none';">
+
+                                    <span class="rd-photo-caption">
+                                        {{ $product->title }}
+                                    </span>
+                                </div>
+                            @endif
+
+                        @empty
+
+                            <p>No restaurant photos available yet.</p>
+
+                        @endforelse
 
                     </div>
 
                 </section>
 
                 <section class="rd-extra-panel" data-panel="offers">
-                    <h2>Available Offers</h2>
-                    @if ((int) ($restaurant->discount_percentage ?? 0) > 0)
-                        <p><strong>{{ (int) $restaurant->discount_percentage }}% OFF</strong> restaurant offer. Check final
-                            eligibility and charges at checkout.</p>
-                    @else
-                        <p>No restaurant-specific discount is currently listed.</p>
-                    @endif
-                    <p><strong>Delivery fee:</strong>
-                        {{ is_null($restaurant->delivery_fee) ? 'Not specified' : '₹' . number_format((float) $restaurant->delivery_fee, 0) }}.
-                    </p>
-                    <p><strong>Minimum order:</strong>
-                        {{ is_null($restaurant->minimum_order) ? 'Not specified' : '₹' . number_format((float) $restaurant->minimum_order, 0) }}.
-                    </p>
+                    <div class="rd-section-heading">
+                        <div><span class="rd-section-kicker">✦ Special deals</span>
+                            <h2>Offers & Benefits</h2>
+                            <p>Check the restaurant offer and ordering conditions before checkout.</p>
+                        </div>
+                    </div>
+                    <div class="rd-offer-grid">
+                        @if ((int) ($restaurant->discount_percentage ?? 0) > 0)
+                            <article class="rd-offer-card"><span class="rd-offer-label">RESTAURANT OFFER</span>
+                                <h3>{{ (int) $restaurant->discount_percentage }}% OFF</h3>
+                                <p>Discount offer listed by this restaurant.</p>
+                                <div class="rd-offer-meta">Final eligibility is confirmed at checkout.</div>
+                            </article>
+                        @else
+                            <article class="rd-offer-card"><span class="rd-offer-label">BAKASURAN</span>
+                                <h3>Freshly prepared meals</h3>
+                                <p>Explore the menu for available dishes and current pricing.</p>
+                                <div class="rd-offer-meta">No percentage discount is currently listed.</div>
+                            </article>
+                        @endif
+                    </div>
+                    <div class="rd-offer-details">
+                        <div class="rd-offer-detail"><small>Delivery
+                                fee</small><strong>{{ is_null($restaurant->delivery_fee) ? 'Not specified' : '₹' . number_format((float) $restaurant->delivery_fee, 0) }}</strong>
+                        </div>
+                        <div class="rd-offer-detail"><small>Minimum
+                                order</small><strong>{{ is_null($restaurant->minimum_order) ? 'Not specified' : '₹' . number_format((float) $restaurant->minimum_order, 0) }}</strong>
+                        </div>
+                    </div>
                 </section>
 
             </main>
@@ -1895,28 +2466,160 @@
     </div>
 
     <style>
-        .rd-addon-modal{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:16px}
-        .rd-addon-modal.open{display:flex}
-        .rd-addon-backdrop{position:absolute;inset:0;background:rgba(15,15,20,.62);backdrop-filter:blur(3px)}
-        .rd-addon-dialog{position:relative;width:min(520px,100%);max-height:min(82vh,720px);overflow:auto;border-radius:18px;background:#fff;box-shadow:0 24px 80px #0004}
-        .rd-addon-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px;border-bottom:1px solid #e8e8ed}
-        .rd-addon-heading h2{margin:0;font-size:18px;font-weight:850;color:#18181b}
-        .rd-addon-heading p{margin:5px 0 0;color:#71717a;font-size:12px}
-        .rd-addon-close{width:32px;height:32px;border:0;border-radius:50%;background:#f4f4f5;color:#27272a;font-size:22px}
-        .rd-addon-groups{padding:8px 20px 16px}
-        .rd-addon-group{padding:14px 0;border-bottom:1px solid #f0f0f2}
-        .rd-addon-group:last-child{border-bottom:0}
-        .rd-addon-group-title{display:flex;justify-content:space-between;gap:12px;margin-bottom:4px;font-size:13px;font-weight:800;color:#27272a}
-        .rd-addon-group-hint{margin:0 0 10px;color:#71717a;font-size:10px}
-        .rd-addon-option{display:flex;align-items:center;gap:9px;padding:8px 0;color:#3f3f46;font-size:12px}
-        .rd-addon-option input{accent-color:#e11d2e}
-        .rd-addon-option-price{margin-left:auto;font-weight:750;color:#27272a}
-        .rd-addon-empty{padding:18px 0;color:#71717a;font-size:12px}
-        .rd-addon-footer{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 20px;border-top:1px solid #e8e8ed;background:#fff}
-        .rd-addon-footer strong{font-size:17px;color:#18181b}
-        .rd-addon-confirm{padding:11px 18px;border:0;border-radius:9px;background:#e11d2e;color:#fff;font-size:12px;font-weight:800}
-        .rd-addon-confirm:disabled{opacity:.5;cursor:not-allowed}
-        .rd-addon-error{margin:0 20px 12px;color:#b91c1c;font-size:11px}
+        .rd-addon-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px
+        }
+
+        .rd-addon-modal.open {
+            display: flex
+        }
+
+        .rd-addon-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 15, 20, .62);
+            backdrop-filter: blur(3px)
+        }
+
+        .rd-addon-dialog {
+            position: relative;
+            width: min(520px, 100%);
+            max-height: min(82vh, 720px);
+            overflow: auto;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 24px 80px #0004
+        }
+
+        .rd-addon-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 20px;
+            border-bottom: 1px solid #e8e8ed
+        }
+
+        .rd-addon-heading h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 850;
+            color: #18181b
+        }
+
+        .rd-addon-heading p {
+            margin: 5px 0 0;
+            color: #71717a;
+            font-size: 12px
+        }
+
+        .rd-addon-close {
+            width: 32px;
+            height: 32px;
+            border: 0;
+            border-radius: 50%;
+            background: #f4f4f5;
+            color: #27272a;
+            font-size: 22px
+        }
+
+        .rd-addon-groups {
+            padding: 8px 20px 16px
+        }
+
+        .rd-addon-group {
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f2
+        }
+
+        .rd-addon-group:last-child {
+            border-bottom: 0
+        }
+
+        .rd-addon-group-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #27272a
+        }
+
+        .rd-addon-group-hint {
+            margin: 0 0 10px;
+            color: #71717a;
+            font-size: 10px
+        }
+
+        .rd-addon-option {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 0;
+            color: #3f3f46;
+            font-size: 12px
+        }
+
+        .rd-addon-option input {
+            accent-color: #e11d2e
+        }
+
+        .rd-addon-option-price {
+            margin-left: auto;
+            font-weight: 750;
+            color: #27272a
+        }
+
+        .rd-addon-empty {
+            padding: 18px 0;
+            color: #71717a;
+            font-size: 12px
+        }
+
+        .rd-addon-footer {
+            position: sticky;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 15px 20px;
+            border-top: 1px solid #e8e8ed;
+            background: #fff
+        }
+
+        .rd-addon-footer strong {
+            font-size: 17px;
+            color: #18181b
+        }
+
+        .rd-addon-confirm {
+            padding: 11px 18px;
+            border: 0;
+            border-radius: 9px;
+            background: #e11d2e;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800
+        }
+
+        .rd-addon-confirm:disabled {
+            opacity: .5;
+            cursor: not-allowed
+        }
+
+        .rd-addon-error {
+            margin: 0 20px 12px;
+            color: #b91c1c;
+            font-size: 11px
+        }
     </style>
 
     <script>
@@ -1933,11 +2636,20 @@
 
             const cartItemsElement = document.getElementById('rd-cart-items');
 
-            const cart = {};
+            const cartStorageKey = 'bakasuran_cart_restaurant_{{ (int) $restaurant->id }}';
+            let cart = {};
+            try {
+                const savedCart = JSON.parse(localStorage.getItem(cartStorageKey) || '{}');
+                if (savedCart && typeof savedCart === 'object' && !Array.isArray(savedCart)) cart = savedCart;
+            } catch (error) {
+                console.warn('Saved cart could not be restored:', error);
+            }
 
             let selectedCategory = document.querySelector('.rd-category.active')?.dataset.category || 'All';
             let couponApplied = false;
             let pendingDish = null;
+            const restaurantDeliveryFee = Number(@json((float) ($restaurant->delivery_fee ?? 0)));
+            const restaurantMinimumOrder = Number(@json((float) ($restaurant->minimum_order ?? 0)));
 
             const money = value => '₹' + Math.round(Number(value || 0)).toLocaleString('en-IN');
             const addonModal = document.getElementById('rd-addon-modal');
@@ -1984,6 +2696,9 @@
                         actualPrice: 0,
                         image: card.dataset.image || '',
                         label: '',
+                        stock: 0,
+                        minOrder: 1,
+                        maxOrder: 0,
                         available: card.dataset.available === '1'
                     };
                 }
@@ -1997,6 +2712,9 @@
                     actualPrice: Number(option.dataset.actualPrice || 0),
                     image: option.dataset.image || card.dataset.image || '',
                     label: option.textContent.split(' — ')[0].trim(),
+                    stock: Number(option.dataset.stock || 0),
+                    minOrder: Number(option.dataset.minOrder || 1),
+                    maxOrder: Number(option.dataset.maxOrder || 0),
                     available: option.dataset.available === '1'
                 };
             }
@@ -2024,7 +2742,13 @@
                 }
 
                 const image = card.querySelector('.rd-dish-photo img');
-                if (image && variant.image) image.src = variant.image;
+                if (image && variant.image) {
+                    image.onerror = function () {
+                        this.onerror = null;
+                        this.src = 'https://placehold.co/400x300/171717/ffffff?text=Food';
+                    };
+                    image.src = variant.image;
+                }
                 card.dataset.price = String(variant.price);
                 card.dataset.image = variant.image;
 
@@ -2206,12 +2930,25 @@
                 closeAddonModal();
             });
 
+            function persistCart() {
+                try {
+                    localStorage.setItem(cartStorageKey, JSON.stringify(cart));
+                } catch (error) {
+                    console.warn('Cart could not be saved in this browser:', error);
+                }
+            }
+
             function addConfiguredDish(card, variant, addons) {
                 const productId = String(card.dataset.id);
                 const addonKey = addons.map(addon => addon.id).sort((a, b) => a - b).join(',');
                 const variantId = variant.id || 'default';
                 const key = `${productId}:${variantId}:${addonKey}`;
 
+                const currentQty = cart[key]?.qty || 0;
+                if (variant.stock > 0 && currentQty >= variant.stock) {
+                    alert('Only ' + variant.stock + ' units are available for this variant.');
+                    return;
+                }
                 if (!cart[key]) {
                     cart[key] = {
                         id: key,
@@ -2222,6 +2959,7 @@
                         price: variant.price + addons.reduce((sum, addon) => sum + addon.price, 0),
                         basePrice: variant.price,
                         image: variant.image || card.dataset.image,
+                        stock: Number(variant.stock || 0),
                         addons,
                         qty: 1
                     };
@@ -2229,6 +2967,7 @@
                     cart[key].qty++;
                 }
 
+                persistCart();
                 renderCart();
             }
 
@@ -2243,10 +2982,10 @@
 
                 if (!items.length) {
                     cartItemsElement.innerHTML = `
-                        <div class="rd-cart-empty">
-                            <span>🛒</span>
-                            Your cart is waiting.<br>Add delicious dishes to get started!
-                        </div>`;
+                            <div class="rd-cart-empty">
+                                <span>🛒</span>
+                                Your cart is waiting.<br>Add delicious dishes to get started!
+                            </div>`;
                 } else {
                     items.forEach(function (item) {
                         const row = document.createElement('div');
@@ -2298,6 +3037,7 @@
                         remove.setAttribute('aria-label', 'Remove item');
                         remove.addEventListener('click', () => {
                             delete cart[item.id];
+                            persistCart();
                             renderCart();
                         });
 
@@ -2306,10 +3046,12 @@
                     });
                 }
 
-                const delivery = subtotal === 0 ? 0 : (subtotal >= 299 ? 0 : 40);
-                const tax = Math.round(subtotal * 0.05);
-                const discount = couponApplied && subtotal >= 299 ? Math.round(subtotal * 0.10) : 0;
-                const total = Math.max(0, subtotal + delivery + tax - discount);
+                // Use restaurant-configured delivery fee. Tax/coupon are not guessed here;
+                // the Laravel checkout page calculates them from its own configured records.
+                const delivery = subtotal === 0 ? 0 : restaurantDeliveryFee;
+                const tax = 0;
+                const discount = 0;
+                const total = Math.max(0, subtotal + delivery);
 
                 document.getElementById('rd-subtotal').textContent = money(subtotal);
                 document.getElementById('rd-delivery').textContent =
@@ -2318,20 +3060,25 @@
                 document.getElementById('rd-discount').textContent = '−' + money(discount);
                 document.getElementById('rd-discount-row').style.display = discount ? 'flex' : 'none';
                 document.getElementById('rd-total').textContent = money(total);
-                document.getElementById('rd-checkout').disabled = itemCount === 0;
+                const belowMinimum = restaurantMinimumOrder > 0 && subtotal > 0 && subtotal < restaurantMinimumOrder;
+                document.getElementById('rd-checkout').disabled = itemCount === 0 || belowMinimum;
                 document.getElementById('rd-saved').textContent =
-                    discount ? '✓ Coupon discount applied!' :
-                    subtotal >= 299 ? '✓ You qualify for free delivery!' :
-                    subtotal > 0 ? 'Add ₹' + Math.ceil(299 - subtotal) + ' more for free delivery.' :
-                    '✓ Add items to see your order total.';
+                    belowMinimum ? 'Minimum order is ' + money(restaurantMinimumOrder) + '. Add ' + money(restaurantMinimumOrder - subtotal) + ' more.' :
+                        subtotal > 0 ? 'Delivery fee is based on this restaurant.' :
+                            'Add items to see your order total.';
 
                 syncDishControls();
             }
 
             function changeQty(id, change) {
                 if (!cart[id]) return;
+                if (change > 0 && Number(cart[id].stock || 0) > 0 && cart[id].qty >= Number(cart[id].stock)) {
+                    alert('Maximum available stock reached.');
+                    return;
+                }
                 cart[id].qty += change;
                 if (cart[id].qty <= 0) delete cart[id];
+                persistCart();
                 renderCart();
             }
 
@@ -2370,14 +3117,28 @@
                     openAddonModal(card);
                 });
 
+                function selectedVariantCartItem() {
+                    const selected = getSelectedVariant(card);
+                    if (!selected) return null;
+                    return Object.values(cart)
+                        .filter(entry => entry.productId === id && String(entry.variantId) === String(selected.id || 'default'))
+                        .sort((a, b) => a.id.localeCompare(b.id))[0] || null;
+                }
+
                 card.querySelector('.rd-minus').addEventListener('click', function () {
-                    const item = Object.values(cart).filter(entry => entry.productId === id).sort((a, b) => a.id.localeCompare(b.id))[0];
+                    const item = selectedVariantCartItem();
                     if (item) changeQty(item.id, -1);
                 });
 
                 card.querySelector('.rd-plus').addEventListener('click', function () {
-                    const item = Object.values(cart).filter(entry => entry.productId === id).sort((a, b) => a.id.localeCompare(b.id))[0];
-                    if (item) changeQty(item.id, 1);
+                    const item = selectedVariantCartItem();
+                    if (!item) return;
+                    const selected = getSelectedVariant(card);
+                    if (selected?.stock > 0 && item.qty >= selected.stock) {
+                        alert('Only ' + selected.stock + ' units are available for this variant.');
+                        return;
+                    }
+                    changeQty(item.id, 1);
                 });
 
                 card.querySelector('.rd-fav').addEventListener('click', function () {
@@ -2388,10 +3149,9 @@
 
             document.getElementById('rd-clear').addEventListener('click', function () {
 
-                Object.keys(cart).forEach(key => delete cart[key]);
-
+                cart = {};
+                persistCart();
                 couponApplied = false;
-
                 renderCart();
 
             });
@@ -2405,27 +3165,7 @@
             });
 
             document.getElementById('rd-apply-coupon').addEventListener('click', function () {
-
-                const code = document.getElementById('rd-coupon-code').value.trim().toUpperCase();
-
-                if (code === 'BAKA20' && Object.values(cart).some(item => item.qty > 0) &&
-
-                    Object.values(cart).reduce((sum, item) => sum + item.price * item.qty, 0) >= 299) {
-
-                    couponApplied = true;
-
-                    alert('Coupon applied successfully! 10% demo discount.');
-
-                } else {
-
-                    couponApplied = false;
-
-                    alert('Enter BAKA20 and add at least ₹299 to your cart.');
-
-                }
-
-                renderCart();
-
+                alert('Coupon validation is handled on the secure checkout page using active coupon records.');
             });
 
             document.querySelectorAll('.rd-tab[data-tab]').forEach(function (tab) {
@@ -2439,6 +3179,9 @@
                     const panelName = this.dataset.tab;
 
                     const isMenu = panelName === 'menu';
+
+                    const layout = document.getElementById('rd-layout');
+                    layout.classList.toggle('rd-layout--tab-view', !isMenu);
 
                     document.getElementById('rd-category-panel').style.display = isMenu ? '' : 'none';
 
@@ -2481,13 +3224,12 @@
             });
 
             document.getElementById('rd-checkout').addEventListener('click', function () {
-
-                // Frontend preview only. Connect this to the real cart/checkout flow next.
-
-                alert('Your cart is ready. Next, connect this button to your Laravel cart and checkout routes.');
-
+                alert('The menu cart is saved in this browser. Your Laravel checkout reads database CartItem records, so the add-to-cart API route must be connected before secure checkout can start.');
             });
 
+            dishCards.forEach(function (card) {
+                updateCardVariant(card);
+            });
             renderCart();
 
         });

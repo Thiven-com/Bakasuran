@@ -13,16 +13,30 @@ class RestaurantTable extends Model
         'table_name',
         'table_number',
         'seating_capacity',
+        'seating_type',
+        'description',
         'status',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'restaurant_id' => 'integer',
+            'seating_capacity' => 'integer',
+            'status' => 'integer',
+        ];
+    }
+
     public function restaurant(): BelongsTo
     {
-        return $this->belongsTo(Restaurant::class);
+        return $this->belongsTo(Restaurant::class, 'restaurant_id');
     }
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(RestaurantTableBooking::class);
+        return $this->hasMany(
+            RestaurantTableBooking::class,
+            'restaurant_table_id'
+        );
     }
 }

@@ -35,7 +35,6 @@
             </div>
 
             <style>
-
                 .subcategory-grid {
 
                     display: grid;
@@ -60,146 +59,340 @@
 
                 }
 
-                */\* BAKASURAN food product edit styling \*/*
+                /* BAKASURAN food product edit styling */
 
-                .food-edit-header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+                .food-edit-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                    margin-bottom: 18px;
+                }
 
-                .food-edit-header .subtitle { color:#6b7280; margin:4px 0 0; }
+                .food-edit-header .subtitle {
+                    color: #6b7280;
+                    margin: 4px 0 0;
+                }
 
-                .food-section-card { border:1px solid #e9edf2; border-radius:12px; overflow:hidden; }
+                .food-section-card {
+                    border: 1px solid #e9edf2;
+                    border-radius: 12px;
+                    overflow: hidden;
+                }
 
-                .food-section-card .card-body { padding:22px; }
+                .food-section-card .card-body {
+                    padding: 22px;
+                }
 
-                .food-section-title { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+                .food-section-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 18px;
+                }
 
-                .food-section-title h5 { margin:0; font-weight:700; }
+                .food-section-title h5 {
+                    margin: 0;
+                    font-weight: 700;
+                }
 
-                .food-section-title .section-icon { width:38px; height:38px; border-radius:10px; display:grid; place-items:center; background:#fff2e8; color:#e86b20; }
+                .food-section-title .section-icon {
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 10px;
+                    display: grid;
+                    place-items: center;
+                    background: #fff2e8;
+                    color: #e86b20;
+                }
 
-                .food-field-hint { color:#8992a0; font-size:12px; margin-top:5px; display:block; }
+                .food-field-hint {
+                    color: #8992a0;
+                    font-size: 12px;
+                    margin-top: 5px;
+                    display: block;
+                }
 
-                .food-toggle { border:1px solid #e9edf2; border-radius:10px; padding:12px 14px; height:100%; }
+                .food-toggle {
+                    border: 1px solid #e9edf2;
+                    border-radius: 10px;
+                    padding: 12px 14px;
+                    height: 100%;
+                }
 
-                .food-toggle .form-check { margin:0; }
+                .food-toggle .form-check {
+                    margin: 0;
+                }
 
-                .food-image-preview { width:112px; height:112px; object-fit:cover; border-radius:10px; border:1px solid #e9edf2; }
+                .food-image-preview {
+                    width: 112px;
+                    height: 112px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                    border: 1px solid #e9edf2;
+                }
 
-                .variant-box { border:1px solid #e9edf2 !important; border-radius:12px; background:#fff; }
+                .variant-image-preview {
+                    width: 100%;
+                    max-width: 180px;
+                    height: 125px;
+                    border: 1px dashed #dfe4eb;
+                    border-radius: 10px;
+                    background: #fafbfc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    color: #8992a0;
+                    font-size: 12px;
+                }
 
-                @media(max-width:767px) { .food-section-card .card-body { padding:15px; } }
+                .variant-image-preview img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
 
-            
+                .variant-box {
+                    border: 1px solid #e9edf2 !important;
+                    border-radius: 12px;
+                    background: #fff;
+                }
+
+                @media(max-width:767px) {
+                    .food-section-card .card-body {
+                        padding: 15px;
+                    }
+                }
+
+
                 /* BAKASURAN refreshed edit-product UI */
                 .food-edit-header {
-                    background: linear-gradient(135deg,#fff7f0 0%,#ffffff 75%);
+                    background: linear-gradient(135deg, #fff7f0 0%, #ffffff 75%);
                     border: 1px solid #f4dfd0;
                     border-radius: 16px;
                     padding: 22px 24px;
                     margin: 18px 0 22px;
                 }
-                .food-edit-header h4 { color:#202938; font-size:22px; font-weight:750; }
-                .food-edit-header .subtitle { color:#77808d; font-size:13px; }
-                .food-edit-header .badge { border:1px solid #f0d8c7; border-radius:30px; padding:9px 13px; }
-                .page-wrapper .content { background:#f7f8fa; }
-                .page-wrapper .content > .card,
-                .page-wrapper .content form > .card,
-                .page-wrapper .content form > .card.mt-4 {
-                    border:1px solid #e9edf2;
-                    border-radius:16px;
-                    box-shadow:0 5px 22px rgba(25,35,50,.045);
-                    overflow:hidden;
-                }
-                .food-section-card { border-radius:14px; }
-                .accordion-item { border:0 !important; }
-                .accordion-button {
-                    background:#fff !important;
-                    box-shadow:none !important;
-                    padding:18px 20px;
-                }
-                .accordion-button h5 { font-size:16px; font-weight:700; color:#273244; }
-                .accordion-body { padding:22px; }
-                .form-label, label { color:#364152; font-weight:600; font-size:13px; }
-                .form-control, .form-select, select.select {
-                    min-height:43px;
-                    border:1px solid #dfe4eb;
-                    border-radius:9px;
-                    color:#273244;
-                    font-size:13px;
-                    box-shadow:none;
-                }
-                .form-control:focus, .form-select:focus {
-                    border-color:#ed8a4b;
-                    box-shadow:0 0 0 3px rgba(237,138,75,.12);
-                }
-                textarea.form-control { min-height:unset; }
-                .food-toggle {
-                    background:#fff;
-                    border:1px solid #e6eaf0;
-                    border-radius:11px;
-                    padding:14px;
-                    transition:border-color .2s, background .2s;
-                }
-                .food-toggle:has(input:checked) {
-                    border-color:#f0a06b;
-                    background:#fffaf6;
-                }
-                .food-section-title { margin:8px 0 16px; }
-                .food-section-title .section-icon {
-                    background:#fff0e5;
-                    color:#e8752b;
-                    width:40px;height:40px;
-                }
-                .food-image-preview {
-                    width:118px;height:118px;
-                    border-radius:13px;
-                    padding:4px;
-                    background:#fff;
-                    box-shadow:0 3px 12px rgba(0,0,0,.07);
-                }
-                .variant-box {
-                    border:1px solid #e7ebf0 !important;
-                    border-radius:14px;
-                    padding:18px !important;
-                    background:#fff;
-                    box-shadow:0 3px 14px rgba(25,35,50,.035);
-                }
-                .variant-box h6 { font-weight:700; color:#263244; }
-                .variant-box .demo { flex-wrap:wrap; }
-                .variant-box img { border-radius:10px; object-fit:cover; }
-                .btn-submit, .btn-primary {
-                    background:#e8752b;
-                    border-color:#e8752b;
-                }
-                .btn-submit:hover, .btn-primary:hover {
-                    background:#cf5f1c;
-                    border-color:#cf5f1c;
-                }
-                .btn-cancel { border-radius:8px; }
-                .btn-addproduct {
-                    display:flex;
-                    justify-content:flex-end;
-                    gap:10px;
-                    padding-top:12px;
-                }
-                .btn-addproduct .btn { min-width:130px; padding:11px 18px; border-radius:9px; }
-                #newVariantPreview, #existingVariantsContainer { margin-top:20px; }
-                #variantList .border, #newVariantList .border {
-                    border-color:#e6eaf0 !important;
-                    border-radius:13px !important;
-                    background:#fff;
-                }
-                .modal-content { border:0; border-radius:15px; overflow:hidden; }
-                .modal-header { background:#fff8f2; border-bottom:1px solid #f1e4da; }
-                @media(max-width:767px) {
-                    .food-edit-header { padding:17px; }
-                    .accordion-body { padding:14px; }
-                    .page-wrapper .content { padding-left:12px; padding-right:12px; }
-                    .variant-box { padding:13px !important; }
-                    .btn-addproduct { justify-content:stretch; }
-                    .btn-addproduct .btn { flex:1; min-width:0; }
+
+                .food-edit-header h4 {
+                    color: #202938;
+                    font-size: 22px;
+                    font-weight: 750;
                 }
 
-</style>
+                .food-edit-header .subtitle {
+                    color: #77808d;
+                    font-size: 13px;
+                }
+
+                .food-edit-header .badge {
+                    border: 1px solid #f0d8c7;
+                    border-radius: 30px;
+                    padding: 9px 13px;
+                }
+
+                .page-wrapper .content {
+                    background: #f7f8fa;
+                }
+
+                .page-wrapper .content>.card,
+                .page-wrapper .content form>.card,
+                .page-wrapper .content form>.card.mt-4 {
+                    border: 1px solid #e9edf2;
+                    border-radius: 16px;
+                    box-shadow: 0 5px 22px rgba(25, 35, 50, .045);
+                    overflow: hidden;
+                }
+
+                .food-section-card {
+                    border-radius: 14px;
+                }
+
+                .accordion-item {
+                    border: 0 !important;
+                }
+
+                .accordion-button {
+                    background: #fff !important;
+                    box-shadow: none !important;
+                    padding: 18px 20px;
+                }
+
+                .accordion-button h5 {
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #273244;
+                }
+
+                .accordion-body {
+                    padding: 22px;
+                }
+
+                .form-label,
+                label {
+                    color: #364152;
+                    font-weight: 600;
+                    font-size: 13px;
+                }
+
+                .form-control,
+                .form-select,
+                select.select {
+                    min-height: 43px;
+                    border: 1px solid #dfe4eb;
+                    border-radius: 9px;
+                    color: #273244;
+                    font-size: 13px;
+                    box-shadow: none;
+                }
+
+                .form-control:focus,
+                .form-select:focus {
+                    border-color: #ed8a4b;
+                    box-shadow: 0 0 0 3px rgba(237, 138, 75, .12);
+                }
+
+                textarea.form-control {
+                    min-height: unset;
+                }
+
+                .food-toggle {
+                    background: #fff;
+                    border: 1px solid #e6eaf0;
+                    border-radius: 11px;
+                    padding: 14px;
+                    transition: border-color .2s, background .2s;
+                }
+
+                .food-toggle:has(input:checked) {
+                    border-color: #f0a06b;
+                    background: #fffaf6;
+                }
+
+                .food-section-title {
+                    margin: 8px 0 16px;
+                }
+
+                .food-section-title .section-icon {
+                    background: #fff0e5;
+                    color: #e8752b;
+                    width: 40px;
+                    height: 40px;
+                }
+
+                .food-image-preview {
+                    width: 118px;
+                    height: 118px;
+                    border-radius: 13px;
+                    padding: 4px;
+                    background: #fff;
+                    box-shadow: 0 3px 12px rgba(0, 0, 0, .07);
+                }
+
+                .variant-box {
+                    border: 1px solid #e7ebf0 !important;
+                    border-radius: 14px;
+                    padding: 18px !important;
+                    background: #fff;
+                    box-shadow: 0 3px 14px rgba(25, 35, 50, .035);
+                }
+
+                .variant-box h6 {
+                    font-weight: 700;
+                    color: #263244;
+                }
+
+                .variant-box .demo {
+                    flex-wrap: wrap;
+                }
+
+                .variant-box img {
+                    border-radius: 10px;
+                    object-fit: cover;
+                }
+
+                .btn-submit,
+                .btn-primary {
+                    background: #e8752b;
+                    border-color: #e8752b;
+                }
+
+                .btn-submit:hover,
+                .btn-primary:hover {
+                    background: #cf5f1c;
+                    border-color: #cf5f1c;
+                }
+
+                .btn-cancel {
+                    border-radius: 8px;
+                }
+
+                .btn-addproduct {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 10px;
+                    padding-top: 12px;
+                }
+
+                .btn-addproduct .btn {
+                    min-width: 130px;
+                    padding: 11px 18px;
+                    border-radius: 9px;
+                }
+
+                #newVariantPreview,
+                #existingVariantsContainer {
+                    margin-top: 20px;
+                }
+
+                #variantList .border,
+                #newVariantList .border {
+                    border-color: #e6eaf0 !important;
+                    border-radius: 13px !important;
+                    background: #fff;
+                }
+
+                .modal-content {
+                    border: 0;
+                    border-radius: 15px;
+                    overflow: hidden;
+                }
+
+                .modal-header {
+                    background: #fff8f2;
+                    border-bottom: 1px solid #f1e4da;
+                }
+
+                @media(max-width:767px) {
+                    .food-edit-header {
+                        padding: 17px;
+                    }
+
+                    .accordion-body {
+                        padding: 14px;
+                    }
+
+                    .page-wrapper .content {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                    }
+
+                    .variant-box {
+                        padding: 13px !important;
+                    }
+
+                    .btn-addproduct {
+                        justify-content: stretch;
+                    }
+
+                    .btn-addproduct .btn {
+                        flex: 1;
+                        min-width: 0;
+                    }
+                }
+            </style>
 
             <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
 
@@ -233,47 +426,29 @@
 
                                             <div class="col-lg-6">
 
-<div class="mb-3">
+                                                <div class="mb-3">
 
-    <label class="form-label">Product Name</label>
+                                                    <label class="form-label">Product Name</label>
 
-    <input type="text"
+                                                    <input type="text" class="form-control" name="title" id="productName"
+                                                        value="{{ old('title', $product->title) }}" required>
 
-        class="form-control"
+                                                </div>
 
-        name="title"
+                                                <div class="mb-3">
 
-        id="productName"
+                                                    <label class="form-label">Product Slug</label>
 
-        value="{{ old('title', $product->title) }}"
+                                                    <input type="text" class="form-control" name="slug" id="productSlug"
+                                                        value="{{ old('slug', $product->slug ?? '') }}" readonly>
 
-        required>
+                                                    <small class="text-muted">
 
-</div>
+                                                        Automatically generated from product name.
 
-<div class="mb-3">
+                                                    </small>
 
-    <label class="form-label">Product Slug</label>
-
-    <input type="text"
-
-        class="form-control"
-
-        name="slug"
-
-        id="productSlug"
-
-        value="{{ old('slug', $product->slug ?? '') }}"
-
-        readonly>
-
-    <small class="text-muted">
-
-        Automatically generated from product name.
-
-    </small>
-
-</div>
+                                                </div>
 
                                             </div>
 
@@ -307,21 +482,19 @@
 
                                                     </div>
 
-                                                    <select class="select" name="category_id" id="categorySelect"
-
-                                                        required>
+                                                    <select class="select" name="category_id" id="categorySelect" required>
 
                                                         <option value="">Select Category</option>
 
                                                         @foreach ($categories as $cat)
 
-                                                        <option value="{{ $cat->id }}" data-title="{{ $cat->title }}" {{
+                                                                                                        <option value="{{ $cat->id }}" data-title="{{ $cat->title }}" {{
 
                                                             $product->category_id == $cat->id ? 'selected' : '' }}>
 
-                                                            {{ $cat->title }}
+                                                                                                            {{ $cat->title }}
 
-                                                        </option>
+                                                                                                        </option>
 
                                                         @endforeach
 
@@ -333,41 +506,35 @@
 
                                             <div class="col-lg-6 col-md-6 col-sm-6">
 
-    <div class="mb-3 add-product">
+                                                <div class="mb-3 add-product">
 
-        <label class="form-label">Restaurant</label>
+                                                    <label class="form-label">Restaurant</label>
 
-        <select class="select" name="restaurant_id" id="restaurantSelect">
+                                                    <select class="select" name="restaurant_id" id="restaurantSelect">
 
-            <option value="">Select Restaurant (Optional)</option>
+                                                        <option value="">Select Restaurant (Optional)</option>
 
-            @foreach ($restaurants as $restaurant)
+                                                        @foreach ($restaurants as $restaurant)
 
-                <option
+                                                            <option value="{{ $restaurant->id }}" {{ old('restaurant_id', $product->restaurant_id) == $restaurant->id ? 'selected' : '' }}>
 
-                    value="{{ $restaurant->id }}"
+                                                                {{ $restaurant->name }}
 
-                    {{ old('restaurant_id', $product->restaurant_id) == $restaurant->id ? 'selected' : '' }}
+                                                            </option>
 
-                >
+                                                        @endforeach
 
-                    {{ $restaurant->name }}
+                                                    </select>
 
-                </option>
+                                                    @error('restaurant_id')
 
-            @endforeach
+                                                        <small class="text-danger">{{ $message }}</small>
 
-        </select>
+                                                    @enderror
 
-        @error('restaurant_id')
+                                                </div>
 
-            <small class="text-danger">{{ $message }}</small>
-
-        @enderror
-
-    </div>
-
-</div>
+                                            </div>
 
                                         </div>
 
@@ -393,13 +560,12 @@
 
                                             <div class="col-lg-6 col-md-6 col-sm-6 mb-3">
 
-                                                        <label class="form-label">Product Code</label>
+                                                <label class="form-label">Product Code</label>
 
-                                                        <input type="text" class="form-control" readonly
+                                                <input type="text" class="form-control" readonly name="hsn_code"
+                                                    value="{{ old('hsn_code', $product->hsn_code ?? '') }}">
 
-                                                            name="hsn_code" value="{{ old('hsn_code', $product->hsn_code ?? '') }}">
-
-                                                    </div>
+                                            </div>
 
                                             <div class="col-12 mt-3">
 
@@ -413,7 +579,8 @@
 
                                                             <option value="veg" {{ old('food_type', $product->food_type ?? 'veg') == 'veg' ? 'selected' : '' }}>Vegetarian</option>
 
-                                                            <option value="non_veg" {{ old('food_type', $product->food_type ?? 'veg') == 'non_veg' ? 'selected' : '' }}>Non-Vegetarian</option>
+                                                            <option value="non_veg" {{ old('food_type', $product->food_type ?? 'veg') == 'non_veg' ? 'selected' : '' }}>Non-Vegetarian
+                                                            </option>
 
                                                             <option value="egg" {{ old('food_type', $product->food_type ?? 'veg') == 'egg' ? 'selected' : '' }}> Contains Egg</option>
 
@@ -425,9 +592,10 @@
 
                                                         <label class="form-label">Preparation Time (minutes)</label>
 
-                                                        <input type="number" min="0" name="preparation_time" class="form-control"
-
-                                                            value="{{ old('preparation_time', $product->preparation_time) }}" placeholder="e.g. 20">
+                                                        <input type="number" min="0" name="preparation_time"
+                                                            class="form-control"
+                                                            value="{{ old('preparation_time', $product->preparation_time) }}"
+                                                            placeholder="e.g. 20">
 
                                                     </div>
 
@@ -436,7 +604,6 @@
                                                         <label class="form-label">Sort Order</label>
 
                                                         <input type="number" min="0" name="sort_order" class="form-control"
-
                                                             value="{{ old('sort_order', $product->sort_order ?? 0) }}">
 
                                                     </div>
@@ -446,7 +613,6 @@
                                                         <label class="form-label">Allergen Information</label>
 
                                                         <textarea name="allergen_info" rows="2" class="form-control"
-
                                                             placeholder="e.g. Contains dairy, nuts or gluten">{{ old('allergen_info', $product->allergen_info) }}</textarea>
 
                                                     </div>
@@ -459,11 +625,12 @@
 
                                                                 <input type="hidden" name="is_available" value="0">
 
-                                                                <input class="form-check-input" type="checkbox" role="switch" id="productAvailable"
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    role="switch" id="productAvailable" name="is_available"
+                                                                    value="1" {{ old('is_available', $product->is_available) ? 'checked' : '' }}>
 
-                                                                    name="is_available" value="1" {{ old('is_available', $product->is_available) ? 'checked' : '' }}>
-
-                                                                <label class="form-check-label fw-semibold" for="productAvailable">Available for ordering</label>
+                                                                <label class="form-check-label fw-semibold"
+                                                                    for="productAvailable">Available for ordering</label>
 
                                                             </div>
 
@@ -479,11 +646,12 @@
 
                                                                 <input type="hidden" name="is_recommended" value="0">
 
-                                                                <input class="form-check-input" type="checkbox" role="switch" id="productRecommended"
-
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    role="switch" id="productRecommended"
                                                                     name="is_recommended" value="1" {{ old('is_recommended', $product->is_recommended) ? 'checked' : '' }}>
 
-                                                                <label class="form-check-label fw-semibold" for="productRecommended">Recommended product</label>
+                                                                <label class="form-check-label fw-semibold"
+                                                                    for="productRecommended">Recommended product</label>
 
                                                             </div>
 
@@ -500,7 +668,6 @@
                                                 <label class="form-label">Description</label>
 
                                                 <textarea class="form-control h-100" rows="5" id="summernote"
-
                                                     name="description">{!! $product->description !!}</textarea>
 
                                             </div>
@@ -511,7 +678,9 @@
 
                                                     <label>Short Description</label>
 
-                                                    <textarea class="form-control h-100" rows="2" minlength="20" maxlength="200" name="short_description">{!! $product->short_description !!}</textarea>
+                                                    <textarea class="form-control h-100" rows="2" minlength="20"
+                                                        maxlength="200"
+                                                        name="short_description">{!! $product->short_description !!}</textarea>
 
                                                 </div>
 
@@ -525,7 +694,8 @@
 
                                                     <div class="mb-2">
 
-                                                        <img src="{{ asset($product->image) }}" alt="Product Image" class="food-image-preview">
+                                                        <img src="{{ asset($product->image) }}" alt="Product Image"
+                                                            class="food-image-preview">
 
                                                     </div>
 
@@ -533,7 +703,8 @@
 
                                                 <input type="file" name="image" class="form-control" accept="image/*">
 
-                                                <small class="food-field-hint">Leave empty to keep the current product image.</small>
+                                                <small class="food-field-hint">Leave empty to keep the current product
+                                                    image.</small>
 
                                             </div>
 
@@ -547,7 +718,8 @@
 
                                                         <h5>Add-on Groups</h5>
 
-                                                        <small class="text-muted">Select add-ons customers can choose with this product.</small>
+                                                        <small class="text-muted">Select add-ons customers can choose with
+                                                            this product.</small>
 
                                                     </div>
 
@@ -562,10 +734,7 @@
                                                             <label class="food-toggle d-flex align-items-start gap-2">
 
                                                                 <input type="checkbox" class="form-check-input mt-1"
-
-                                                                    name="addon_groups[]" value="{{ $addonGroup->id }}"
-
-                                                                    {{ $product->addonGroups->contains('id', $addonGroup->id) ? 'checked' : '' }}>
+                                                                    name="addon_groups[]" value="{{ $addonGroup->id }}" {{ $product->addonGroups->contains('id', $addonGroup->id) ? 'checked' : '' }}>
 
                                                                 <span>
 
@@ -585,7 +754,9 @@
 
                                                     @empty
 
-                                                        <div class="col-12"><p class="text-muted mb-0">No active add-on groups available.</p></div>
+                                                        <div class="col-12">
+                                                            <p class="text-muted mb-0">No active add-on groups available.</p>
+                                                        </div>
 
                                                     @endforelse
 
@@ -628,7 +799,6 @@
                                 <div class="accordion-header" id="headingOne">
 
                                     <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-
                                         aria-controls="collapseOne">
 
                                         <div class="addproduct-icon">
@@ -638,7 +808,6 @@
                                             </h5>
 
                                             <a href="javascript:void(0);"><i data-feather="chevron-down"
-
                                                     class="chevron-down-add"></i></a>
 
                                         </div>
@@ -648,7 +817,6 @@
                                 </div>
 
                                 <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-
                                     data-bs-parent="#accordionExample">
 
                                     <div class="accordion-body">
@@ -661,15 +829,18 @@
 
                                                     <h5 class="mt-4 mb-3">Product Variants</h5>
 
-                                                    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#bulkUpdateModal" style="float: inline-end;">
+                                                    <button type="button" class="btn btn-primary mb-3"
+                                                        data-bs-toggle="modal" data-bs-target="#bulkUpdateModal"
+                                                        style="float: inline-end;">
 
-    Bulk Update Variants
+                                                        Bulk Update Variants
 
-</button>
+                                                    </button>
 
                                                 </div>
 
-                                                             *{{-- <input type="text" class="form-control mt-2 attribute-search" placeholder="Search..."> --}}*
+                                                *{{-- <input type="text" class="form-control mt-2 attribute-search"
+                                                    placeholder="Search..."> --}}*
 
                                                 <div class="row">
 
@@ -682,11 +853,8 @@
                                                                 <label class="form-label fw-bold">{{$attribute->name }}</label>
 
                                                                 <button type="button"
-
                                                                     class="btn btn-sm btn-primary open-modal mx-2"
-
                                                                     data-attribute-id="{{ $attribute->id }}"
-
                                                                     data-attribute-name="{{ $attribute->name }}">
 
                                                                     + Add
@@ -697,17 +865,15 @@
 
                                                             @if (str_contains(strtolower($attribute->name), 'color'))
 
-    <input type="text"
+                                                                <input type="text" class="form-control mt-2 attribute-search"
+                                                                    placeholder="Search {{ $attribute->name }}..."
+                                                                    style="width:min-content"
+                                                                    data-attribute-id="{{ $attribute->id }}">
 
-        class="form-control mt-2 attribute-search"
+                                                            @endif
 
-        placeholder="Search {{ $attribute->name }}..." style="width:min-content"
-
-        data-attribute-id="{{ $attribute->id }}">
-
-@endif
-
-                                                            <div class="row attribute-values mt-2" data-attribute-id="{{ $attribute->id }}">
+                                                            <div class="row attribute-values mt-2"
+                                                                data-attribute-id="{{ $attribute->id }}">
 
                                                                 @foreach($attribute->attributeValues as $value)
 
@@ -716,11 +882,8 @@
                                                                         <label class="form-check-label">
 
                                                                             <input type="checkbox"
-
                                                                                 name="variant_attributes[{{ $attribute->id }}][]"
-
                                                                                 value="{{ $value->name }}"
-
                                                                                 class="form-check-input variant-checkbox">
 
                                                                             <b class="text-dark">{{ $value->name }}</b>
@@ -763,7 +926,8 @@
 
                                         @php
 
-                                            $orderQty = App\Models\OrderItem::where('product_variant_id', $variant->id)->whereHas('order', function($query) {$query->where('status', '!=', 'cancelled');})->sum('quantity');
+                                            $orderQty = App\Models\OrderItem::where('product_variant_id', $variant->id)->whereHas('order', function ($query) {
+                                                $query->where('status', '!=', 'cancelled'); })->sum('quantity');
 
                                             $addedPiece = ((int) $variant->stock + (int) $orderQty) ?? 0;
 
@@ -776,11 +940,9 @@
                                                 <h6>{{ $variant->sku }}</h6>
 
                                                 <button type="button"
-
                                                     class="btn btn-danger btn-sm remove-variant">Remove</button>
 
                                                 <input type="hidden" name="existing_variants[{{ $variant->id }}][id]"
-
                                                     value="{{ $variant->id }}">
 
                                             </div>
@@ -797,15 +959,14 @@
 
                                                 @endif
 
-                                                    <div style="w-25">
+                                                <div style="w-25">
 
-                                                        <label for="image">Product Image(450x600 px)</label>
+                                                    <label for="image">Product Image(450x600 px)</label>
 
-                                                <input type="file" name="existing_variants[{{ $variant->id }}][image]"
+                                                    <input type="file" name="existing_variants[{{ $variant->id }}][image]"
+                                                        class="form-control">
 
-                                                    class="form-control">
-
-                                                    </div>
+                                                </div>
 
                                             </div>
 
@@ -816,48 +977,40 @@
                                                     <label class="form-label">Variant Video</label>
 
                                                     <input type="file" name="existing_variants[{{ $variant->id }}][video]"
-
                                                         class="form-control variant-video">
 
                                                     <button type="button"
-
                                                         class="btn btn-sm btn-warning mt-2 remove-selected-file"
-
                                                         style="display:none;">
 
                                                         Remove Selected File
 
                                                     </button>
 
-                                                            @if($variant->video)
+                                                    @if($variant->video)
 
-                                                                <div class="mt-2">
+                                                        <div class="mt-2">
 
-                                                                    <video controls style="width:200px;height:150px">
+                                                            <video controls style="width:200px;height:150px">
 
-                                                                        <source src="{{ asset($variant->video) }}">
+                                                                <source src="{{ asset($variant->video) }}">
 
-                                                                    </video>
+                                                            </video>
 
-                                                                </div>
+                                                        </div>
 
-                                                                <div class="form-check mt-1">
+                                                        <div class="form-check mt-1">
 
-                                                                   <button type="button"
+                                                            <button type="button" class="btn btn-sm btn-danger delete-video-btn"
+                                                                data-id="{{ $variant->id }}" data-type="video">
 
-                                                                        class="btn btn-sm btn-danger delete-video-btn"
+                                                                Delete Video
 
-                                                                        data-id="{{ $variant->id }}"
+                                                            </button>
 
-                                                                        data-type="video">
+                                                        </div>
 
-                                                                        Delete Video
-
-                                                                    </button>
-
-                                                                </div>
-
-                                                            @endif
+                                                    @endif
 
                                                 </div>
 
@@ -866,54 +1019,45 @@
                                                     <label class="form-label">Promotional Video</label>
 
                                                     <input type="file"
-
                                                         name="existing_variants[{{ $variant->id }}][promotional_video]"
-
                                                         class="form-control variant-video">
 
                                                     <button type="button"
-
                                                         class="btn btn-sm btn-warning mt-2 remove-selected-file"
-
                                                         style="display:none;">
 
                                                         Remove Selected File
 
                                                     </button>
 
-                                                         @if($variant->promotional_video)
+                                                    @if($variant->promotional_video)
 
-                                                                <div class="row d-flex">
+                                                        <div class="row d-flex">
 
-                                                                <div class="mt-2">
+                                                            <div class="mt-2">
 
-                                                                    <video controls style="width: 200px;height:150px">
+                                                                <video controls style="width: 200px;height:150px">
 
-                                                                        <source src="{{ asset($variant->promotional_video) }}">
+                                                                    <source src="{{ asset($variant->promotional_video) }}">
 
-                                                                    </video>
+                                                                </video>
 
-                                                                </div>
+                                                            </div>
 
-                                                                <div class="form-check mt-1">
+                                                            <div class="form-check mt-1">
 
-                                                                   <button type="button"
+                                                                <button type="button" class="btn btn-sm btn-danger delete-video-btn"
+                                                                    data-id="{{ $variant->id }}" data-type="promotional_video">
 
-                                                                        class="btn btn-sm btn-danger delete-video-btn"
+                                                                    Delete Video
 
-                                                                        data-id="{{ $variant->id }}"
+                                                                </button>
 
-                                                                        data-type="promotional_video">
+                                                            </div>
 
-                                                                        Delete Video
+                                                        </div>
 
-                                                                    </button>
-
-                                                                </div>
-
-                                                                </div>
-
-                                                        @endif
+                                                    @endif
 
                                                 </div>
 
@@ -928,15 +1072,12 @@
                                                     @foreach($variant->media as $media)
 
                                                         <div class="border p-2 position-relative"
-
                                                             style="width: 120px; text-align: center;">
 
                                                             <img src="{{ asset($media->url) }}" alt="" class="img-fluid"
-
                                                                 style="max-height:100px;">
 
                                                             <button type="button" class="btn btn-sm btn-danger remove-variant-media"
-
                                                                 data-id="{{ $media->id }}">
 
                                                                 Remove
@@ -944,7 +1085,6 @@
                                                             </button>
 
                                                             <input type="hidden" name="keep_variant_gallery[{{ $variant->id }}][]"
-
                                                                 value="{{ $media->id }}">
 
                                                         </div>
@@ -954,7 +1094,6 @@
                                                 </div>
 
                                                 <input type="file" name="variant_gallery[{{ $variant->id }}][]"
-
                                                     class="form-control" multiple accept="image/*">
 
                                             </div>
@@ -966,7 +1105,6 @@
                                                     <label class="form-label">SKU</label>
 
                                                     <input type="text" class="form-control" readonly value="{{ $variant->sku }}"
-
                                                         required>
 
                                                 </div>
@@ -980,9 +1118,7 @@
                                                     <label>Actual Price</label>
 
                                                     <input type="text"
-
                                                         name="existing_variants[{{ $variant->id }}][actual_price]"
-
                                                         value="{{ $variant->actual_price }}" class="form-control">
 
                                                 </div>
@@ -992,7 +1128,6 @@
                                                     <label>Sale Price</label>
 
                                                     <input type="text" name="existing_variants[{{ $variant->id }}][sale_price]"
-
                                                         value="{{ $variant->price }}" class="form-control">
 
                                                 </div>
@@ -1002,9 +1137,7 @@
                                                     <label class="form-label">Weight</label>
 
                                                     <input type="number" step="0.01" min="0.1" class="form-control"
-
                                                         name="existing_variants[{{ $variant->id }}][weight]"
-
                                                         value="{{ $variant->weight }}">
 
                                                 </div>
@@ -1014,7 +1147,6 @@
                                                     <label>Stock</label>
 
                                                     <input type="text" name="existing_variants[{{ $variant->id }}][stock]"
-
                                                         value="{{ $variant->stock }}" class="form-control">
 
                                                 </div>
@@ -1024,9 +1156,7 @@
                                                     <label>Low Stock Alert</label>
 
                                                     <input type="text"
-
                                                         name="existing_variants[{{ $variant->id }}][low_stock_alert]"
-
                                                         value="{{ $variant->low_stock_alert }}" class="form-control">
 
                                                 </div>
@@ -1036,9 +1166,7 @@
                                                     <label>Min Order</label>
 
                                                     <input type="text"
-
                                                         name="existing_variants[{{ $variant->id }}][product_min_order]"
-
                                                         value="{{ $variant->product_min_order }}" class="form-control">
 
                                                 </div>
@@ -1048,47 +1176,43 @@
                                                     <label>Max Order</label>
 
                                                     <input type="text"
-
                                                         name="existing_variants[{{ $variant->id }}][product_max_order]"
-
                                                         value="{{ $variant->product_max_order }}" class="form-control">
 
                                                 </div>
 
-                                                    <div class="col-md-4 mt-3">
+                                                <div class="col-md-4 mt-3">
 
-                                                        <label>Preorder Stock</label>
+                                                    <label>Preorder Stock</label>
 
-                                                        <input type="text"
+                                                    <input type="text"
+                                                        name="existing_variants[{{ $variant->id }}][preorder_stock]"
+                                                        value="{{ $variant->preorder_stock }}" class="form-control">
 
-                                                            name="existing_variants[{{ $variant->id }}][preorder_stock]"
+                                                </div>
 
-                                                            value="{{ $variant->preorder_stock }}" class="form-control">
+                                                <div class="col-md-4 mt-3">
 
-                                                    </div>
+                                                    <label>Preorder</label>
 
-                                                        <div class="col-md-4 mt-3">
+                                                    <select class="form-control"
+                                                        name="existing_variants[{{ $variant->id }}][preorder]">
 
-                                                            <label>Preorder</label>
+                                                        <option value="0" {{ !$variant->preorder ? 'selected' : '' }}>No
+                                                        </option>
 
-                                                            <select class="form-control"
+                                                        <option value="1" {{ $variant->preorder ? 'selected' : '' }}>Yes
+                                                        </option>
 
-                                                                name="existing_variants[{{ $variant->id }}][preorder]">
+                                                    </select>
 
-                                                                <option value="0" {{ !$variant->preorder ? 'selected' : '' }}>No</option>
-
-                                                                <option value="1" {{ $variant->preorder ? 'selected' : '' }}>Yes</option>
-
-                                                            </select>
-
-                                                            </div>
+                                                </div>
 
                                                 <div class="col-md-4 mt-3">
 
                                                     <label>Status</label>
 
                                                     <select name="existing_variants[{{ $variant->id }}][status]"
-
                                                         class="form-control">
 
                                                         <option value="show" {{ $variant->status === 'show' ? 'selected' : '' }}>
@@ -1147,7 +1271,7 @@
 
     </div>
 
-        <div class="modal fade" id="addValueModal" tabindex="-1">
+    <div class="modal fade" id="addValueModal" tabindex="-1">
 
         <div class="modal-dialog">
 
@@ -1171,13 +1295,13 @@
 
                         <input type="text" id="newValueInput" class="form-control" onkeydown="if(event.key === ' '){ event.preventDefault(); }
 
-        if(event.key === 'Enter'){
+            if(event.key === 'Enter'){
 
-            event.preventDefault();
+                event.preventDefault();
 
-            this.value = this.value.replace(/\s+/g,'');
+                this.value = this.value.replace(/\s+/g,'');
 
-        }" placeholder="Enter value">
+            }" placeholder="Enter value">
 
                     </div>
 
@@ -1199,145 +1323,146 @@
 
     <div class="modal fade" id="bulkUpdateModal" tabindex="-1">
 
-    <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg">
 
-        <form action="{{ route('admin.bulkProductUpdate') }}" method="post">
+            <form action="{{ route('admin.bulkProductUpdate') }}" method="post">
 
-            @csrf
+                @csrf
 
-        <div class="modal-content">
+                <div class="modal-content">
 
-            <div class="modal-header">
+                    <div class="modal-header">
 
-                <h5 class="modal-title">Bulk Update Variants</h5>
+                        <h5 class="modal-title">Bulk Update Variants</h5>
 
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div class="row">
-
-                    <input type="hidden" value="{{ $product->id }}" name="product_id" required>
-
-                    <div class="col-md-4 mt-3">
-
-                        <label>Actual Price</label>
-
-                        <input type="text" id="bulk_actual_price" name="actual_price" class="form-control">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 
                     </div>
 
-                    <div class="col-md-4 mt-3">
+                    <div class="modal-body">
 
-                        <label>Sale Price</label>
+                        <div class="row">
 
-                        <input type="text" id="bulk_sale_price" name="price" class="form-control">
+                            <input type="hidden" value="{{ $product->id }}" name="product_id" required>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Actual Price</label>
+
+                                <input type="text" id="bulk_actual_price" name="actual_price" class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Sale Price</label>
+
+                                <input type="text" id="bulk_sale_price" name="price" class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Weight</label>
+
+                                <input type="number" step="0.01" min="0.1" id="bulk_weight" name="weight"
+                                    class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Stock</label>
+
+                                <input type="number" min="0" id="bulk_stock" name="stock" class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Preorder Stock</label>
+
+                                <input type="number" min="0" name="preorder_stock" class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Low Stock Alert</label>
+
+                                <input type="number" min="0" name="low_stock_alert" class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Min Order</label>
+
+                                <input type="number" min="0" name="product_min_order" class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Max Order</label>
+
+                                <input type="number" min="0" name="product_max_order" class="form-control">
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Preorder</label>
+
+                                <select class="form-control" name="preorder">
+
+                                    <option value="">Select</option>
+
+                                    <option value="0">No</option>
+
+                                    <option value="1">Yes</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+
+                                <label>Status</label>
+
+                                <select class="form-control" name="status">
+
+                                    <option value="">Select Status</option>
+
+                                    <option value="show">Show</option>
+
+                                    <option value="hide">Hide</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
-                    <div class="col-md-4 mt-3">
+                    <div class="modal-footer">
 
-                        <label>Weight</label>
+                        <button type="submit" id="applyBulkUpdate" class="btn btn-success">
 
-                        <input type="number"  step="0.01" min="0.1" id="bulk_weight" name="weight"  class="form-control">
+                            Apply Changes
 
-                    </div>
-
-                     <div class="col-md-4 mt-3">
-
-                        <label>Stock</label>
-
-                        <input type="number" min="0" id="bulk_stock" name="stock" class="form-control">
-
-                    </div>
-
-                    <div class="col-md-4 mt-3">
-
-                        <label>Preorder Stock</label>
-
-                        <input type="number" min="0" name="preorder_stock" class="form-control">
-
-                    </div>
-
-                    <div class="col-md-4 mt-3">
-
-                        <label>Low Stock Alert</label>
-
-                        <input type="number" min="0" name="low_stock_alert" class="form-control">
-
-                    </div>
-
-                    <div class="col-md-4 mt-3">
-
-                        <label>Min Order</label>
-
-                        <input type="number" min="0" name="product_min_order" class="form-control">
-
-                    </div>
-
-                    <div class="col-md-4 mt-3">
-
-                        <label>Max Order</label>
-
-                        <input type="number" min="0" name="product_max_order" class="form-control">
-
-                    </div>
-
-                    <div class="col-md-4 mt-3">
-
-                        <label>Preorder</label>
-
-                        <select class="form-control" name="preorder">
-
-                            <option value="">Select</option>
-
-                            <option value="0">No</option>
-
-                            <option value="1">Yes</option>
-
-                        </select>
-
-                    </div>
-
-                    <div class="col-md-4 mt-3">
-
-                        <label>Status</label>
-
-                        <select class="form-control" name="status">
-
-                            <option value="">Select Status</option>
-
-                            <option value="show">Show</option>
-
-                            <option value="hide">Hide</option>
-
-                        </select>
+                        </button>
 
                     </div>
 
                 </div>
 
-            </div>
-
-            <div class="modal-footer">
-
-                <button type="submit" id="applyBulkUpdate" class="btn btn-success">
-
-                    Apply Changes
-
-                </button>
-
-            </div>
+            </form>
 
         </div>
 
-        </form>
-
     </div>
-
-</div>
 
     <script src="https\://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -1417,125 +1542,132 @@
 
                     const variantBlock = `
 
-                        <div class="border rounded p-3 mb-3">
+                            <div class="border rounded p-3 mb-3">
 
-                            <h6 class="col-md-4 mt-3">${combinationName}</h6>
+                                <h6 class="col-md-4 mt-3">${combinationName}</h6>
 
-                            <div class="demo mb-4" style="display:flex; align-items:center; gap:5px;">
+                                <div class="row mb-3">
+                                    <div class="col-md-5">
+                                        <label class="form-label">Variant Image <span class="text-danger">*</span></label>
+                                        <input type="file"
+                                               class="form-control new-variant-image-input"
+                                               name="variants[${inputKey}][image]"
+                                               accept="image/jpeg,image/png,image/webp"
+                                               required>
+                                        <small class="food-field-hint">Upload an image for this new variant (JPG, PNG or WEBP).</small>
+                                        <div class="variant-image-preview mt-2"><span>Image preview</span></div>
+                                    </div>
+                                </div>
 
-                                <input type="file" class="form-control w-25" name="variants[${inputKey}][image]" accept="image/*" required>
+                                <div class="row g-3">
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">SKU</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][sku]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Actual Price</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][actual_price]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Sale Price</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][sale_price]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Weight</label>
+
+                                        <input type="number" step="0.01" min="0" class="form-control" name="variants[${inputKey}][weight]">
+
+                                    </div>                                
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Stock</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][stock]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Low Stock Alert</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][low_stock_alert]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Product Min Order</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][product_min_order]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Product Max Order</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][product_max_order]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Preorder Stock</label>
+
+                                        <input type="text" class="form-control" name="variants[${inputKey}][preorder_stock]" required>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Preorder</label>
+
+                                        <select class="form-control" name="variants[${inputKey}][preorder]" required>
+
+                                            <option value="0">No</option>
+
+                                            <option value="1">Yes</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4 mt-3">
+
+                                        <label class="form-label">Status</label>
+
+                                        <select class="form-control" name="variants[${inputKey}][status]" required>
+
+                                            <option value="show">Show</option>
+
+                                            <option value="hide">Hide</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
 
                             </div>
 
-                            <div class="row g-3">
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">SKU</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][sku]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Actual Price</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][actual_price]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Sale Price</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][sale_price]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Weight</label>
-
-                                    <input type="number" step="0.01" min="0" class="form-control" name="variants[${inputKey}][weight]">
-
-                                </div>                                
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Stock</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][stock]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Low Stock Alert</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][low_stock_alert]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Product Min Order</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][product_min_order]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Product Max Order</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][product_max_order]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Preorder Stock</label>
-
-                                    <input type="text" class="form-control" name="variants[${inputKey}][preorder_stock]" required>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Preorder</label>
-
-                                    <select class="form-control" name="variants[${inputKey}][preorder]" required>
-
-                                        <option value="0">No</option>
-
-                                        <option value="1">Yes</option>
-
-                                    </select>
-
-                                </div>
-
-                                <div class="col-md-4 mt-3">
-
-                                    <label class="form-label">Status</label>
-
-                                    <select class="form-control" name="variants[${inputKey}][status]" required>
-
-                                        <option value="show">Show</option>
-
-                                        <option value="hide">Hide</option>
-
-                                    </select>
-
-                                </div>
-
                             </div>
 
-                        </div>
-
-                        </div>
-
-                    `;
+                        `;
 
                     $variantList.append(variantBlock);
 
@@ -1548,6 +1680,56 @@
             }
 
         }
+
+        // Preview image for newly generated variant combinations.
+        $(document).on('change', '.new-variant-image-input', function () {
+            const input = this;
+            const file = input.files && input.files[0];
+            const preview = $(input).closest('.col-md-5').find('.variant-image-preview')[0];
+            if (!file) return;
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                alert('Please select a JPG, PNG or WEBP image.');
+                input.value = '';
+                preview.innerHTML = '<span>Image preview</span>';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = event => {
+                const image = document.createElement('img');
+                image.src = event.target.result;
+                image.alt = 'Variant image preview';
+                preview.replaceChildren(image);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Preview replacement image for an existing variant.
+        $(document).on('change', 'input[name^="existing_variants"][name$="[image]"]', function () {
+            const input = this;
+            const file = input.files && input.files[0];
+            const container = input.closest('.demo');
+            if (!file || !container) return;
+            let preview = container.querySelector('.variant-image-preview');
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.className = 'variant-image-preview mt-2';
+                input.insertAdjacentElement('afterend', preview);
+            }
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                alert('Please select a JPG, PNG or WEBP image.');
+                input.value = '';
+                preview.innerHTML = '<span>Current image will be kept</span>';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = event => {
+                const image = document.createElement('img');
+                image.src = event.target.result;
+                image.alt = 'Replacement variant image preview';
+                preview.replaceChildren(image);
+            };
+            reader.readAsDataURL(file);
+        });
 
         $(document).on('change', 'input.variant-checkbox', function () {
 
@@ -1611,11 +1793,11 @@
 
                                 html += `<div>
 
-                                            <input type="checkbox" name="subcategories[]" value="${subcat.id}" ${checked}>
+                                                <input type="checkbox" name="subcategories[]" value="${subcat.id}" ${checked}>
 
-                                            ${subcat.title}
+                                                ${subcat.title}
 
-                                        </div>`;
+                                            </div>`;
 
                             });
 
@@ -1805,23 +1987,23 @@
 
                             container.insertAdjacentHTML('beforeend', `
 
-                                                    <div class="col-lg-2">
+                                                        <div class="col-lg-2">
 
-                                                        <label>
+                                                            <label>
 
-                                                            <input type="checkbox"
+                                                                <input type="checkbox"
 
-                                                                name="variant_attributes[${attrId}][]"
+                                                                    name="variant_attributes[${attrId}][]"
 
-                                                                value="${data.name}" checked class="form-check-input variant-checkbox">
+                                                                    value="${data.name}" checked class="form-check-input variant-checkbox">
 
-                                                            ${data.name}
+                                                                ${data.name}
 
-                                                        </label>
+                                                            </label>
 
-                                                    </div>
+                                                        </div>
 
-                                                `);
+                                                    `);
 
                             // clear input\
 
@@ -1877,168 +2059,168 @@
 
     </script>
 
-<script>
+    <script>
 
-    $(document).on('keyup', '.attribute-search', function () {
+        $(document).on('keyup', '.attribute-search', function () {
 
-        let searchText = $(this).val().toLowerCase();
+            let searchText = $(this).val().toLowerCase();
 
-    let attributeId = $(this).data('attribute-id');
+            let attributeId = $(this).data('attribute-id');
 
-    let container = $('.attribute-values[data-attribute-id="' + attributeId + '"]');
+            let container = $('.attribute-values[data-attribute-id="' + attributeId + '"]');
 
-    container.find('.attribute-item').each(function () {
+            container.find('.attribute-item').each(function () {
 
-        let labelText = $(this).text().toLowerCase();
+                let labelText = $(this).text().toLowerCase();
 
-    if (labelText.includes(searchText)) {
+                if (labelText.includes(searchText)) {
 
-        $(this).show();
+                    $(this).show();
 
-        } else {
+                } else {
 
-        $(this).hide();
+                    $(this).hide();
 
-        }
+                }
 
-    });
+            });
 
-    updateVariantPreview();
+            updateVariantPreview();
 
-});
+        });
 
-</script>
+    </script>
 
-<script>
+    <script>
 
-    $(document).on('click', '.delete-video-btn', function () {
+        $(document).on('click', '.delete-video-btn', function () {
 
-    let button = $(this);
+            let button = $(this);
 
-    let variantId = button.data('id');
+            let variantId = button.data('id');
 
-    let type = button.data('type');
+            let type = button.data('type');
 
-    if (!confirm('Are you sure you want to delete this video?')) return;
+            if (!confirm('Are you sure you want to delete this video?')) return;
 
-    $.ajax({
+            $.ajax({
 
-        url: '/admin/delete-variant-video',
+                url: '/admin/delete-variant-video',
 
-        type: 'POST',
+                type: 'POST',
 
-        data: {
+                data: {
 
-            _token: '{{ csrf_token() }}',
+                    _token: '{{ csrf_token() }}',
 
-            id: variantId,
+                    id: variantId,
 
-            type: type
+                    type: type
 
-        },
+                },
 
-        success: function (response) {
+                success: function (response) {
 
-            if (response.success) {
+                    if (response.success) {
 
-                button.closest('.mt-2').remove(); // remove video preview\
+                        button.closest('.mt-2').remove(); // remove video preview\
 
-                button.remove();
+                        button.remove();
+
+                    }
+
+                }
+
+            });
+
+        });
+
+    </script>
+
+    <script>
+
+        $(document).on('change', '.variant-video', function () {
+
+            let input = $(this);
+
+            let removeBtn = input.siblings('.remove-selected-file');
+
+            if (this.files.length > 0) {
+
+                removeBtn.show();
+
+            } else {
+
+                removeBtn.hide();
 
             }
 
-        }
+        });
 
-    });
+        $(document).on('click', '.remove-selected-file', function () {
 
-});
+            let btn = $(this);
 
-</script>
+            let input = btn.siblings('.variant-video');
 
-<script>
+            input.val(''); // clear selected file\
 
-    $(document).on('change', '.variant-video', function () {
+            btn.hide();
 
-    let input = $(this);
+        });
 
-    let removeBtn = input.siblings('.remove-selected-file');
+    </script>
 
-    if (this.files.length > 0) {
+    <script>
 
-        removeBtn.show();
+        document.addEventListener("DOMContentLoaded", function () {
 
-    } else {
+            const productName = document.getElementById("productName");
 
-        removeBtn.hide();
+            const productSlug = document.getElementById("productSlug");
 
-    }
+            if (!productName || !productSlug) {
 
-});
+                console.error("Product name or slug input not found");
 
-$(document).on('click', '.remove-selected-file', function () {
+                return;
 
-    let btn = $(this);
+            }
 
-    let input = btn.siblings('.variant-video');
+            function generateSlug(value) {
 
-    input.val(''); // clear selected file\
+                return value
 
-    btn.hide();
+                    .toLowerCase()
 
-});
+                    .trim()
 
-</script>
+                    .replace(/[^a-z0-9\s-]/g, "")
 
-<script>
+                    .replace(/\s+/g, "-")
 
-document.addEventListener("DOMContentLoaded", function () {
+                    .replace(/-+/g, "-")
 
-    const productName = document.getElementById("productName");
+                    .replace(/^-|-$/g, "");
 
-    const productSlug = document.getElementById("productSlug");
+            }
 
-    if (!productName || !productSlug) {
+            function updateSlug() {
 
-        console.error("Product name or slug input not found");
+                productSlug.value = generateSlug(productName.value);
 
-        return;
+            }
 
-    }
+            // Generate slug when product name changes*
 
-    function generateSlug(value) {
+            productName.addEventListener("input", updateSlug);
 
-        return value
+            // Generate slug when page loads*
 
-            .toLowerCase()
+            updateSlug();
 
-            .trim()
+        });
 
-            .replace(/[^a-z0-9\s-]/g, "")
-
-            .replace(/\s+/g, "-")
-
-            .replace(/-+/g, "-")
-
-            .replace(/^-|-$/g, "");
-
-    }
-
-    function updateSlug() {
-
-        productSlug.value = generateSlug(productName.value);
-
-    }
-
-    // Generate slug when product name changes*
-
-    productName.addEventListener("input", updateSlug);
-
-    // Generate slug when page loads*
-
-    updateSlug();
-
-});
-
-</script>
+    </script>
 
 @endsection

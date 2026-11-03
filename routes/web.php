@@ -30,6 +30,10 @@ Route::post(
     [PageControllers::class, 'checkAvailability']
 )->name('restaurant.check-availability');
 
+Route::post('/restaurant/{slug}/confirm-booking',
+    [PageControllers::class, 'confirmTableBooking']
+)->name('restaurant.confirm-booking');
+
 Route::get('/product/{slug}', [PageControllers::class, 'product_details'])
     ->name('productdetails');
 

@@ -19,24 +19,35 @@ class RestaurantTableBooking extends Model
         'booking_time',
         'end_time',
         'guest_count',
+        'seating_type',
+        'occasion',
         'special_requests',
         'status',
+        'confirmed_at',
+        'cancelled_at',
+        'admin_notes',
     ];
 
     protected function casts(): array
     {
         return [
             'booking_date' => 'date:Y-m-d',
+            'guest_count' => 'integer',
+            'confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
     public function restaurant(): BelongsTo
     {
-        return $this->belongsTo(Restaurant::class);
+        return $this->belongsTo(Restaurant::class, 'restaurant_id');
     }
 
     public function restaurantTable(): BelongsTo
     {
-        return $this->belongsTo(RestaurantTable::class);
+        return $this->belongsTo(
+            RestaurantTable::class,
+            'restaurant_table_id'
+        );
     }
 }

@@ -99,6 +99,47 @@
                                                                         </a>
                                                                 </li>
 
+                                                                {{-- Table Management --}}
+                                                                <li>
+                                                                        <a href="{{ route('admin.restaurant-tables.index') }}"
+                                                                                class="{{ Request::is('restaurant-tables*') ? 'active' : '' }}">
+                                                                                <i
+                                                                                        class="ti ti-layout-grid fs-16 me-2"></i>
+                                                                                <span>Table Management</span>
+                                                                        </a>
+                                                                </li>
+
+                                                                {{-- Table Bookings --}}
+                                                                <li>
+                                                                        <a href="{{ route('admin.restaurant-bookings.index') }}"
+                                                                                class="{{ Request::is('restaurant-bookings*') ? 'active' : '' }}">
+                                                                                <i
+                                                                                        class="ti ti-calendar-check fs-16 me-2"></i>
+                                                                                <span>Table Bookings</span>
+                                                                        </a>
+                                                                </li>
+
+                                                                {{-- Booking Hours --}}
+                                                                <li>
+                                                                        <a href="{{ route('admin.booking-hours.index') }}"
+                                                                                class="{{ Request::is('booking-hours*') ? 'active' : '' }}">
+                                                                                <i class="ti ti-clock fs-16 me-2"></i>
+                                                                                <span>Booking Hours</span>
+                                                                        </a>
+                                                                </li>
+
+                                                                {{-- Booking Settings --}}
+                                                                <li>
+                                                                        <a href="{{ route('admin.booking-settings.index') }}"
+                                                                                class="{{ Request::is('booking-settings*') ? 'active' : '' }}">
+                                                                                <i
+                                                                                        class="ti ti-settings fs-16 me-2"></i>
+                                                                                <span>Booking Settings</span>
+                                                                        </a>
+                                                                </li>
+
+
+
                                                                 <li
                                                                         class="{{ Request::is('admin/products') ? 'active' : '' }}">
                                                                         <a href="{{route('admin.products.index')}}"><i
