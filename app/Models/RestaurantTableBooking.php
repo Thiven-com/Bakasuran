@@ -30,13 +30,13 @@ class RestaurantTableBooking extends Model
         ];
     }
 
-    public function restaurant(): BelongsTo
+    public function restaurant()
     {
-        return $this->belongsTo(Restaurant::class);
+        return $this->belongsTo(Restaurant::class, 'restaurant_id');
     }
 
-    public function restaurantTable(): BelongsTo
+    public function restaurantTable()
     {
-        return $this->belongsTo(RestaurantTable::class);
+        return $this->belongsTo(RestaurantTable::class, 'restaurant_table_id');
     }
 }

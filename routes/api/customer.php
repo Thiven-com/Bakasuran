@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\CustomerApp\CheckoutController;
 use App\Http\Controllers\CustomerApp\ProductController;
+use App\Http\Controllers\CustomerApp\ProductRatingController;
 use App\Http\Controllers\CustomerApp\ProductVariantController;
 use App\Http\Controllers\CustomerApp\RestaurantController;
+use App\Http\Controllers\CustomerApp\RestaurantFoodOrderController;
+use App\Http\Controllers\CustomerApp\RestaurantReviewController;
 use App\Http\Controllers\CustomerApp\RestaurantTableBookingController;
 use App\Http\Controllers\CustomerApp\TableBookingController;
 use App\Http\Controllers\CustomerApp\WebhookController;
@@ -58,6 +61,66 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
     Route::get('ratings', 'ProductController@ratings');
 
     //RestaurantTableBooking
+
+    // Get food menu by table
+    Route::get('/menu/{tableId}', [
+        RestaurantFoodOrderController::class,
+        'menu'
+    ]);
+
+    // Place food order
+    Route::post('/order', [
+        RestaurantFoodOrderController::class,
+        'store'
+    ]);
+
+    // Customer order list
+    Route::get('/orders', [
+        RestaurantFoodOrderController::class,
+        'index'
+    ]);
+
+    // Order details
+    Route::get('/orders/{id}', [
+        RestaurantFoodOrderController::class,
+        'show'
+    ]);
+
+    // Update products / quantities
+    Route::put('/orders/{id}/items', [
+        RestaurantFoodOrderController::class,
+        'updateItems'
+    ]);
+
+    // Cancel order
+    Route::post('/orders/{id}/cancel', [
+        RestaurantFoodOrderController::class,
+        'cancel'
+    ]);
+
+    // Add restaurant review
+    Route::post('restaurant-review', [RestaurantReviewController::class, 'store']);
+
+    // Get restaurant reviews
+    Route::get('restaurant/{restaurant_id}/reviews', [RestaurantReviewController::class, 'index']);
+
+    // View single review
+    Route::get('restaurant-review/{id}', [RestaurantReviewController::class, 'show']);
+
+    // Add product rating
+    Route::post('product-rating', [ProductRatingController::class, 'store']);
+
+    // Get product ratings
+    Route::get('product/{product_id}/ratings', [ProductRatingController::class, 'index']);
+
+    // View single rating
+    Route::get('product-rating/{id}', [ProductRatingController::class, 'show']);
+
+    // Update rating
+    Route::put('product-rating/{id}', [ProductRatingController::class, 'update']);
+
+    // Delete rating
+    Route::delete('product-rating/{id}', [ProductRatingController::class, 'destroy']);
 
     // Step 3: Check available tables for the selected date/time
     Route::get(
@@ -114,6 +177,10 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
 
     Route::get('restaurants', [RestaurantController::class, 'index']);
     Route::get('restaurants/{id}', [RestaurantController::class, 'show']);
+    Route::post(
+        'restaurant-table-bookings/{id}/cancel',
+        [RestaurantTableBookingController::class, 'cancel']
+    );
 
     // routes/api.php
 

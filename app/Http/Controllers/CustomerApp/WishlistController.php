@@ -23,8 +23,9 @@ class WishlistController extends Controller
         $items = WishlistItem::with([
             'variant:id,product_id,sku,slug,price,stock,image,actual_price',
             'variant.attributeValues.attribute',
-            'variant.product:id,title,slug,category_id,short_description,title',
+            'variant.product:id,title,slug,category_id,restaurant_id,short_description',
             'variant.product.category:id,title,slug',
+            'variant.product.restaurant:id,name',
         ])
             ->where('user_id', $user->id)
             ->latest('id')

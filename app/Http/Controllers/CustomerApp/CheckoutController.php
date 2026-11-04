@@ -64,9 +64,27 @@ class CheckoutController extends Controller
         $deliveryCharges = $data['delivery_charges'] ?? [];
 
         // 2) Load cart
-        $cart = \App\Models\CartItem::with(['variant.product'])
-            ->where('user_id', $user->id)->where('type', $orderType)
-            ->get();
+        $cart = CartItem::with([
+    'variant.product' => function ($query) {
+        $query->select([
+            'id',
+            'title',
+            'slug',
+            'category_id',
+            'restaurant_id', // Important
+            'image',
+            'description',
+            'short_description',
+        ]);
+    },
+    'variant.product.category:id,title',
+    'variant.product.restaurant:id,name',
+    'variant.media',
+    'variant.attributeValues.attribute',
+])
+    ->where('user_id', $user->id)
+    ->where('type', $orderType)
+    ->get();
 
         if ($cart->isEmpty()) {
             return response()->json(['success' => 1, 'message' => 'Cart is empty']);
@@ -187,7 +205,20 @@ class CheckoutController extends Controller
             $itemsPrepared = [];
 
             foreach ($cart as $line) {
-                $variant = ProductVariant::with('product')
+                $variant = ProductVariant::with([
+                    'product' => function ($query) {
+                        $query->select([
+                            'id',
+                            'title',
+                            'slug',
+                            'category_id',
+                            'restaurant_id',
+                            'image',
+                        ]);
+                    },
+                    'product.restaurant:id,name',
+                    'product.category:id,title',
+                ])
                     ->select('id', 'price', 'stock', 'product_id', 'sku', 'weight')
                     ->findOrFail($line->product_variant_id);
 
@@ -396,6 +427,8 @@ class CheckoutController extends Controller
             //     $ci->delete();
             // }
 
+            $cartArray = (new CartCollection($cart))->toArray(request());
+
             return response()->json([
                 'success' => 1,
                 'message' => 'Order placed',
@@ -406,20 +439,55 @@ class CheckoutController extends Controller
                 'grand_total' => $order->grand_total,
                 'delivery_total' => $order->delivery_total,
                 'address' => $order->shipping_address, // same as billing
-                'provider_order_id' => $payment->provider_order_id
+                'provider_order_id' => $payment->provider_order_id,
+                'cart' => $cartArray,
             ]);
         });
     }
 
     public function show(Request $request)
     {
+
         $user = auth('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Unauthenticated. Please login again.'
+            ], 401);
+        }
+
         $type = $request->order_type ?? 'order';
+
         $cartItems = CartItem::with([
-            'variant.product:id,title,slug,category_id,image,description,short_description',
+            'variant.product' => function ($query) {
+                $query->select(
+                    'id',
+                    'title',
+                    'slug',
+                    'category_id',
+                    'restaurant_id',
+                    'image',
+                    'description',
+                    'short_description'
+                );
+            },
+            'variant.product.category:id,title',
+            'variant.product.restaurant:id,name',
             'variant.media',
             'variant.attributeValues.attribute',
-        ])->where('user_id', $user->id)->where('type', $type)->get();
+        ])
+            ->where('user_id', $user->id)
+            ->where('type', $type)
+            ->get();
+
+        // $user = auth('sanctum')->user();
+        // $type = $request->order_type ?? 'order';
+        // $cartItems = CartItem::with([
+        //     'variant.product:id,title,slug,category_id,image,description,short_description',
+        //     'variant.media',
+        //     'variant.attributeValues.attribute',
+        // ])->where('user_id', $user->id)->where('type', $type)->get();
 
         if (count($cartItems) == 0) {
             return response()->json([
@@ -428,7 +496,19 @@ class CheckoutController extends Controller
             ]);
         }
         $validator = Validator::make($request->all(), [
-            'address_id' => 'required|integer|exists:addresses,id',
+            'address_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) use ($user) {
+                    $exists = Address::where('id', $value)
+                        ->where('customer_id', $user->id)
+                        ->exists();
+
+                    if (!$exists) {
+                        $fail('The selected address is invalid.');
+                    }
+                },
+            ],
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -440,32 +520,35 @@ class CheckoutController extends Controller
         $outOfStockItems = [];
 
         foreach ($cartItems as $line) {
-            $variant = ProductVariant::select(
-                'id',
-                'stock',
-                'sku',
-                'preorder',
-                'preorder_stock'
-            )->find($line->product_variant_id);
+
+            $variant = $line->variant;
+
+            if (!$variant) {
+                $outOfStockItems[] = [
+                    'product_variant_id' => $line->product_variant_id,
+                    'sku' => null,
+                    'message' => 'Product variant not found',
+                ];
+
+                continue;
+            }
 
             if ($type === 'order') {
 
-                // ✅ Normal order → check stock
                 if (($variant->stock ?? 0) >= $line->quantity) {
                     $inStockItems[] = $line;
                 } else {
                     $outOfStockItems[] = [
                         'product_variant_id' => $variant->id,
                         'sku' => $variant->sku,
-                        'message' => 'Insufficient stock'
+                        'message' => 'Insufficient stock',
                     ];
                 }
+
             } else {
 
-                // ✅ Preorder → check
                 if ($variant->preorder) {
 
-                    // Optional: check preorder stock limit
                     if (
                         is_null($variant->preorder_stock) ||
                         $variant->preorder_stock >= $line->quantity
@@ -475,14 +558,15 @@ class CheckoutController extends Controller
                         $outOfStockItems[] = [
                             'product_variant_id' => $variant->id,
                             'sku' => $variant->sku,
-                            'message' => 'Preorder stock limit reached'
+                            'message' => 'Preorder stock limit reached',
                         ];
                     }
+
                 } else {
                     $outOfStockItems[] = [
                         'product_variant_id' => $variant->id,
                         'sku' => $variant->sku,
-                        'message' => 'Preorder not available'
+                        'message' => 'Preorder not available',
                     ];
                 }
             }
@@ -512,6 +596,8 @@ class CheckoutController extends Controller
 
         // ✅ Only valid items
         $cart = new CartCollection(collect($inStockItems));
+
+        $cartArray = $cart->toArray($request);
 
         // Addresses
         $addresses = Address::where('customer_id', $user->id)
@@ -580,7 +666,7 @@ class CheckoutController extends Controller
         // ✅ Calculate weight
         $totalWeight = 0;
 
-        foreach ($cartItems as $item) {
+        foreach ($inStockItems as $item) {
             $variant = $item->variant;
 
             $weight = $variant->weight ?? 0; // assume KG
@@ -593,32 +679,55 @@ class CheckoutController extends Controller
         $weightInGrams = $totalWeight * 1000;
 
         // ✅ Get default address
-        $defaultAddress = Address::where('customer_id', $user->id)->where('id', $request->address_id)->first();
+        // Get selected address
+        $defaultAddress = Address::where('customer_id', $user->id)
+            ->where('id', $request->address_id)
+            ->first();
+
+        if (!$defaultAddress) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Selected address not found.',
+            ], 422);
+        }
+
         $shipping = 0;
-        $zone = ShippingZone::whereJsonContains('regions', $defaultAddress->state)->first();
+
+        $zone = ShippingZone::whereJsonContains(
+            'regions',
+            $defaultAddress->state
+        )->first();
+
         if ($zone) {
-            // Free shipping check
+
             if ($zone->free_shipping == 'yes') {
+
                 $shipping = 0;
+
             } else {
 
                 $charge = FreightCharge::where('shipping_zone_id', $zone->id)
                     ->where('min_weight', '<=', $totalWeight)
                     ->where('max_weight', '>=', $totalWeight)
                     ->first();
+
                 if ($charge) {
-                    $shipping = $charge->charge;
-                } else {
-                    // Optional fallback (no slab found)
-                    $shipping = 0;
+                    $shipping = (float) $charge->charge;
                 }
-                $latestCharge = FreightCharge::where('shipping_zone_id', $zone->id)->latest()->first();
-                if ($latestCharge->max_weight < $totalWeight) {
+
+                $latestCharge = FreightCharge::where('shipping_zone_id', $zone->id)
+                    ->latest()
+                    ->first();
+
+                if ($latestCharge && $latestCharge->max_weight < $totalWeight) {
                     $shipping = (float) $latestCharge->charge + 30;
                 }
             }
         }
+
         $shipping = round($shipping);
+        $appliedCoupon = null;
+        $discount = 0;
         $appliedCoupon = null;
 
         if ($request->filled('code')) {

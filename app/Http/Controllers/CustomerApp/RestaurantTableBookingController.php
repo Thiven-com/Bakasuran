@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\CustomerApp;
 
 use App\Http\Controllers\Controller;
+use App\Models\Restaurant;
 use App\Models\RestaurantTable;
 use App\Models\RestaurantTableBooking;
 use Illuminate\Http\Request;
@@ -21,14 +22,42 @@ class RestaurantTableBookingController extends Controller
             $query->where('restaurant_id', $request->restaurant_id);
         }
 
-        $tables = $query->orderBy('restaurant_id')
+        $tables = $query->with([
+            'bookings' => function ($q) {
+                $q->whereIn('status', ['pending', 'confirmed', 'cancelled'])
+                    ->latest();
+            }
+        ])
+            ->orderBy('restaurant_id')
             ->orderBy('table_number')
             ->get();
 
         return response()->json([
             'success' => 1,
             'message' => 'Restaurant tables retrieved successfully',
-            'data' => $tables
+            'data' => $tables->map(function ($table) {
+                return [
+                    'id' => $table->id,
+                    'restaurant_id' => $table->restaurant_id,
+                    'table_name' => $table->table_name,
+                    'table_number' => $table->table_number,
+                    'seating_capacity' => $table->seating_capacity,
+                    'status' => $table->status,
+
+                    'bookings' => $table->bookings->map(function ($booking) {
+                        return [
+                            'booking_id' => $booking->id,
+                            'booking_number' => $booking->booking_number,
+                            'customer_name' => $booking->customer_name,
+                            'booking_date' => $booking->booking_date,
+                            'booking_time' => $booking->booking_time,
+                            'end_time' => $booking->end_time,
+                            'guest_count' => $booking->guest_count,
+                            'booking_status' => $booking->status,
+                        ];
+                    }),
+                ];
+            }),
         ]);
     }
 
@@ -36,125 +65,138 @@ class RestaurantTableBookingController extends Controller
      * GET: Get available tables for a restaurant and time slot.
      */
     public function availableTables(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'restaurant_id' => 'required|integer|exists:restaurants,id',
-        'booking_date' => 'required|date_format:Y-m-d|after_or_equal:today',
-        'booking_time' => 'required|date_format:H:i',
-        'end_time' => 'nullable|date_format:H:i|after:booking_time',
-        'guest_count' => 'required|integer|min:1',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => 0,
-            'message' => 'Validation failed',
-            'errors' => $validator->errors(),
-        ], 422);
-    }
-
-    $data = $validator->validated();
-
-    // Default booking duration: 2 hours
-    $startTime = $data['booking_time'];
-
-    $endTime = $data['end_time'] ?? date(
-        'H:i:s',
-        strtotime($startTime) + 7200
-    );
-
-    // Prevent booking a past time today
-    if (
-        $data['booking_date'] === now()->toDateString()
-        && $startTime <= now()->format('H:i')
-    ) {
-        return response()->json([
-            'success' => 0,
-            'message' => 'Please select a future booking time',
-            'data' => [],
-        ], 422);
-    }
-
-    // Get booked tables during the selected time slot
-    $bookedTableIds = RestaurantTableBooking::where(
-        'restaurant_id',
-        $data['restaurant_id']
-    )
-        ->where('booking_date', $data['booking_date'])
-        ->whereIn('status', ['pending', 'confirmed'])
-        ->where('booking_time', '<', $endTime)
-        ->where('end_time', '>', $startTime)
-        ->pluck('restaurant_table_id')
-        ->unique()
-        ->values()
-        ->all();
-
-    // Get all active restaurant tables
-    $tables = RestaurantTable::where(
-        'restaurant_id',
-        $data['restaurant_id']
-    )
-        ->where('status', 1)
-        ->orderBy('seating_capacity')
-        ->orderBy('table_number')
-        ->get([
-            'id',
-            'restaurant_id',
-            'table_name',
-            'table_number',
-            'seating_capacity',
-            'status',
+    {
+        $validator = Validator::make($request->all(), [
+            'restaurant_id' => 'required|integer|exists:restaurants,id',
+            'booking_date' => 'required|date_format:Y-m-d|after_or_equal:today',
+            'booking_time' => 'required|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i|after:booking_time',
+            'guest_count' => 'required|integer|min:1',
         ]);
 
-    // Add availability status to every table
-    $tables = $tables->map(function ($table) use ($bookedTableIds, $data) {
-
-        if ($table->seating_capacity < $data['guest_count']) {
-            $table->availability = 'not_available';
-            $table->availability_reason = 'Insufficient seating capacity';
-        } elseif (in_array($table->id, $bookedTableIds)) {
-            $table->availability = 'not_available';
-            $table->availability_reason = 'Already booked for this time slot';
-        } else {
-            $table->availability = 'available';
-            $table->availability_reason = null;
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
-        return $table;
-    });
+        $data = $validator->validated();
 
-    $availableTables = $tables
-        ->where('availability', 'available')
-        ->values();
+        // Default booking duration: 2 hours
+        $startTime = $data['booking_time'];
 
-    $notAvailableTables = $tables
-        ->where('availability', 'not_available')
-        ->values();
+        $endTime = $data['end_time'] ?? date(
+            'H:i:s',
+            strtotime($startTime) + 7200
+        );
 
-    return response()->json([
-        'success' => 1,
-        'message' => 'Restaurant tables retrieved successfully',
+        // Prevent booking a past time today
+        if (
+            $data['booking_date'] === now()->toDateString()
+            && $startTime <= now()->format('H:i')
+        ) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Please select a future booking time',
+                'data' => [],
+            ], 422);
+        }
 
-        'booking_details' => [
-            'restaurant_id' => (int) $data['restaurant_id'],
-            'booking_date' => $data['booking_date'],
-            'booking_time' => $startTime,
-            'end_time' => $endTime,
-            'guest_count' => (int) $data['guest_count'],
-        ],
+        // Get booked tables during the selected time slot
+        $bookedTableIds = RestaurantTableBooking::where(
+            'restaurant_id',
+            $data['restaurant_id']
+        )
+            ->where('booking_date', $data['booking_date'])
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('booking_time', '<', $endTime)
+            ->where('end_time', '>', $startTime)
+            ->pluck('restaurant_table_id')
+            ->unique()
+            ->values()
+            ->all();
 
-        'summary' => [
-            'total_tables' => $tables->count(),
-            'available_tables' => $availableTables->count(),
-            'not_available_tables' => $notAvailableTables->count(),
-        ],
+        // Get all active restaurant tables
+        $tables = RestaurantTable::where(
+            'restaurant_id',
+            $data['restaurant_id']
+        )
+            ->where('status', 1)
+            ->orderBy('seating_capacity')
+            ->orderBy('table_number')
+            ->get([
+                'id',
+                'restaurant_id',
+                'table_name',
+                'table_number',
+                'seating_capacity',
+                'status',
+            ]);
 
-        'available_tables' => $availableTables,
-        'not_available_tables' => $notAvailableTables,
+        // Add availability status to every table
+        $tables = $tables->map(function ($table) use ($bookedTableIds, $data) {
 
-        'data' => $tables->values(),
-    ]);
-}
+            if ($table->seating_capacity < $data['guest_count']) {
+                $table->availability = 'not_available';
+                $table->availability_reason = 'Insufficient seating capacity';
+            } elseif (in_array($table->id, $bookedTableIds)) {
+                $table->availability = 'not_available';
+                $table->availability_reason = 'Already booked for this time slot';
+            } else {
+                $table->availability = 'available';
+                $table->availability_reason = null;
+            }
+
+            return $table;
+        });
+        $totalTables = RestaurantTable::where('restaurant_id', $data['restaurant_id'])->count();
+
+        $totalBookedTables = RestaurantTableBooking::where('restaurant_id', $data['restaurant_id'])
+            ->where('booking_date', $data['booking_date'])
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('booking_time', '<', $endTime)
+            ->where('end_time', '>', $startTime)
+            ->distinct('restaurant_table_id')
+            ->count('restaurant_table_id');
+
+        $restaurant = Restaurant::select('id', 'name')
+            ->find($data['restaurant_id']);
+
+        $availableTables = $tables
+            ->where('availability', 'available')
+            ->values();
+
+        $notAvailableTables = $tables
+            ->where('availability', 'not_available')
+            ->values();
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'Restaurant tables retrieved successfully',
+
+            'booking_details' => [
+                'restaurant_id' => (int) $data['restaurant_id'],
+                'booking_date' => $data['booking_date'],
+                'booking_time' => $startTime,
+                'end_time' => $endTime,
+                'guest_count' => (int) $data['guest_count'],
+            ],
+
+            'summary' => [
+                'total_booked_tables' => $totalBookedTables,
+                'total_tables' => $tables->count(),
+                'available_tables' => $availableTables->count(),
+                'not_available_tables' => $notAvailableTables->count(),
+            ],
+
+            'available_tables' => $availableTables,
+            'not_available_tables' => $notAvailableTables,
+
+            'data' => $tables->values(),
+        ]);
+    }
 
 
     // POST: Create restaurant table booking
@@ -163,7 +205,6 @@ class RestaurantTableBookingController extends Controller
         $validator = Validator::make($request->all(), [
             'restaurant_id' => 'required|integer|exists:restaurants,id',
             'restaurant_table_id' => 'required|integer|exists:restaurant_tables,id',
-            'customer_id' => 'nullable|integer',
             'customer_name' => 'required|string|max:150',
             'customer_mobile' => 'required|string|max:20',
             'customer_email' => 'nullable|email|max:150',
@@ -182,9 +223,20 @@ class RestaurantTableBookingController extends Controller
             ], 422);
         }
 
+        $user = auth('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Unauthenticated',
+            ], 401);
+        }
+
         $data = $validator->validated();
 
-        // Default booking duration: 2 hours
+        // Always get customer ID from authenticated user
+        $data['customer_id'] = $user->id;
+
         if (empty($data['end_time'])) {
             $data['end_time'] = date(
                 'H:i:s',
@@ -203,10 +255,10 @@ class RestaurantTableBookingController extends Controller
         }
 
         $result = DB::transaction(function () use ($data) {
-            $table = RestaurantTable::where(
-                'id',
-                $data['restaurant_table_id']
-            )->lockForUpdate()->first();
+
+            $table = RestaurantTable::where('id', $data['restaurant_table_id'])
+                ->lockForUpdate()
+                ->first();
 
             if (
                 !$table ||
@@ -252,6 +304,14 @@ class RestaurantTableBookingController extends Controller
 
             $booking = RestaurantTableBooking::create($data);
 
+            $restaurant = Restaurant::select('id', 'name')
+                ->find($data['restaurant_id']);
+
+            $booking->setAttribute('restaurant', [
+                'id' => $restaurant?->id,
+                'name' => $restaurant?->name,
+            ]);
+
             return ['booking' => $booking];
         });
 
@@ -272,7 +332,10 @@ class RestaurantTableBookingController extends Controller
     // GET: Booking list
     public function index(Request $request)
     {
-        $query = RestaurantTableBooking::query();
+        $query = RestaurantTableBooking::with([
+            'restaurant:id,name,logo',
+            'restaurantTable:id,restaurant_id,table_name,table_number,seating_capacity'
+        ]);
 
         if ($request->filled('restaurant_id')) {
             $query->where('restaurant_id', $request->restaurant_id);
@@ -290,12 +353,29 @@ class RestaurantTableBookingController extends Controller
             $query->where('status', $request->status);
         }
 
-        $bookings = $query->latest()
-            ->paginate(15);
+        $restaurantIds = (clone $query)
+            ->distinct()
+            ->pluck('restaurant_id');
+
+        $totalBookedTables = RestaurantTableBooking::whereIn(
+            'restaurant_id',
+            $restaurantIds
+        )
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->distinct('restaurant_table_id')
+            ->count('restaurant_table_id');
+
+        $bookings = $query->latest()->paginate(15);
 
         return response()->json([
             'success' => 1,
             'message' => 'Restaurant table bookings retrieved successfully',
+
+            'summary' => [
+                'total_booked_tables' => $totalBookedTables,
+                'total_bookings' => (clone $query)->count(),
+            ],
+
             'data' => $bookings,
         ]);
     }
@@ -303,8 +383,10 @@ class RestaurantTableBookingController extends Controller
     // GET: Booking details by ID
     public function show($id)
     {
-        $booking = RestaurantTableBooking::with('restaurantTable')
-            ->find($id);
+        $booking = RestaurantTableBooking::with([
+            'restaurant:id,name',
+            'restaurantTable'
+        ])->find($id);
 
         if (!$booking) {
             return response()->json([
@@ -316,6 +398,61 @@ class RestaurantTableBookingController extends Controller
         return response()->json([
             'success' => 1,
             'message' => 'Booking details retrieved successfully',
+            'data' => $booking,
+        ]);
+    }
+
+    // POST: Cancel restaurant table booking
+    // POST: Cancel restaurant table booking
+    public function cancel($id)
+    {
+        $user = auth('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Unauthenticated',
+            ], 401);
+        }
+
+        $booking = RestaurantTableBooking::with([
+            'restaurant:id,name',
+            'restaurantTable:id,restaurant_id,table_name,table_number,seating_capacity'
+        ])
+            ->where('customer_id', $user->id)
+            ->where('id', $id)
+            ->first();
+
+        if (!$booking) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Booking not found for this customer',
+                'customer_id' => $user->id,
+                'booking_id' => $id,
+            ], 404);
+        }
+
+        if (!in_array($booking->status, ['pending', 'confirmed'])) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'This booking cannot be cancelled',
+                'current_status' => $booking->status,
+            ], 422);
+        }
+
+        $booking->status = 'cancelled';
+        $booking->save();
+
+        $booking->refresh();
+
+        $booking->load([
+            'restaurant:id,name',
+            'restaurantTable:id,restaurant_id,table_name,table_number,seating_capacity'
+        ]);
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'Restaurant table booking cancelled successfully',
             'data' => $booking,
         ]);
     }

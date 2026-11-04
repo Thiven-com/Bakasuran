@@ -21,8 +21,11 @@ class RestaurantTable extends Model
         return $this->belongsTo(Restaurant::class);
     }
 
-    public function bookings(): HasMany
+    public function bookings()
     {
-        return $this->hasMany(RestaurantTableBooking::class);
+        return $this->hasMany(
+            RestaurantTableBooking::class,
+            'restaurant_table_id'
+        );
     }
 }

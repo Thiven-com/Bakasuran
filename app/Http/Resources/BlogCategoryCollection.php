@@ -22,7 +22,7 @@ class BlogCategoryCollection extends ResourceCollection
                     "id" => $data->id,
                     "name" => $data->name,
                     "description" => $data->description,
-                    "image" => isset($data->image) ? asset($data->image) : null,
+                    // "image" => isset($data->image) ? asset($data->image) : null,
                     "created_at" => Carbon::parse($data->created_at)->format('d-M, Y'),
                     "updated_at" => Carbon::parse($data->updated_at)->format('d-M, Y'),
                     'count' => $this->blogsCount($data->id)
