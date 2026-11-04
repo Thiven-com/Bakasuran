@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Customer extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
+    protected $table = 'customers';
+
+    protected $guard = 'customer';
 
     protected $fillable = [
         'name',
