@@ -112,6 +112,7 @@ class AccountController extends Controller
     }
 
     // 2. VERIFY OTP
+
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -119,36 +120,61 @@ class AccountController extends Controller
             'otp' => 'required|digits:4',
         ]);
 
-        $user = Customer::where('mobile', $request->mobile)->first();
+        try {
+            $user = Customer::where('mobile', $request->mobile)->first();
 
-        if (!$user) {
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Customer not found',
+                ], 404);
+            }
+
+            if ((string) $user->otp !== (string) $request->otp) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid OTP',
+                ], 422);
+            }
+
+            // Authenticate using the customer guard
+            Auth::guard('customer')->login($user);
+
+            // Regenerate session to prevent session fixation
+            $request->session()->regenerate();
+
+            // Clear OTP after successful verification
+            $user->update([
+                'otp' => null,
+            ]);
+
+            Log::info('CUSTOMER LOGIN SUCCESS', [
+                'customer_id' => $user->id,
+                'session_id' => $request->session()->getId(),
+                'authenticated' => Auth::guard('customer')->check(),
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Login successful',
+                'redirect' => route('home'),
+            ]);
+
+        } catch (\Throwable $e) {
+
+            Log::error('CUSTOMER OTP VERIFICATION ERROR', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
             return response()->json([
                 'status' => false,
-                'message' => 'Customer not found'
-            ]);
+                'message' => 'Unable to verify OTP. Please try again.',
+            ], 500);
         }
-
-        if ((string) $user->otp !== (string) $request->otp) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid OTP'
-            ]);
-        }
-
-        // Login customer
-        Auth::guard('customer')->login($user);
-
-        // Clear OTP after successful verification
-        $user->update([
-            'otp' => null,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Login successful',
-            'redirect' => url('/')
-        ]);
     }
+
 
     private function sendWhatsAppMessage($cust_mobile, $templateName, array $fields = [])
     {

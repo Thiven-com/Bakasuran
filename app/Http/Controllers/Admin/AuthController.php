@@ -47,7 +47,7 @@ class AuthController extends Controller
         if (Auth::guard('admin')->attempt($credentials, $remember)) {
 
             if ($remember) {
-
+                
                 Cookie::queue(
                     Cookie::make('admin_email', $request->email, 43200) // 30 days
                 );
@@ -72,8 +72,6 @@ class AuthController extends Controller
 
     public function dashboard()
     {
-        $this->updateOrders();
-        // site setting for footer
         $site = SiteSetting::first();
 
         // Orders today count
