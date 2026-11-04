@@ -47,7 +47,8 @@ Route::get('logout', "AuthController@logout")->name('admin.logout');
 
 Route::group(['middleware' => 'admin'], function () {
 
-    Route::get('dashboard', "AuthController@dashboard")->name('admin.dashboard');
+    Route::get('/dashboard', [AuthController::class, 'dashboard'])
+        ->name('admin.dashboard');
     Route::resource('sellers', SellerController::class);
     Route::resource('categories', CategoryController::class)->names('admin.categories');
     Route::resource('customers', CustomerController::class)->names('admin.customers');

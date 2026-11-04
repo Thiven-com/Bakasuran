@@ -8,20 +8,20 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
 use App\Models\Seller;
 use Carbon\Carbon;
-use Validator;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 use App\Mail\AdminPasswordResetOtpMail;
 use App\Models\Order;
 use App\Models\ProductVariant;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\SiteSetting;
-use DB;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -463,7 +463,7 @@ class AuthController extends Controller
         //     escapeshellarg($database),
         //     escapeshellarg($path)
         // );
-        
+
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 
             $mysqldump = '"C:\\Program Files\\MySQL\\MySQL Server 9.6\\bin\\mysqldump.exe"';
@@ -546,7 +546,7 @@ class AuthController extends Controller
 
     public function queueRestart()
     {
-        \Artisan::call('queue:restart');
+        \Illuminate\Support\Facades\Artisan::call('queue:restart');
 
         return response()->json([
             'status' => true,
