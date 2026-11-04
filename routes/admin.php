@@ -34,9 +34,9 @@ use Illuminate\Support\Facades\Route;
 // Route::post('custom-register', [CustomAuthController::class, 'customRegister'])->name('register.custom');
 // Route::get('signout', [CustomAuthController::class, 'signOut'])->name('signout');
 
-Route::get('/', function () {
-    return redirect()->route('admin.dashboard');
-});
+// Route::get('/', function () {
+//     return redirect()->route('admin.dashboard');
+// });
 
 
 Route::get('login', "AuthController@showLoginForm")->name('admin.login');
