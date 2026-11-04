@@ -10,6 +10,9 @@ class RestaurantBookingSetting extends Model
     protected $fillable = [
         'restaurant_id',
         'slot_duration',
+        'booking_duration',
+        'cleaning_duration',
+        'min_notice_minutes',
         'max_advance_days',
         'min_guests',
         'max_guests',
@@ -25,6 +28,9 @@ class RestaurantBookingSetting extends Model
             'min_guests' => 'integer',
             'max_guests' => 'integer',
             'is_booking_enabled' => 'boolean',
+            'booking_duration' => 'integer',
+            'cleaning_duration' => 'integer',
+            'min_notice_minutes' => 'integer',
         ];
     }
 

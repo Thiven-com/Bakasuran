@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Restaurant extends Model
 {
@@ -78,8 +79,13 @@ class Restaurant extends Model
         return $this->hasOne(RestaurantBookingSetting::class, 'restaurant_id');
     }
 
-    public function bookingHours()
+    public function bookingHours(): HasMany
     {
         return $this->hasMany(RestaurantBookingHour::class, 'restaurant_id');
+    }
+
+    public function bookingSessions(): HasMany
+    {
+        return $this->hasMany(RestaurantBookingSession::class, 'restaurant_id');
     }
 }

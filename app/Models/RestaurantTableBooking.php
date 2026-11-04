@@ -50,4 +50,12 @@ class RestaurantTableBooking extends Model
             'restaurant_table_id'
         );
     }
+
+    public function customer(): BelongsTo
+{
+    return $this->belongsTo(
+        Customer::class,
+        'customer_id'
+    );
+}
 }

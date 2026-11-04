@@ -119,6 +119,27 @@ class RestaurantBookingSettingController extends Controller
                 'nullable',
                 'boolean',
             ],
+
+            'booking_duration' => [
+                'required',
+                'integer',
+                'min:15',
+                'max:480',
+            ],
+
+            'cleaning_duration' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:120',
+            ],
+
+            'min_notice_minutes' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:10080',
+            ],
         ]);
 
         RestaurantBookingSetting::create([
@@ -128,6 +149,9 @@ class RestaurantBookingSettingController extends Controller
             'min_guests' => $validated['min_guests'],
             'max_guests' => $validated['max_guests'],
             'is_booking_enabled' => $request->boolean('is_booking_enabled'),
+            'booking_duration' => $validated['booking_duration'],
+            'cleaning_duration' => $validated['cleaning_duration'],
+            'min_notice_minutes' => $validated['min_notice_minutes'],
         ]);
 
         return redirect()
@@ -194,6 +218,27 @@ class RestaurantBookingSettingController extends Controller
                 'nullable',
                 'boolean',
             ],
+
+            'booking_duration' => [
+                'required',
+                'integer',
+                'min:15',
+                'max:480',
+            ],
+
+            'cleaning_duration' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:120',
+            ],
+
+            'min_notice_minutes' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:10080',
+            ],
         ]);
 
         $booking_setting->update([
@@ -203,6 +248,9 @@ class RestaurantBookingSettingController extends Controller
             'min_guests' => $validated['min_guests'],
             'max_guests' => $validated['max_guests'],
             'is_booking_enabled' => $request->boolean('is_booking_enabled'),
+            'booking_duration' => $validated['booking_duration'],
+            'cleaning_duration' => $validated['cleaning_duration'],
+            'min_notice_minutes' => $validated['min_notice_minutes'],
         ]);
 
         return redirect()

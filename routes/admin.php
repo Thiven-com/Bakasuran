@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\RestaurantTableController;
 use App\Http\Controllers\Admin\RestaurantBookingController;
 use App\Http\Controllers\Admin\RestaurantBookingHourController;
 use App\Http\Controllers\Admin\RestaurantBookingSettingController;
+use App\Http\Controllers\Admin\RestaurantBookingSessionController;
 
 
 /*
@@ -97,6 +98,12 @@ Route::group(['middleware' => 'admin'], function () {
     // Restaurant Table Management
     Route::resource('restaurant-tables', RestaurantTableController::class)
         ->names('admin.restaurant-tables');
+        
+Route::get(
+    'restaurant-tables/{restaurant}/manage',
+    [RestaurantTableController::class, 'manage']
+)->name('admin.restaurant-tables.manage');
+
     Route::resource('restaurant-bookings', RestaurantBookingController::class)
         ->names('admin.restaurant-bookings');
 
@@ -121,6 +128,25 @@ Route::put('booking-hours/{restaurant}', [RestaurantBookingHourController::class
 
 Route::delete('booking-hours/{restaurant}', [RestaurantBookingHourController::class, 'destroy'])
     ->name('admin.booking-hours.destroy');
+
+
+    Route::get('booking-sessions', [RestaurantBookingSessionController::class, 'index'])
+    ->name('admin.booking-sessions.index');
+
+Route::get('booking-sessions/create', [RestaurantBookingSessionController::class, 'create'])
+    ->name('admin.booking-sessions.create');
+
+Route::post('booking-sessions', [RestaurantBookingSessionController::class, 'store'])
+    ->name('admin.booking-sessions.store');
+
+Route::get('booking-sessions/{bookingSession}/edit', [RestaurantBookingSessionController::class, 'edit'])
+    ->name('admin.booking-sessions.edit');
+
+Route::put('booking-sessions/{bookingSession}', [RestaurantBookingSessionController::class, 'update'])
+    ->name('admin.booking-sessions.update');
+
+Route::delete('booking-sessions/{bookingSession}', [RestaurantBookingSessionController::class, 'destroy'])
+    ->name('admin.booking-sessions.destroy');
 
 // Booking Settings CRUD
 Route::resource(

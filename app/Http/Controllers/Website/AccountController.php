@@ -103,7 +103,7 @@ class AccountController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Login successful'
+            'message' => 'Login successfull'
         ]);
     }
 

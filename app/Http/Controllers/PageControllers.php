@@ -26,6 +26,7 @@ use App\Models\RestaurantBookingSetting;
 use App\Models\RestaurantBookingHour;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
+use App\Models\RestaurantBookingSession;
 
 
 class PageControllers extends Controller
@@ -1093,17 +1094,20 @@ class PageControllers extends Controller
 
 
 
+
     public function table_booking($slug)
     {
         $restaurant = Restaurant::where('slug', $slug)
             ->where('is_active', true)
             ->firstOrFail();
 
+        // Restaurant booking settings configured by admin
         $settings = RestaurantBookingSetting::where(
             'restaurant_id',
             $restaurant->id
         )->first();
 
+        // Weekly opening and closing hours
         $bookingHours = RestaurantBookingHour::where(
             'restaurant_id',
             $restaurant->id
@@ -1112,52 +1116,32 @@ class PageControllers extends Controller
             ->get()
             ->keyBy('day_of_week');
 
+        // Active booking sessions configured by admin
+        $bookingSessions = RestaurantBookingSession::where(
+            'restaurant_id',
+            $restaurant->id
+        )
+            ->where('is_active', true)
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get()
+            ->groupBy('day_of_week');
+
         $restaurantName = $restaurant->name;
 
-        // Restore availability results after the POST redirect.
-        $availabilityChecked = session('availability_checked', false);
-        $bookingDetails = session('booking_details');
-        $availableTables = collect();
-
-        // Only display results belonging to this restaurant.
-        if (
-            $availabilityChecked &&
-            session('booking_slug') === $slug &&
-            is_array($bookingDetails)
-        ) {
-            $tableIds = collect(session('available_table_ids', []))
-                ->map(fn($id) => (int) $id)
-                ->all();
-
-            $availableTables = RestaurantTable::where(
-                'restaurant_id',
-                $restaurant->id
+        return view(
+            'website.table-booking.booking-details',
+            compact(
+                'slug',
+                'restaurant',
+                'restaurantName',
+                'settings',
+                'bookingHours',
+                'bookingSessions'
             )
-                ->whereIn('id', $tableIds)
-                ->where('status', 1)
-                ->get()
-                ->map(function ($table) {
-                    return [
-                        'id' => $table->id,
-                        'table_number' => $table->table_number,
-                        'capacity' => $table->seating_capacity,
-                        'status' => 'available',
-                        'seating_type' => $table->seating_type,
-                    ];
-                });
-        }
-
-        return view('website.table-booking', compact(
-            'slug',
-            'restaurant',
-            'restaurantName',
-            'settings',
-            'bookingHours',
-            'availableTables',
-            'availabilityChecked',
-            'bookingDetails'
-        ));
+        );
     }
+
 
 
 
@@ -1170,6 +1154,7 @@ class PageControllers extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
+        // 1. Validate customer input
         $validated = $request->validate([
             'booking_date' => [
                 'required',
@@ -1201,8 +1186,7 @@ class PageControllers extends Controller
             ],
         ]);
 
-        // 1. Booking settings
-
+        // 2. Get restaurant booking settings
         $settings = RestaurantBookingSetting::where(
             'restaurant_id',
             $restaurant->id
@@ -1216,8 +1200,7 @@ class PageControllers extends Controller
                 ->withInput();
         }
 
-        // 2. Guest limits
-
+        // 3. Validate guest limits
         if (
             $validated['guests'] < $settings->min_guests ||
             $validated['guests'] > $settings->max_guests
@@ -1229,13 +1212,12 @@ class PageControllers extends Controller
                 ->withInput();
         }
 
-        // 3. Advance booking limit
-
+        // 4. Validate booking advance limit
         $bookingDate = Carbon::parse($validated['booking_date'])
             ->startOfDay();
 
         $lastAllowedDate = today()->addDays(
-            $settings->max_advance_days
+            (int) $settings->max_advance_days
         );
 
         if ($bookingDate->gt($lastAllowedDate)) {
@@ -1247,8 +1229,26 @@ class PageControllers extends Controller
                 ->withInput();
         }
 
-        // 4. Restaurant booking hours
+        // 5. Validate booking duration settings
+        $slotDuration = (int) $settings->slot_duration;
+        $bookingDuration = (int) $settings->booking_duration;
+        $cleaningDuration = (int) $settings->cleaning_duration;
+        $minNoticeMinutes = (int) $settings->min_notice_minutes;
 
+        if (
+            $slotDuration <= 0 ||
+            $bookingDuration <= 0 ||
+            $cleaningDuration < 0 ||
+            $minNoticeMinutes < 0
+        ) {
+            return back()
+                ->withErrors([
+                    'booking_time' => 'Restaurant booking settings are not configured correctly.',
+                ])
+                ->withInput();
+        }
+
+        // 6. Get restaurant opening hours
         $hours = RestaurantBookingHour::where(
             'restaurant_id',
             $restaurant->id
@@ -1282,41 +1282,90 @@ class PageControllers extends Controller
             $validated['booking_date'] . ' ' . $hours->closing_time
         );
 
-        $slotDuration = (int) $settings->slot_duration;
+        // 7. Calculate actual reservation end and cleaning buffer
+        $endTime = $bookingTime->copy()->addMinutes($bookingDuration);
 
-        if ($slotDuration <= 0) {
+        $blockedUntil = $endTime->copy()->addMinutes($cleaningDuration);
+
+        // 8. Validate minimum notice
+        $minimumBookingTime = now()->addMinutes($minNoticeMinutes);
+
+        if ($bookingTime->lt($minimumBookingTime)) {
             return back()
                 ->withErrors([
-                    'booking_time' => 'The restaurant booking duration is not configured correctly.',
+                    'booking_time' => "Please book at least {$minNoticeMinutes} minutes in advance.",
                 ])
                 ->withInput();
         }
 
-        $endTime = $bookingTime->copy()->addMinutes($slotDuration);
-
+        // 9. Validate restaurant opening hours
         if (
             $bookingTime->lt($openingTime) ||
             $endTime->gt($closingTime)
         ) {
             return back()
                 ->withErrors([
-                    'booking_time' => 'The selected time is outside restaurant booking hours.',
+                    'booking_time' => 'The selected booking time is outside restaurant opening hours.',
                 ])
                 ->withInput();
         }
 
-        // 5. Prevent past booking times
+        // 10. Get active admin-configured sessions for selected weekday
+        $bookingSessions = RestaurantBookingSession::where(
+            'restaurant_id',
+            $restaurant->id
+        )
+            ->where('day_of_week', $bookingDate->dayOfWeek)
+            ->where('is_active', true)
+            ->orderBy('start_time')
+            ->get();
 
-        if ($bookingTime->lt(now())) {
+        if ($bookingSessions->isEmpty()) {
             return back()
                 ->withErrors([
-                    'booking_time' => 'Please select a future booking time.',
+                    'booking_time' => 'No booking sessions are available on your selected day.',
                 ])
                 ->withInput();
         }
 
-        // 6. Get active tables matching seating and guest capacity
+        // 11. Check whether the selected time belongs to an active session
+        $matchingSession = $bookingSessions->first(function ($session) use ($validated, $bookingTime, $endTime, $slotDuration) {
+            $sessionStart = Carbon::parse(
+                $validated['booking_date'] . ' ' . $session->start_time
+            );
 
+            $sessionEnd = Carbon::parse(
+                $validated['booking_date'] . ' ' . $session->end_time
+            );
+
+            // Booking must start inside the session
+            // and finish before the session closes.
+            if (
+                $bookingTime->lt($sessionStart) ||
+                $endTime->gt($sessionEnd)
+            ) {
+                return false;
+            }
+
+            // Booking start must match the session slot interval.
+            $minutesFromSessionStart = $sessionStart->diffInMinutes(
+                $bookingTime,
+                false
+            );
+
+            return $minutesFromSessionStart >= 0 &&
+                $minutesFromSessionStart % $slotDuration === 0;
+        });
+
+        if (!$matchingSession) {
+            return back()
+                ->withErrors([
+                    'booking_time' => 'Please select a valid time within the restaurant booking sessions.',
+                ])
+                ->withInput();
+        }
+
+        // 12. Get active tables matching seating and guest capacity
         $tables = RestaurantTable::where(
             'restaurant_id',
             $restaurant->id
@@ -1326,9 +1375,8 @@ class PageControllers extends Controller
             ->where('seating_capacity', '>=', $validated['guests'])
             ->get();
 
-        // 7. Check existing reservations for overlapping times
-
-        $availableTables = $tables->filter(function ($table) use ($validated, $bookingTime, $endTime, $slotDuration) {
+        // 13. Check existing reservations and cleaning buffers
+        $availableTables = $tables->filter(function ($table) use ($validated, $bookingTime, $blockedUntil, $bookingDuration, $cleaningDuration) {
             $existingBookings = RestaurantTableBooking::where(
                 'restaurant_table_id',
                 $table->id
@@ -1345,16 +1393,22 @@ class PageControllers extends Controller
                     $validated['booking_date'] . ' ' . $booking->booking_time
                 );
 
+                // end_time represents the existing reservation's actual end.
+                // Use booking_duration as fallback for older records.
                 $existingEnd = $booking->end_time
                     ? Carbon::parse(
                         $validated['booking_date'] . ' ' . $booking->end_time
                     )
-                    : $existingStart->copy()->addMinutes($slotDuration);
+                    : $existingStart->copy()->addMinutes($bookingDuration);
 
-                // Overlapping intervals mean the table is unavailable.
+                // Include the cleaning buffer after the existing reservation.
+                $existingBlockedUntil = $existingEnd->copy()
+                    ->addMinutes($cleaningDuration);
+
+                // Check overlapping blocked intervals.
                 if (
-                    $existingStart->lt($endTime) &&
-                    $existingEnd->gt($bookingTime)
+                    $existingStart->lt($blockedUntil) &&
+                    $existingBlockedUntil->gt($bookingTime)
                 ) {
                     return false;
                 }
@@ -1363,8 +1417,7 @@ class PageControllers extends Controller
             return true;
         })->values();
 
-        // 8. Verify a previously selected table, if supplied
-
+        // 14. Verify previously selected table, if supplied
         if ($request->filled('table_id')) {
             $selectedTable = $availableTables->firstWhere(
                 'id',
@@ -1382,8 +1435,7 @@ class PageControllers extends Controller
             $availableTables = collect([$selectedTable]);
         }
 
-        // 9. No available tables
-
+        // 15. Check whether any tables are available
         if ($availableTables->isEmpty()) {
             return back()
                 ->withErrors([
@@ -1392,17 +1444,88 @@ class PageControllers extends Controller
                 ->withInput();
         }
 
-        // 10. Store only the matching table IDs in the session
+        // 16. Store booking information in session
 
+        session([
+            'availability_checked' => true,
+            'booking_slug' => $slug,
+            'booking_details' => $validated,
+            'available_table_ids' => $availableTables->pluck('id')->all(),
+        ]);
+
+        // Redirect to Step 2: Select Table
+
+        return redirect()->route('restaurant.select-table', [
+            'slug' => $slug,
+        ]);
+    }
+
+
+    public function selectTablePage($slug)
+{
+    $restaurant = Restaurant::where('slug', $slug)
+        ->where('is_active', true)
+        ->firstOrFail();
+
+    // Verify that availability was checked for this restaurant.
+    if (
+        !session('availability_checked') ||
+        session('booking_slug') !== $slug ||
+        !is_array(session('booking_details'))
+    ) {
         return redirect()
             ->route('restaurant.table-booking', ['slug' => $slug])
-            ->with([
-                'availability_checked' => true,
-                'booking_slug' => $slug,
-                'booking_details' => $validated,
-                'available_table_ids' => $availableTables->pluck('id')->all(),
+            ->withErrors([
+                'booking_date' => 'Please enter your booking details first.',
             ]);
     }
+
+    $bookingDetails = session('booking_details');
+
+    $tableIds = collect(session('available_table_ids', []))
+        ->map(fn ($id) => (int) $id)
+        ->all();
+
+    if (empty($tableIds)) {
+        return redirect()
+            ->route('restaurant.table-booking', ['slug' => $slug])
+            ->withErrors([
+                'table_id' => 'No available tables found. Please check availability again.',
+            ]);
+    }
+
+    // Load only tables previously returned as available.
+    $availableTables = RestaurantTable::where(
+        'restaurant_id',
+        $restaurant->id
+    )
+        ->whereIn('id', $tableIds)
+        ->where('status', 1)
+        ->where('seating_type', $bookingDetails['seating'])
+        ->where('seating_capacity', '>=', $bookingDetails['guests'])
+        ->get();
+
+    if ($availableTables->isEmpty()) {
+        return redirect()
+            ->route('restaurant.table-booking', ['slug' => $slug])
+            ->withErrors([
+                'table_id' => 'Available tables have changed. Please check again.',
+            ]);
+    }
+
+    $restaurantName = $restaurant->name;
+
+    return view(
+        'website.table-booking.select-table',
+        compact(
+            'slug',
+            'restaurant',
+            'restaurantName',
+            'bookingDetails',
+            'availableTables'
+        )
+    );
+}
 
 
     public function confirmTableBooking(Request $request, $slug)
@@ -1411,18 +1534,20 @@ class PageControllers extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
+        // 1. Validate customer and booking details
         $validated = $request->validate([
-            'booking_date' => 'required|date|after_or_equal:today',
-            'booking_time' => 'required|date_format:H:i',
-            'guests' => 'required|integer|min:1|max:100',
-            'seating' => 'required|in:indoor,outdoor,family,private',
-            'table_id' => 'required|integer',
-            'customer_name' => 'required|string|max:150',
-            'customer_mobile' => 'required|string|max:20',
-            'customer_email' => 'nullable|email|max:150',
-            'special_request' => 'nullable|string|max:1000',
+            'booking_date' => ['required', 'date', 'after_or_equal:today'],
+            'booking_time' => ['required', 'date_format:H:i'],
+            'guests' => ['required', 'integer', 'min:1', 'max:100'],
+            'seating' => ['required', 'in:indoor,outdoor,family,private'],
+            'table_id' => ['required', 'integer'],
+            'customer_name' => ['required', 'string', 'max:150'],
+            'customer_mobile' => ['required', 'string', 'max:20'],
+            'customer_email' => ['nullable', 'email', 'max:150'],
+            'special_request' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        // 2. Get restaurant booking settings
         $settings = RestaurantBookingSetting::where(
             'restaurant_id',
             $restaurant->id
@@ -1434,27 +1559,53 @@ class PageControllers extends Controller
             ])->withInput();
         }
 
+        // 3. Validate guest limits
         if (
             $validated['guests'] < $settings->min_guests ||
             $validated['guests'] > $settings->max_guests
         ) {
             return back()->withErrors([
-                'guests' => 'Guest count is outside the permitted limit.',
+                'guests' => "Please select between {$settings->min_guests} and {$settings->max_guests} guests.",
             ])->withInput();
         }
 
-        $bookingDate = Carbon::parse($validated['booking_date']);
+        // 4. Validate advance booking limit
+        $bookingDate = Carbon::parse($validated['booking_date'])->startOfDay();
 
-        if ($bookingDate->gt(today()->addDays($settings->max_advance_days))) {
+        $lastAllowedDate = today()->addDays(
+            (int) $settings->max_advance_days
+        );
+
+        if ($bookingDate->gt($lastAllowedDate)) {
             return back()->withErrors([
                 'booking_date' => 'Selected date exceeds the advance booking limit.',
             ])->withInput();
         }
 
+        // 5. Validate booking settings
+        $slotDuration = (int) $settings->slot_duration;
+        $bookingDuration = (int) $settings->booking_duration;
+        $cleaningDuration = (int) $settings->cleaning_duration;
+        $minNoticeMinutes = (int) $settings->min_notice_minutes;
+
+        if (
+            $slotDuration <= 0 ||
+            $bookingDuration <= 0 ||
+            $cleaningDuration < 0 ||
+            $minNoticeMinutes < 0
+        ) {
+            return back()->withErrors([
+                'booking_time' => 'Restaurant booking settings are not configured correctly.',
+            ])->withInput();
+        }
+
+        // 6. Get restaurant opening hours
         $hours = RestaurantBookingHour::where(
             'restaurant_id',
             $restaurant->id
-        )->where('day_of_week', $bookingDate->dayOfWeek)->first();
+        )
+            ->where('day_of_week', $bookingDate->dayOfWeek)
+            ->first();
 
         if (
             !$hours ||
@@ -1480,104 +1631,160 @@ class PageControllers extends Controller
             $validated['booking_date'] . ' ' . $hours->closing_time
         );
 
-        $slotDuration = (int) $settings->slot_duration;
+        // 7. Calculate reservation end and cleaning buffer
+        $endTime = $bookingTime->copy()->addMinutes($bookingDuration);
 
-        if ($slotDuration <= 0) {
+        $blockedUntil = $endTime->copy()->addMinutes($cleaningDuration);
+
+        // 8. Validate minimum booking notice
+        $minimumBookingTime = now()->addMinutes($minNoticeMinutes);
+
+        if ($bookingTime->lt($minimumBookingTime)) {
             return back()->withErrors([
-                'booking_time' => 'Invalid booking duration.',
+                'booking_time' => "Please book at least {$minNoticeMinutes} minutes in advance.",
             ])->withInput();
         }
 
-        $endTime = $bookingTime->copy()->addMinutes($slotDuration);
-
+        // 9. Validate restaurant opening hours
         if (
             $bookingTime->lt($openingTime) ||
-            $endTime->gt($closingTime) ||
-            $bookingTime->lt(now())
+            $endTime->gt($closingTime)
         ) {
             return back()->withErrors([
-                'booking_time' => 'Selected booking time is unavailable.',
+                'booking_time' => 'Selected booking time is outside restaurant opening hours.',
             ])->withInput();
         }
 
-        // Ensure the submitted time matches the configured slot interval.
-        $minutesFromOpening = $openingTime->diffInMinutes($bookingTime, false);
+        // 10. Get active admin-configured sessions
+        $bookingSessions = RestaurantBookingSession::where(
+            'restaurant_id',
+            $restaurant->id
+        )
+            ->where('day_of_week', $bookingDate->dayOfWeek)
+            ->where('is_active', true)
+            ->orderBy('start_time')
+            ->get();
 
-        if ($minutesFromOpening < 0 || $minutesFromOpening % $slotDuration !== 0) {
+        if ($bookingSessions->isEmpty()) {
             return back()->withErrors([
-                'booking_time' => 'Please select a valid booking slot.',
+                'booking_time' => 'No booking sessions are available on this date.',
             ])->withInput();
         }
 
-        try {
-            $booking = DB::transaction(function () use ($validated, $restaurant, $bookingTime, $endTime) {
-                $table = RestaurantTable::where('id', $validated['table_id'])
-                    ->where('restaurant_id', $restaurant->id)
-                    ->where('status', 1)
-                    ->lockForUpdate()
-                    ->first();
+        // 11. Verify selected time belongs to an active session
+        $matchingSession = $bookingSessions->first(function ($session) use ($validated, $bookingTime, $endTime, $slotDuration) {
+            $sessionStart = Carbon::parse(
+                $validated['booking_date'] . ' ' . $session->start_time
+            );
+
+            $sessionEnd = Carbon::parse(
+                $validated['booking_date'] . ' ' . $session->end_time
+            );
+
+            if (
+                $bookingTime->lt($sessionStart) ||
+                $endTime->gt($sessionEnd)
+            ) {
+                return false;
+            }
+
+            $minutesFromSessionStart = $sessionStart->diffInMinutes(
+                $bookingTime,
+                false
+            );
+
+            return $minutesFromSessionStart >= 0 &&
+                $minutesFromSessionStart % $slotDuration === 0;
+        });
+
+        if (!$matchingSession) {
+            return back()->withErrors([
+                'booking_time' => 'Please select a valid time within an active restaurant booking session.',
+            ])->withInput();
+        }
+
+        // 12. Recheck the selected table inside a database transaction
+        $booking = DB::transaction(function () use ($validated, $restaurant, $bookingTime, $endTime, $blockedUntil, $bookingDuration, $cleaningDuration) {
+            $table = RestaurantTable::where(
+                'id',
+                $validated['table_id']
+            )
+                ->where('restaurant_id', $restaurant->id)
+                ->where('status', 1)
+                ->lockForUpdate()
+                ->first();
+
+            if (
+                !$table ||
+                $table->seating_type !== $validated['seating'] ||
+                $table->seating_capacity < $validated['guests']
+            ) {
+                throw ValidationException::withMessages([
+                    'table_id' => 'The selected table is no longer available. Please select another table.',
+                ]);
+            }
+
+            // 13. Check existing bookings for this table
+            $existingBookings = RestaurantTableBooking::where(
+                'restaurant_table_id',
+                $table->id
+            )
+                ->whereDate('booking_date', $validated['booking_date'])
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->get();
+
+            foreach ($existingBookings as $existing) {
+                $existingStart = Carbon::parse(
+                    $validated['booking_date'] . ' ' . $existing->booking_time
+                );
+
+                $existingEnd = $existing->end_time
+                    ? Carbon::parse(
+                        $validated['booking_date'] . ' ' . $existing->end_time
+                    )
+                    : $existingStart->copy()->addMinutes($bookingDuration);
+
+                $existingBlockedUntil = $existingEnd->copy()
+                    ->addMinutes($cleaningDuration);
 
                 if (
-                    !$table ||
-                    $table->seating_type !== $validated['seating'] ||
-                    $table->seating_capacity < $validated['guests']
+                    $existingStart->lt($blockedUntil) &&
+                    $existingBlockedUntil->gt($bookingTime)
                 ) {
                     throw ValidationException::withMessages([
-                        'table_id' => 'The selected table is no longer available.',
+                        'table_id' => 'This table has just been booked or is within its cleaning period. Please select another table.',
                     ]);
                 }
+            }
 
-                $existingBookings = RestaurantTableBooking::where(
-                    'restaurant_table_id',
-                    $table->id
-                )
-                    ->whereDate('booking_date', $validated['booking_date'])
-                    ->whereIn('status', ['pending', 'confirmed'])
-                    ->get();
+            // 14. Create reservation
+            return RestaurantTableBooking::create([
+                'booking_number' => 'BK' .
+                    now()->format('ymd') .
+                    strtoupper(\Illuminate\Support\Str::random(6)),
 
-                foreach ($existingBookings as $existing) {
-                    $existingStart = Carbon::parse(
-                        $validated['booking_date'] . ' ' . $existing->booking_time
-                    );
+                'restaurant_id' => $restaurant->id,
+                'restaurant_table_id' => $table->id,
+                'customer_id' => Auth::guard('customer')->id(),
 
-                    $existingEnd = $existing->end_time
-                        ? Carbon::parse(
-                            $validated['booking_date'] . ' ' . $existing->end_time
-                        )
-                        : $existingStart->copy()->addHour();
+                'customer_name' => $validated['customer_name'],
+                'customer_mobile' => $validated['customer_mobile'],
+                'customer_email' => $validated['customer_email'] ?? null,
 
-                    if (
-                        $existingStart->lt($endTime) &&
-                        $existingEnd->gt($bookingTime)
-                    ) {
-                        throw ValidationException::withMessages([
-                            'table_id' => 'This table has just been booked. Please select another table.',
-                        ]);
-                    }
-                }
+                'booking_date' => $validated['booking_date'],
+                'booking_time' => $bookingTime->format('H:i:s'),
+                'end_time' => $endTime->format('H:i:s'),
 
-                return RestaurantTableBooking::create([
-                    'booking_number' => 'BK' . now()->format('ymd') . strtoupper(\Illuminate\Support\Str::random(6)),
-                    'restaurant_id' => $restaurant->id,
-                    'restaurant_table_id' => $table->id,
-                    'customer_id' => Auth::guard('customer')->id(),
-                    'customer_name' => $validated['customer_name'],
-                    'customer_mobile' => $validated['customer_mobile'],
-                    'customer_email' => $validated['customer_email'] ?? null,
-                    'booking_date' => $validated['booking_date'],
-                    'booking_time' => $bookingTime->format('H:i:s'),
-                    'end_time' => $endTime->format('H:i:s'),
-                    'guest_count' => $validated['guests'],
-                    'seating_type' => $validated['seating'],
-                    'special_requests' => $validated['special_request'] ?? null,
-                    'status' => 'pending',
-                ]);
-            });
-        } catch (ValidationException $e) {
-            throw $e;
-        }
+                'guest_count' => $validated['guests'],
+                'seating_type' => $validated['seating'],
 
-        // Clear previous availability data after successful reservation.
+                'special_requests' => $validated['special_request'] ?? null,
+
+                'status' => 'pending',
+            ]);
+        });
+
+        // 15. Clear previous availability data
         session()->forget([
             'availability_checked',
             'booking_slug',
@@ -1585,9 +1792,73 @@ class PageControllers extends Controller
             'available_table_ids',
         ]);
 
+        // 16. Redirect after successful booking
         return redirect()
             ->route('restaurant.table-booking', ['slug' => $slug])
-            ->with('success', 'Your table reservation has been submitted successfully. Booking ID: ' . $booking->booking_number);
+            ->with(
+                'success',
+                'Your table reservation has been submitted successfully. Booking ID: ' .
+                $booking->booking_number
+            );
+    }
+
+
+    public function confirmBookingPage($slug)
+{
+    $restaurant = Restaurant::where('slug', $slug)
+      ->where('is_active', true)
+        ->firstOrFail();
+
+    $bookingDetails = session('booking_details');
+    $availableTableIds = session('available_table_ids', []);
+
+    if (
+        !session('availability_checked') ||
+        session('booking_slug') !== $slug ||
+        !is_array($bookingDetails) ||
+        empty($bookingDetails['table_id'])
+    ) {
+        return redirect()
+            ->route('restaurant.table-booking', ['slug' => $slug])
+            ->with('error', 'Please select your booking details and table first.');
+    }
+
+    $selectedTable = RestaurantTable::where('restaurant_id', $restaurant->id)
+        ->whereIn('id', $availableTableIds)
+        ->where('id', $bookingDetails['table_id'])
+        ->where('status', 1)
+        ->first();
+
+    if (!$selectedTable) {
+        return redirect()
+            ->route('restaurant.select-table', ['slug' => $slug])
+            ->with('error', 'Your selected table is no longer available.');
+    }
+
+    return view('website.table-booking.booking-confirmation', [
+        'slug' => $slug,
+        'restaurant' => $restaurant,
+        'restaurantName' => $restaurant->name,
+        'bookingDetails' => $bookingDetails,
+        'selectedTable' => $selectedTable,
+    ]);
+}
+
+
+
+    public function myTableBookings()
+    {
+        $customer = Auth::guard('customer')->user();
+
+        $bookings = RestaurantTableBooking::with([
+            'restaurant',
+            'restaurantTable',
+        ])
+            ->where('customer_id', $customer->id)
+            ->latest()
+            ->paginate(10);
+
+        return view('website.my-table-bookings', compact('bookings'));
     }
 
 

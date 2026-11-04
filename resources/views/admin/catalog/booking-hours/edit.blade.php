@@ -3,7 +3,7 @@
 
 @section('content')
 
-<div class="booking-hours-edit-page">
+<div class="booking-hours-edit-page" style="margin-top:70px;">
     <div class="container-fluid py-4">
 
         {{-- HEADER --}}
@@ -117,24 +117,24 @@
                                         </td>
 
                                         <td>
-                                            <input type="hidden"
-                                                   name="hours[{{ $day }}][is_closed]"
-                                                   value="0">
+    <input type="hidden"
+           name="hours[{{ $day }}][is_closed]"
+           value="0">
 
-                                            <div class="form-check">
-                                                <input type="checkbox"
-                                                       name="hours[{{ $day }}][is_closed]"
-                                                       value="1"
-                                                       class="form-check-input closed-checkbox"
-                                                       id="closed_{{ $day }}"
-                                                       {{ old("hours.$day.is_closed", $isClosed) ? 'checked' : '' }}>
+    <div class="form-check">
+        <input type="checkbox"
+               name="hours[{{ $day }}][is_closed]"
+               value="1"
+               class="form-check-input closed-checkbox"
+               id="closed_{{ $day }}"
+               {{ old("hours.$day.is_closed", $isClosed) ? 'checked' : '' }}>
 
-                                                <label class="form-check-label"
-                                                       for="closed_{{ $day }}">
-                                                    Closed
-                                                </label>
-                                            </div>
-                                        </td>
+        <label class="form-check-label"
+               for="closed_{{ $day }}">
+            Closed
+        </label>
+    </div>
+</td>
 
                                     </tr>
 
@@ -173,6 +173,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     function handleClosedDay(row) {
+
         const checkbox = row.querySelector('.closed-checkbox');
         const opening = row.querySelector('.opening-time');
         const closing = row.querySelector('.closing-time');
@@ -185,12 +186,16 @@ document.addEventListener('DOMContentLoaded', function () {
         opening.required = !isClosed;
         closing.required = !isClosed;
 
-        if (isClosed) {
-            opening.value = '';
-            closing.value = '';
-        } else {
-            if (!opening.value) opening.value = '09:00';
-            if (!closing.value) closing.value = '22:00';
+        if (!isClosed) {
+
+            if (!opening.value) {
+                opening.value = '09:00';
+            }
+
+            if (!closing.value) {
+                closing.value = '22:00';
+            }
+
         }
     }
 

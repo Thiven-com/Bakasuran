@@ -4,8 +4,8 @@
 
     <style>
         /* =========================================================
-                           SUDHEERA SAREES - STATIC ACCOUNT DASHBOARD
-                        ========================================================= */
+                                   SUDHEERA SAREES - STATIC ACCOUNT DASHBOARD
+                                ========================================================= */
 
         .sudheera-account-page {
             background: #fbf8f3;
@@ -15,8 +15,8 @@
         }
 
         /* =========================================================
-                           BREADCRUMB
-                        ========================================================= */
+                                   BREADCRUMB
+                                ========================================================= */
 
         .sudheera-breadcrumb-section {
             padding-bottom: 10px;
@@ -44,16 +44,16 @@
         }
 
         /* =========================================================
-                           ACCOUNT LAYOUT
-                        ========================================================= */
+                                   ACCOUNT LAYOUT
+                                ========================================================= */
 
         .sudheera-account-layout {
             padding-top: 35px;
         }
 
         /* =========================================================
-                           SIDEBAR
-                        ========================================================= */
+                                   SIDEBAR
+                                ========================================================= */
 
         .sudheera-sidebar {
             background: #fff;
@@ -130,16 +130,16 @@
         }
 
         /* =========================================================
-                           MAIN CONTENT
-                        ========================================================= */
+                                   MAIN CONTENT
+                                ========================================================= */
 
         .sudheera-account-content {
             padding-left: 10px;
         }
 
         /* =========================================================
-                           WELCOME
-                        ========================================================= */
+                                   WELCOME
+                                ========================================================= */
 
         .sudheera-welcome {
             position: relative;
@@ -208,8 +208,8 @@
         }
 
         /* =========================================================
-                           DASHBOARD CARDS
-                        ========================================================= */
+                                   DASHBOARD CARDS
+                                ========================================================= */
 
         .sudheera-dashboard-card {
             background: #fff;
@@ -279,8 +279,8 @@
         }
 
         /* =========================================================
-                           QUICK INFORMATION
-                        ========================================================= */
+                                   QUICK INFORMATION
+                                ========================================================= */
 
         .sudheera-info-card {
             background: #fff;
@@ -353,8 +353,8 @@
         }
 
         /* =========================================================
-                           RESPONSIVE
-                        ========================================================= */
+                                   RESPONSIVE
+                                ========================================================= */
 
         @media (max-width: 1199px) {
 
@@ -478,424 +478,457 @@
 
 
     <!-- =========================================================
-                         ACCOUNT PAGE
-                    ========================================================= -->
+                                 ACCOUNT PAGE
+                            ========================================================= -->
 
-<main class="sudheera-account-page">
+    <main class="sudheera-account-page">
 
-    <!-- =====================================================
-         BREADCRUMB
-    ====================================================== -->
+        <!-- =====================================================
+                 BREADCRUMB
+            ====================================================== -->
 
-    <section class="sudheera-breadcrumb-section">
+        <section class="sudheera-breadcrumb-section">
 
-        <div class="container">
+            <div class="container">
 
-            <div class="sudheera-breadcrumb-content">
+                <div class="sudheera-breadcrumb-content">
 
-                <ul class="sudheera-breadcrumb-list">
+                    <ul class="sudheera-breadcrumb-list">
 
-                    <li>
-                        <a href="{{ route('home') }}">
-                            Home
-                        </a>
+                        <li>
+                            <a href="{{ route('home') }}">
+                                Home
+                            </a>
 
-                        <span style="margin:0 8px; color:#b6a99c;">
-                            /
-                        </span>
-
-                        <span style="color:#83786e; font-size:13px;">
-                            My Account
-                        </span>
-                    </li>
-
-                </ul>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         ACCOUNT CONTENT
-    ====================================================== -->
-
-    <section class="sudheera-account-layout">
-
-        <div class="container">
-
-            <div class="row g-4">
-
-
-                <!-- =================================================
-                     SIDEBAR
-                ================================================== -->
-
-                <div class="col-lg-4 col-xl-3">
-
-                    <div class="sudheera-sidebar">
-
-                        <div class="sudheera-sidebar-title">
-                            My Account
-                        </div>
-
-
-                        <a href="{{ route('account') }}" class="sudheera-nav-item active">
-
-                            <i class="icon icon-Dashboard"></i>
-
-                            <span>
-                                Dashboard
+                            <span style="margin:0 8px; color:#b6a99c;">
+                                /
                             </span>
 
-                            <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
-
-                        </a>
-
-
-                        <a href="{{ route('orders') }}" class="sudheera-nav-item">
-
-                            <i class="icon icon-Box"></i>
-
-                            <span>
-                                My Orders
+                            <span style="color:#83786e; font-size:13px;">
+                                My Account
                             </span>
+                        </li>
 
-                            <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
-
-                        </a>
-
-
-                        <a href="{{ route('wishlist') }}" class="sudheera-nav-item">
-
-                            <i class="icon icon-Hearth"></i>
-
-                            <span>
-                                My Wishlist
-                            </span>
-
-                            <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
-
-                        </a>
-
-
-                        <a href="{{ route('addresses') }}" class="sudheera-nav-item">
-
-                            <i class="icon icon-DotLocation"></i>
-
-                            <span>
-                                Delivery Addresses
-                            </span>
-
-                            <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
-
-                        </a>
-
-
-                        <a href="{{ route('account-settings') }}" class="sudheera-nav-item">
-
-                            <i class="icon icon-Setting"></i>
-
-                            <span>
-                                Account Settings
-                            </span>
-
-                            <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
-
-                        </a>
-
-
-                        <a href="{{ route('logout') }}" class="sudheera-nav-item sudheera-nav-logout">
-
-                            <i class="icon icon-Logout"></i>
-
-                            <span>
-                                Log Out
-                            </span>
-
-                        </a>
-
-                    </div>
+                    </ul>
 
                 </div>
 
+            </div>
 
-                <!-- =================================================
-                     MAIN CONTENT
-                ================================================== -->
-
-                <div class="col-lg-8 col-xl-9">
-
-                    <div class="sudheera-account-content">
+        </section>
 
 
-                        <!-- =================================================
-                             WELCOME
+        <!-- =====================================================
+                 ACCOUNT CONTENT
+            ====================================================== -->
+
+        <section class="sudheera-account-layout">
+
+            <div class="container">
+
+                <div class="row g-4">
+
+
+                    <!-- =================================================
+                             SIDEBAR
                         ================================================== -->
 
-                        <div class="sudheera-welcome">
+                    <div class="col-lg-4 col-xl-3">
 
-                            <div class="sudheera-welcome-content">
+                        <div class="sudheera-sidebar">
 
-                                <div class="sudheera-welcome-label">
-                                    BAKASURAN FOOD
-                                </div>
-
-                                <h2 class="sudheera-welcome-title">
-                                    Welcome back, {{ $address->name ?? 'Food Lover' }} 👋
-                                </h2>
-
-                                <p class="sudheera-welcome-text">
-                                    Welcome to your BAKASURAN account dashboard.
-                                    Manage your food orders, track deliveries,
-                                    revisit your favourite dishes and update
-                                    your account details — all in one place.
-                                    Your next delicious meal is just a few
-                                    clicks away.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             DASHBOARD CARDS
-                        ================================================== -->
-
-                        <div class="row g-4">
-
-
-                            <!-- ORDERS -->
-
-                            <div class="col-md-6">
-
-                                <div class="sudheera-dashboard-card">
-
-                                    <div class="sudheera-card-icon">
-                                        <i class="fa fa-shopping-bag"></i>
-                                    </div>
-
-                                    <h6>
-                                        My Food Orders
-                                    </h6>
-
-                                    <p>
-                                        View your previous orders, check
-                                        order details and follow the status
-                                        of your food deliveries.
-                                    </p>
-
-                                    <a href="{{ route('orders') }}" class="sudheera-dashboard-btn">
-
-                                        View My Orders
-
-                                        <i class="fa fa-arrow-right"></i>
-
-                                    </a>
-
-                                </div>
-
+                            <div class="sudheera-sidebar-title">
+                                My Account
                             </div>
 
 
-                            <!-- WISHLIST -->
+                            <a href="{{ route('account') }}" class="sudheera-nav-item active">
 
-                            <div class="col-md-6">
+                                <i class="icon icon-Dashboard"></i>
 
-                                <div class="sudheera-dashboard-card">
-
-                                    <div class="sudheera-card-icon">
-                                        <i class="fa fa-heart"></i>
-                                    </div>
-
-                                    <h6>
-                                        Favourite Foods
-                                    </h6>
-
-                                    <p>
-                                        Find the food items you have saved
-                                        and revisit dishes you would love
-                                        to order again.
-                                    </p>
-
-                                    <a href="{{ route('wishlist') }}" class="sudheera-dashboard-btn">
-
-                                        View Wishlist
-
-                                        <i class="fa fa-arrow-right"></i>
-
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- ACCOUNT -->
-
-                            <div class="col-md-6">
-
-                                <div class="sudheera-dashboard-card">
-
-                                    <div class="sudheera-card-icon">
-                                        <i class="fa fa-user"></i>
-                                    </div>
-
-                                    <h6>
-                                        My Account Details
-                                    </h6>
-
-                                    <p>
-                                        Keep your personal information,
-                                        contact details and account
-                                        preferences up to date.
-                                    </p>
-
-                                    <a href="{{ route('account-settings') }}" class="sudheera-dashboard-btn">
-
-                                        Manage Account
-
-                                        <i class="fa fa-arrow-right"></i>
-
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- LOGOUT -->
-
-                            <div class="col-md-6">
-
-                                <div class="sudheera-dashboard-card">
-
-                                    <div class="sudheera-card-icon">
-                                        <i class="fa fa-sign-out"></i>
-                                    </div>
-
-                                    <h6>
-                                        Sign Out
-                                    </h6>
-
-                                    <p>
-                                        Finished ordering for now?
-                                        Securely sign out of your
-                                        BAKASURAN account.
-                                    </p>
-
-                                    <a href="{{ route('logout') }}" class="sudheera-dashboard-btn">
-
-                                        Log Out
-
-                                        <i class="fa fa-arrow-right"></i>
-
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             QUICK ACCOUNT INFORMATION
-                        ================================================== -->
-
-                        <div class="sudheera-info-card">
-
-                            <div class="sudheera-info-title">
-
-                                <h5>
-                                    My Account Information
-                                </h5>
-
-                                <span class="sudheera-info-badge">
-                                    Account Overview
+                                <span>
+                                    Dashboard
                                 </span>
 
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
+                            </a>
+
+
+                            <a href="{{ route('orders') }}" class="sudheera-nav-item">
+
+                                <i class="icon icon-Box"></i>
+
+                                <span>
+                                    My Orders
+                                </span>
+
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
+                            </a>
+
+
+                            <a href="{{ route('customer.table-bookings') }}" class="sudheera-nav-item">
+                                <i class="fa fa-calendar"></i>
+                                <span>My Table Bookings</span>
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+                            </a>
+
+
+                            <a href="{{ route('wishlist') }}" class="sudheera-nav-item">
+
+                                <i class="icon icon-Hearth"></i>
+
+                                <span>
+                                    My Wishlist
+                                </span>
+
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
+                            </a>
+
+
+                            <a href="{{ route('addresses') }}" class="sudheera-nav-item">
+
+                                <i class="icon icon-DotLocation"></i>
+
+                                <span>
+                                    Delivery Addresses
+                                </span>
+
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
+                            </a>
+
+
+                            <a href="{{ route('account-settings') }}" class="sudheera-nav-item">
+
+                                <i class="icon icon-Setting"></i>
+
+                                <span>
+                                    Account Settings
+                                </span>
+
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
+                            </a>
+
+
+                            <a href="{{ route('logout') }}" class="sudheera-nav-item sudheera-nav-logout">
+
+                                <i class="icon icon-Logout"></i>
+
+                                <span>
+                                    Log Out
+                                </span>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                             MAIN CONTENT
+                        ================================================== -->
+
+                    <div class="col-lg-8 col-xl-9">
+
+                        <div class="sudheera-account-content">
+
+
+                            <!-- =================================================
+                                     WELCOME
+                                ================================================== -->
+
+                            <div class="sudheera-welcome">
+
+                                <div class="sudheera-welcome-content">
+
+                                    <div class="sudheera-welcome-label">
+                                        BAKASURAN FOOD
+                                    </div>
+
+                                    <h2 class="sudheera-welcome-title">
+                                        Welcome back, {{ $address->name ?? 'Food Lover' }} 👋
+                                    </h2>
+
+                                    <p class="sudheera-welcome-text">
+                                        Welcome to your BAKASURAN account dashboard.
+                                        Manage your food orders, track deliveries,
+                                        revisit your favourite dishes and update
+                                        your account details — all in one place.
+                                        Your next delicious meal is just a few
+                                        clicks away.
+                                    </p>
+
+                                </div>
+
                             </div>
 
 
-                            <div class="row g-3">
+                            <!-- =================================================
+                                     DASHBOARD CARDS
+                                ================================================== -->
+
+                            <div class="row g-4">
 
 
-                                <!-- NAME -->
+                                <!-- ORDERS -->
 
-                                <div class="col-md-4">
+                                <div class="col-md-6">
 
-                                    <div class="sudheera-info-row">
+                                    <div class="sudheera-dashboard-card">
 
-                                        <div class="sudheera-info-row-icon">
+                                        <div class="sudheera-card-icon">
+                                            <i class="fa fa-shopping-bag"></i>
+                                        </div>
+
+                                        <h6>
+                                            My Food Orders
+                                        </h6>
+
+                                        <p>
+                                            View your previous orders, check
+                                            order details and follow the status
+                                            of your food deliveries.
+                                        </p>
+
+                                        <a href="{{ route('orders') }}" class="sudheera-dashboard-btn">
+
+                                            View My Orders
+
+                                            <i class="fa fa-arrow-right"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- WISHLIST -->
+
+                                <div class="col-md-6">
+
+                                    <div class="sudheera-dashboard-card">
+
+                                        <div class="sudheera-card-icon">
+                                            <i class="fa fa-heart"></i>
+                                        </div>
+
+                                        <h6>
+                                            Favourite Foods
+                                        </h6>
+
+                                        <p>
+                                            Find the food items you have saved
+                                            and revisit dishes you would love
+                                            to order again.
+                                        </p>
+
+                                        <a href="{{ route('wishlist') }}" class="sudheera-dashboard-btn">
+
+                                            View Wishlist
+
+                                            <i class="fa fa-arrow-right"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- TABLE BOOKINGS -->
+                                <div class="col-md-6">
+                                    <div class="sudheera-dashboard-card">
+
+                                        <div class="sudheera-card-icon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+
+                                        <h6>My Table Bookings</h6>
+
+                                        <p>
+                                            View your restaurant reservations, check booking
+                                            details and track confirmation or cancellation status.
+                                        </p>
+
+                                        <a href="{{ route('customer.table-bookings') }}" class="sudheera-dashboard-btn">
+                                            View Table Bookings
+                                            <i class="fa fa-arrow-right"></i>
+                                        </a>
+
+                                    </div>
+                                </div>
+
+
+                                <!-- ACCOUNT -->
+
+                                <div class="col-md-6">
+
+                                    <div class="sudheera-dashboard-card">
+
+                                        <div class="sudheera-card-icon">
                                             <i class="fa fa-user"></i>
                                         </div>
 
-                                        <div>
+                                        <h6>
+                                            My Account Details
+                                        </h6>
 
-                                            <div class="sudheera-info-label">
-                                                Full Name
-                                            </div>
+                                        <p>
+                                            Keep your personal information,
+                                            contact details and account
+                                            preferences up to date.
+                                        </p>
 
-                                            <div class="sudheera-info-value">
-                                                {{ $address->name ?? 'Not provided' }}
-                                            </div>
+                                        <a href="{{ route('account-settings') }}" class="sudheera-dashboard-btn">
 
-                                        </div>
+                                            Manage Account
 
-                                    </div>
+                                            <i class="fa fa-arrow-right"></i>
 
-                                </div>
-
-
-                                <!-- EMAIL -->
-
-                                <div class="col-md-4">
-
-                                    <div class="sudheera-info-row">
-
-                                        <div class="sudheera-info-row-icon">
-                                            <i class="fa fa-envelope"></i>
-                                        </div>
-
-                                        <div>
-
-                                            <div class="sudheera-info-label">
-                                                Email Address
-                                            </div>
-
-                                            <div class="sudheera-info-value">
-                                                {{ $address->email ?? 'Not provided' }}
-                                            </div>
-
-                                        </div>
+                                        </a>
 
                                     </div>
 
                                 </div>
 
 
-                                <!-- PHONE -->
+                                <!-- LOGOUT -->
 
-                                <div class="col-md-4">
+                                <div class="col-md-6">
 
-                                    <div class="sudheera-info-row">
+                                    <div class="sudheera-dashboard-card">
 
-                                        <div class="sudheera-info-row-icon">
-                                            <i class="fa fa-phone"></i>
+                                        <div class="sudheera-card-icon">
+                                            <i class="fa fa-sign-out"></i>
                                         </div>
 
-                                        <div>
+                                        <h6>
+                                            Sign Out
+                                        </h6>
 
-                                            <div class="sudheera-info-label">
-                                                Mobile Number
+                                        <p>
+                                            Finished ordering for now?
+                                            Securely sign out of your
+                                            BAKASURAN account.
+                                        </p>
+
+                                        <a href="{{ route('logout') }}" class="sudheera-dashboard-btn">
+
+                                            Log Out
+
+                                            <i class="fa fa-arrow-right"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                     QUICK ACCOUNT INFORMATION
+                                ================================================== -->
+
+                            <div class="sudheera-info-card">
+
+                                <div class="sudheera-info-title">
+
+                                    <h5>
+                                        My Account Information
+                                    </h5>
+
+                                    <span class="sudheera-info-badge">
+                                        Account Overview
+                                    </span>
+
+                                </div>
+
+
+                                <div class="row g-3">
+
+
+                                    <!-- NAME -->
+
+                                    <div class="col-md-4">
+
+                                        <div class="sudheera-info-row">
+
+                                            <div class="sudheera-info-row-icon">
+                                                <i class="fa fa-user"></i>
                                             </div>
 
-                                            <div class="sudheera-info-value">
-                                                {{ $address->mobile ?? 'Not provided' }}
+                                            <div>
+
+                                                <div class="sudheera-info-label">
+                                                    Full Name
+                                                </div>
+
+                                                <div class="sudheera-info-value">
+                                                    {{ $address->name ?? 'Not provided' }}
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- EMAIL -->
+
+                                    <div class="col-md-4">
+
+                                        <div class="sudheera-info-row">
+
+                                            <div class="sudheera-info-row-icon">
+                                                <i class="fa fa-envelope"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <div class="sudheera-info-label">
+                                                    Email Address
+                                                </div>
+
+                                                <div class="sudheera-info-value">
+                                                    {{ $address->email ?? 'Not provided' }}
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- PHONE -->
+
+                                    <div class="col-md-4">
+
+                                        <div class="sudheera-info-row">
+
+                                            <div class="sudheera-info-row-icon">
+                                                <i class="fa fa-phone"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <div class="sudheera-info-label">
+                                                    Mobile Number
+                                                </div>
+
+                                                <div class="sudheera-info-value">
+                                                    {{ $address->mobile ?? 'Not provided' }}
+                                                </div>
+
                                             </div>
 
                                         </div>
@@ -906,8 +939,8 @@
 
                             </div>
 
-                        </div>
 
+                        </div>
 
                     </div>
 
@@ -915,11 +948,9 @@
 
             </div>
 
-        </div>
+        </section>
 
-    </section>
-
-</main>
+    </main>
 
 
 @endsection

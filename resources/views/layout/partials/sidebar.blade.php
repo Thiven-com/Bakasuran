@@ -128,6 +128,16 @@
                                                                         </a>
                                                                 </li>
 
+                                                                {{-- Booking Sessions --}}
+                                                                <li>
+                                                                        <a href="{{ route('admin.booking-sessions.index') }}"
+                                                                                class="{{ Request::is('booking-sessions*') ? 'active' : '' }}">
+                                                                                <i
+                                                                                        class="ti ti-calendar-time fs-16 me-2"></i>
+                                                                                <span>Booking Sessions</span>
+                                                                        </a>
+                                                                </li>
+
                                                                 {{-- Booking Settings --}}
                                                                 <li>
                                                                         <a href="{{ route('admin.booking-settings.index') }}"

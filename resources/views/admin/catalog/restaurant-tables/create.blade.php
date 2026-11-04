@@ -201,10 +201,10 @@
                         <option value="">Select Restaurant</option>
 
                         @foreach($restaurants as $restaurant)
-                            <option value="{{ $restaurant->id }}"
-                                {{ old('restaurant_id') == $restaurant->id ? 'selected' : '' }}>
-                                {{ $restaurant->name }}
-                            </option>
+                           <option value="{{ $restaurant->id }}"
+    {{ old('restaurant_id', $selectedRestaurantId ?? '') == $restaurant->id ? 'selected' : '' }}>
+    {{ $restaurant->name }}
+</option>
                         @endforeach
 
                     </select>

@@ -106,6 +106,85 @@
                             @enderror
                         </div>
 
+                        <div class="col-md-6">
+    <label class="form-label fw-semibold">
+        Booking Duration <span class="text-danger">*</span>
+    </label>
+
+    <select name="booking_duration" class="form-select" required>
+        @foreach([30, 60, 90, 120, 150, 180, 240, 300, 360, 480] as $duration)
+            <option value="{{ $duration }}"
+                {{ old('booking_duration', $booking_setting->booking_duration ?? 120) == $duration ? 'selected' : '' }}>
+                {{ $duration }} Minutes
+            </option>
+        @endforeach
+    </select>
+
+    @error('booking_duration')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+
+    <small class="text-muted">
+        Total time allocated for each customer reservation.
+    </small>
+</div>
+
+
+<div class="col-md-6">
+    <label class="form-label fw-semibold">
+        Cleaning Duration <span class="text-danger">*</span>
+    </label>
+
+    <select name="cleaning_duration" class="form-select" required>
+        @foreach([0, 10, 15, 20, 30, 45, 60] as $duration)
+            <option value="{{ $duration }}"
+                {{ old('cleaning_duration', $booking_setting->cleaning_duration ?? 15) == $duration ? 'selected' : '' }}>
+                {{ $duration }} Minutes
+            </option>
+        @endforeach
+    </select>
+
+    @error('cleaning_duration')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+
+    <small class="text-muted">
+        Time required to clean the table after a customer leaves.
+    </small>
+</div>
+
+
+<div class="col-md-6">
+    <label class="form-label fw-semibold">
+        Minimum Booking Notice <span class="text-danger">*</span>
+    </label>
+
+    <select name="min_notice_minutes" class="form-select" required>
+        @foreach([0, 15, 30, 60, 120, 180, 360, 720, 1440] as $minutes)
+            <option value="{{ $minutes }}"
+                {{ old('min_notice_minutes', $booking_setting->min_notice_minutes ?? 60) == $minutes ? 'selected' : '' }}>
+
+                @if($minutes < 60)
+                    {{ $minutes }} Minutes
+                @elseif($minutes % 1440 === 0)
+                    {{ $minutes / 1440 }} Day(s)
+                @else
+                    {{ $minutes / 60 }} Hour(s)
+                @endif
+
+            </option>
+        @endforeach
+    </select>
+
+    @error('min_notice_minutes')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+
+    <small class="text-muted">
+        Minimum advance notice required before booking.
+    </small>
+</div>
+
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">
                                 Minimum Guests

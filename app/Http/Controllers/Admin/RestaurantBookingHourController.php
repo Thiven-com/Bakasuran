@@ -82,6 +82,13 @@ class RestaurantBookingHourController extends Controller
     // EDIT
     public function edit(Restaurant $restaurant)
     {
+        if (!$restaurant->bookingHours()->exists()) {
+            return redirect()
+                ->route('admin.booking-hours.index')
+                ->with('error', 'Booking hours not found for this restaurant.');
+        }
+
+
         $bookingHours = RestaurantBookingHour::where(
             'restaurant_id',
             $restaurant->id
@@ -147,6 +154,7 @@ class RestaurantBookingHourController extends Controller
     {
         $rules = [
             'hours' => ['required', 'array', 'size:7'],
+            'hours.*' => ['required', 'array'],
             'hours.*.is_closed' => ['nullable', 'boolean'],
             'hours.*.opening_time' => ['nullable', 'date_format:H:i'],
             'hours.*.closing_time' => ['nullable', 'date_format:H:i'],

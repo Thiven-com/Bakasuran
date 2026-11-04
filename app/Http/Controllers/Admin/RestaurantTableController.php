@@ -13,48 +13,27 @@ class RestaurantTableController extends Controller
     /**
      * Display all restaurant tables.
      */
+
     public function index(Request $request)
     {
-        $query = RestaurantTable::with('restaurant')->latest();
+        $query = Restaurant::query()
+            ->withCount('tables')
+            ->with([
+                'tables:id,restaurant_id,status,seating_capacity'
+            ])
+            ->orderBy('name');
 
-        // Search tables by name, number or restaurant
         if ($request->filled('search')) {
             $search = $request->search;
 
-            $query->where(function ($q) use ($search) {
-                $q->where('table_name', 'like', "%{$search}%")
-                    ->orWhere('table_number', 'like', "%{$search}%")
-                    ->orWhereHas('restaurant', function ($restaurant) use ($search) {
-                        $restaurant->where('name', 'like', "%{$search}%");
-                    });
-            });
+            $query->where('name', 'like', "%{$search}%");
         }
 
-        // Filter by restaurant
-        if ($request->filled('restaurant_id')) {
-            $query->where('restaurant_id', $request->restaurant_id);
-        }
+        $restaurants = $query->paginate(12)->withQueryString();
 
-        // Filter by seating type
-        if ($request->filled('seating_type')) {
-            $query->where('seating_type', $request->seating_type);
-        }
+        $totalRestaurants = Restaurant::count();
 
-        // Filter by status
-        if ($request->has('status') && $request->status !== '') {
-            $query->where('status', $request->status);
-        }
-
-        $tables = $query->paginate(12)->withQueryString();
-
-        $restaurants = Restaurant::orderBy('name')->get();
-
-        // Dashboard statistics
         $totalTables = RestaurantTable::count();
-
-        $activeTables = RestaurantTable::where('status', 1)->count();
-
-        $inactiveTables = RestaurantTable::where('status', 0)->count();
 
         $totalCapacity = RestaurantTable::where('status', 1)
             ->sum('seating_capacity');
@@ -62,8 +41,45 @@ class RestaurantTableController extends Controller
         return view(
             'admin.catalog.restaurant-tables.index',
             compact(
-                'tables',
                 'restaurants',
+                'totalRestaurants',
+                'totalTables',
+                'totalCapacity'
+            )
+        );
+    }
+
+
+
+
+    /**
+     * Show all tables belonging to the selected restaurant.
+     */
+    public function manage(Restaurant $restaurant)
+    {
+        $tables = RestaurantTable::where('restaurant_id', $restaurant->id)
+            ->latest()
+            ->paginate(12);
+
+        $totalTables = RestaurantTable::where('restaurant_id', $restaurant->id)->count();
+
+        $activeTables = RestaurantTable::where('restaurant_id', $restaurant->id)
+            ->where('status', 1)
+            ->count();
+
+        $inactiveTables = RestaurantTable::where('restaurant_id', $restaurant->id)
+            ->where('status', 0)
+            ->count();
+
+        $totalCapacity = RestaurantTable::where('restaurant_id', $restaurant->id)
+            ->where('status', 1)
+            ->sum('seating_capacity');
+
+        return view(
+            'admin.catalog.restaurant-tables.manage',
+            compact(
+                'restaurant',
+                'tables',
                 'totalTables',
                 'activeTables',
                 'inactiveTables',
@@ -75,15 +91,17 @@ class RestaurantTableController extends Controller
     /**
      * Show the add table form.
      */
-    public function create()
+    public function create(Request $request)
     {
         $restaurants = Restaurant::where('is_active', true)
             ->orderBy('name')
             ->get();
 
+        $selectedRestaurantId = $request->query('restaurant_id');
+
         return view(
             'admin.catalog.restaurant-tables.create',
-            compact('restaurants')
+            compact('restaurants', 'selectedRestaurantId')
         );
     }
 
@@ -142,7 +160,7 @@ class RestaurantTableController extends Controller
         RestaurantTable::create($validated);
 
         return redirect()
-            ->route('admin.restaurant-tables.index')
+            ->route('admin.restaurant-tables.manage', $validated['restaurant_id'])
             ->with('success', 'Restaurant table added successfully.');
     }
 
@@ -161,17 +179,17 @@ class RestaurantTableController extends Controller
      * Show the edit table form.
      */
     public function edit(RestaurantTable $restaurant_table)
-    {
-        $restaurants = Restaurant::orderBy('name')->get();
+{
+    $restaurant = $restaurant_table->restaurant;
 
-        return view(
-            'admin.catalog.restaurant-tables.edit',
-            compact(
-                'restaurant_table',
-                'restaurants'
-            )
-        );
-    }
+    return view(
+        'admin.catalog.restaurant-tables.edit',
+        compact(
+            'restaurant_table',
+            'restaurant'
+        )
+    );
+}
 
     /**
      * Update restaurant table details.
@@ -181,10 +199,10 @@ class RestaurantTableController extends Controller
         RestaurantTable $restaurant_table
     ) {
         $validated = $request->validate([
-            'restaurant_id' => [
-                'required',
-                'exists:restaurants,id',
-            ],
+           'restaurant_id' => [
+    'required',
+    Rule::in([$restaurant_table->restaurant_id]),
+],
 
             'table_name' => [
                 'required',
@@ -231,7 +249,7 @@ class RestaurantTableController extends Controller
         $restaurant_table->update($validated);
 
         return redirect()
-            ->route('admin.restaurant-tables.index')
+            ->route('admin.restaurant-tables.manage', $restaurant_table->restaurant_id)
             ->with('success', 'Restaurant table updated successfully.');
     }
 
@@ -239,21 +257,23 @@ class RestaurantTableController extends Controller
      * Delete a restaurant table.
      */
     public function destroy(RestaurantTable $restaurant_table)
-    {
-        // Prevent deletion if booking records exist
-        if ($restaurant_table->bookings()->exists()) {
-            return redirect()
-                ->route('admin.restaurant-tables.index')
-                ->with(
-                    'error',
-                    'This table has booking records. Deactivate it instead of deleting it.'
-                );
-        }
+{
+    $restaurantId = $restaurant_table->restaurant_id;
 
-        $restaurant_table->delete();
-
+    // Prevent deletion if booking records exist
+    if ($restaurant_table->bookings()->exists()) {
         return redirect()
-            ->route('admin.restaurant-tables.index')
-            ->with('success', 'Restaurant table deleted successfully.');
+            ->route('admin.restaurant-tables.manage', $restaurantId)
+            ->with(
+                'error',
+                'This table has booking records. Deactivate it instead of deleting it.'
+            );
     }
+
+    $restaurant_table->delete();
+
+    return redirect()
+        ->route('admin.restaurant-tables.manage', $restaurantId)
+        ->with('success', 'Restaurant table deleted successfully.');
+}
 }
