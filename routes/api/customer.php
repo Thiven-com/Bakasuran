@@ -67,6 +67,7 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
         RestaurantFoodOrderController::class,
         'menu'
     ]);
+    Route::get('/restaurant/{restaurantId}/menu', [RestaurantFoodOrderController::class, 'restaurantMenu']);
 
     // Place food order
     Route::post('/order', [

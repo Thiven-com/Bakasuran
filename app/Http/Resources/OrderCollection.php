@@ -71,9 +71,9 @@ class OrderCollection extends ResourceCollection
                     ];
                 })->values(),
                 'ordernotes' => $this->orderNotes($order->id),
-                'invoice_pdf' => !in_array($order->status, ['cancelled', 'pending']) 
-                 ? route('orderInvoice', $order->id) 
-                 : null,
+                // 'invoice_pdf' => !in_array($order->status, ['cancelled', 'pending']) 
+                //  ? route('orderInvoice', $order->id) 
+                //  : null,
                 // shipments
                 // 'shipments' => $order->shipments->map(function ($s) {
                 //     return [

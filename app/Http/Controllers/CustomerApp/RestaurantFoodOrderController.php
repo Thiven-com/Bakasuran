@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\CustomerApp;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\RestaurantFoodOrder;
 use App\Models\RestaurantFoodOrderItem;
 use App\Models\RestaurantTable;
@@ -70,6 +71,9 @@ class RestaurantFoodOrderController extends Controller
                     'product_variant_id' => $variant->id,
                     'variant_name' => $variant->name ?? null,
 
+                    'restaurant_id' => $variant->product->restaurant_id ?? null,
+                    'restaurant_name' => $variant->product->restaurant->name ?? null,
+
                     'image' => $image,
 
                     'price' => $variant->price,
@@ -84,6 +88,7 @@ class RestaurantFoodOrderController extends Controller
             'restaurant' => [
                 'restaurant_id' => $table->restaurant_id,
                 'restaurant_name' => $restaurant?->name,
+                'restaurant_logo' => $restaurant?->logo,
             ],
 
             'table' => [
@@ -96,11 +101,90 @@ class RestaurantFoodOrderController extends Controller
         ]);
     }
 
+
+    public function restaurantMenu($restaurantId)
+    {
+        // Find restaurant
+        $restaurant = Restaurant::find($restaurantId);
+
+        if (!$restaurant) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant not found',
+            ], 404);
+        }
+
+        // Get all food products belonging to this restaurant
+        $products = Product::with([
+            'variants.media',
+            'media',
+        ])
+            ->where('restaurant_id', $restaurantId)
+            ->get()
+            ->map(function ($product) {
+
+                $productMedia = $product->media->first();
+
+                $productImage = $product->image
+                    ?: ($productMedia?->thumbnail_url
+                        ?: $productMedia?->url);
+
+                if ($productImage && !filter_var($productImage, FILTER_VALIDATE_URL)) {
+                    $productImage = asset(ltrim($productImage, '/'));
+                }
+
+                $variants = $product->variants->map(function ($variant) use ($productImage) {
+
+                    $variantMedia = $variant->media->first();
+
+                    $image = $variant->image
+                        ?: ($variantMedia?->thumbnail_url
+                            ?: ($variantMedia?->url
+                                ?: $productImage));
+
+                    if ($image && !filter_var($image, FILTER_VALIDATE_URL)) {
+                        $image = asset(ltrim($image, '/'));
+                    }
+
+                    return [
+                        'product_variant_id' => $variant->id,
+                        'variant_name' => $variant->name,
+                        'price' => $variant->price,
+                        'actual_price' => $variant->actual_price,
+                        'image' => $image,
+                    ];
+                });
+
+                return [
+                    'product_id' => $product->id,
+                    'product_name' => $product->title,
+                    'product_slug' => $product->slug,
+                    'restaurant_id' => $product->restaurant_id,
+                    'image' => $productImage,
+                    'variants' => $variants,
+                ];
+            });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Restaurant food menu fetched successfully',
+
+            'restaurant' => [
+                'restaurant_id' => $restaurant->id,
+                'restaurant_name' => $restaurant->name,
+            ],
+
+            'products' => $products,
+        ]);
+    }
+
     /**
      * Place food order with multiple products.
      */
+
     public function store(Request $request)
     {
+        // Validate request
         $validator = Validator::make($request->all(), [
             'restaurant_table_id' => 'required|integer|exists:restaurant_tables,id',
 
@@ -131,6 +215,7 @@ class RestaurantFoodOrderController extends Controller
 
         $customerId = $customer->id;
 
+        // Get selected restaurant table
         $table = RestaurantTable::find($request->restaurant_table_id);
 
         if (!$table) {
@@ -140,6 +225,7 @@ class RestaurantFoodOrderController extends Controller
             ], 404);
         }
 
+        // Check table availability
         if ((int) $table->status !== 1) {
             return response()->json([
                 'status' => false,
@@ -147,22 +233,23 @@ class RestaurantFoodOrderController extends Controller
             ], 422);
         }
 
+        // Automatically get restaurant ID from selected table
+        $restaurantId = $table->restaurant_id;
+
         try {
 
-            return DB::transaction(function () use ($request, $customerId, $table) {
+            return DB::transaction(function () use ($request, $customerId, $table, $restaurantId) {
 
                 $subtotal = 0;
                 $items = [];
 
+                // Validate products and calculate subtotal
                 foreach ($request->products as $product) {
 
                     $variant = ProductVariant::with('product')
                         ->where('id', $product['product_variant_id'])
-                        ->whereHas('product', function ($query) use ($table) {
-                            $query->where(
-                                'restaurant_id',
-                                $table->restaurant_id
-                            );
+                        ->whereHas('product', function ($query) use ($restaurantId) {
+                            $query->where('restaurant_id', $restaurantId);
                         })
                         ->first();
 
@@ -190,20 +277,28 @@ class RestaurantFoodOrderController extends Controller
                     ];
                 }
 
-                // Create food order
+                // Create restaurant food order
                 $order = RestaurantFoodOrder::create([
                     'order_number' => 'RFO-' . strtoupper(Str::random(10)),
-                    'restaurant_id' => $table->restaurant_id,
+
+                    // Restaurant and table details
+                    'restaurant_id' => $restaurantId,
                     'restaurant_table_id' => $table->id,
+
+                    // Customer details
                     'customer_id' => $customerId,
+
+                    // Amount details
                     'subtotal' => $subtotal,
                     'tax' => 0,
                     'grand_total' => $subtotal,
+
+                    // Order details
                     'status' => 'pending',
                     'special_instructions' => $request->special_instructions,
                 ]);
 
-                // Save multiple food products
+                // Save multiple food order items
                 foreach ($items as $item) {
 
                     $variant = $item['variant'];
@@ -219,6 +314,7 @@ class RestaurantFoodOrderController extends Controller
                     ]);
                 }
 
+                // Load order relationships
                 $order->load([
                     'items',
                     'table',
@@ -245,6 +341,7 @@ class RestaurantFoodOrderController extends Controller
 
             \Log::error('Restaurant food order error', [
                 'customer_id' => $customerId,
+                'restaurant_id' => $restaurantId,
                 'error' => $e->getMessage(),
             ]);
 
@@ -254,6 +351,7 @@ class RestaurantFoodOrderController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * Customer order list.
