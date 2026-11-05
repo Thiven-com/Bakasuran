@@ -15,16 +15,72 @@ use Carbon\Carbon;
 class RestaurantBookingController extends Controller
 {
     /**
-     * Display all restaurant bookings.
+     * Display all restaurants with their booking counts.
      */
     public function index(Request $request)
+    {
+        $restaurants = Restaurant::query()
+            ->select('restaurants.*')
+            ->selectSub(function ($query) {
+                $query->from('restaurant_table_bookings')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('restaurant_id', 'restaurants.id');
+            }, 'bookings_count')
+            ->selectSub(function ($query) {
+                $query->from('restaurant_table_bookings')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('restaurant_id', 'restaurants.id')
+                    ->where('status', 'pending');
+            }, 'pending_bookings_count')
+            ->selectSub(function ($query) {
+                $query->from('restaurant_table_bookings')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('restaurant_id', 'restaurants.id')
+                    ->where('status', 'confirmed');
+            }, 'confirmed_bookings_count')
+            ->selectSub(function ($query) {
+                $query->from('restaurant_table_bookings')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('restaurant_id', 'restaurants.id')
+                    ->where('status', 'cancelled');
+            }, 'cancelled_bookings_count')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where('restaurants.name', 'like', '%' . $request->search . '%');
+            })
+            ->orderBy('restaurants.name')
+            ->paginate(12)
+            ->withQueryString();
+
+        $totalRestaurants = Restaurant::count();
+        $totalBookings = RestaurantTableBooking::count();
+
+        $restaurantsWithBookings = RestaurantTableBooking::query()
+            ->distinct()
+            ->count('restaurant_id');
+
+        return view(
+            'admin.catalog.restaurant-bookings.index',
+            compact(
+                'restaurants',
+                'totalRestaurants',
+                'totalBookings',
+                'restaurantsWithBookings'
+            )
+        );
+    }
+
+    /**
+     * Display bookings for one selected restaurant.
+     */
+    public function restaurantBookings(Request $request, Restaurant $restaurant)
     {
         $query = RestaurantTableBooking::with([
             'restaurant',
             'restaurantTable',
-        ])->latest();
+        ])
+            ->where('restaurant_id', $restaurant->id)
+            ->latest();
 
-        // Search booking number, customer name or mobile.
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -35,39 +91,37 @@ class RestaurantBookingController extends Controller
             });
         }
 
-        // Filter by restaurant.
-        if ($request->filled('restaurant_id')) {
-            $query->where('restaurant_id', $request->restaurant_id);
-        }
-
-        // Filter by booking status.
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by booking date.
         if ($request->filled('booking_date')) {
             $query->whereDate('booking_date', $request->booking_date);
         }
 
         $bookings = $query->paginate(12)->withQueryString();
 
-        $restaurants = Restaurant::orderBy('name')->get();
+        $restaurantBookings = RestaurantTableBooking::where(
+            'restaurant_id',
+            $restaurant->id
+        );
 
-        // Booking statistics.
-        $totalBookings = RestaurantTableBooking::count();
-
-        $pendingBookings = RestaurantTableBooking::where('status', 'pending')->count();
-
-        $confirmedBookings = RestaurantTableBooking::where('status', 'confirmed')->count();
-
-        $cancelledBookings = RestaurantTableBooking::where('status', 'cancelled')->count();
+        $totalBookings = (clone $restaurantBookings)->count();
+        $pendingBookings = (clone $restaurantBookings)
+            ->where('status', 'pending')
+            ->count();
+        $confirmedBookings = (clone $restaurantBookings)
+            ->where('status', 'confirmed')
+            ->count();
+        $cancelledBookings = (clone $restaurantBookings)
+            ->where('status', 'cancelled')
+            ->count();
 
         return view(
-            'admin.catalog.restaurant-bookings.index',
+            'admin.catalog.restaurant-bookings.restaurant-index',
             compact(
+                'restaurant',
                 'bookings',
-                'restaurants',
                 'totalBookings',
                 'pendingBookings',
                 'confirmedBookings',
@@ -79,13 +133,17 @@ class RestaurantBookingController extends Controller
     /**
      * Show the create booking page.
      */
-    public function create()
+    public function create(Request $request)
     {
         $restaurants = Restaurant::orderBy('name')->get();
 
+        $selectedRestaurantId = Restaurant::whereKey(
+            $request->query('restaurant_id')
+        )->value('id');
+
         return view(
             'admin.catalog.restaurant-bookings.create',
-            compact('restaurants')
+            compact('restaurants', 'selectedRestaurantId')
         );
     }
 
@@ -96,12 +154,12 @@ class RestaurantBookingController extends Controller
     {
         $this->normalizeTimeInputs($request);
 
-        $validated = $request->validate($this->bookingValidationRules($request));
+        $validated = $request->validate(
+            $this->bookingValidationRules($request)
+        );
 
-        // Validate table capacity and availability.
         $this->validateBookingAvailability($validated);
 
-        // Generate a unique booking number.
         do {
             $bookingNumber = 'BK' . now()->format('YmdHis') . random_int(100, 999);
         } while (
@@ -110,7 +168,6 @@ class RestaurantBookingController extends Controller
 
         $validated['booking_number'] = $bookingNumber;
 
-        // Set confirmation and cancellation timestamps.
         $validated['confirmed_at'] = $validated['status'] === 'confirmed'
             ? now()
             : null;
@@ -122,7 +179,7 @@ class RestaurantBookingController extends Controller
         RestaurantTableBooking::create($validated);
 
         return redirect()
-            ->route('admin.restaurant-bookings.index')
+            ->route('admin.restaurant-bookings.restaurant', $validated['restaurant_id'])
             ->with('success', 'Restaurant booking created successfully.');
     }
 
@@ -174,18 +231,17 @@ class RestaurantBookingController extends Controller
         Request $request,
         RestaurantTableBooking $restaurant_booking
     ) {
-        // Normalize times before applying date_format validation.
         $this->normalizeTimeInputs($request);
 
-        $validated = $request->validate($this->bookingValidationRules($request));
+        $validated = $request->validate(
+            $this->bookingValidationRules($request)
+        );
 
-        // Exclude the current booking from conflict checking.
         $this->validateBookingAvailability(
             $validated,
             $restaurant_booking->id
         );
 
-        // Set confirmation timestamp when booking becomes confirmed.
         if (
             $validated['status'] === 'confirmed' &&
             $restaurant_booking->status !== 'confirmed'
@@ -193,12 +249,10 @@ class RestaurantBookingController extends Controller
             $validated['confirmed_at'] = now();
         }
 
-        // Clear confirmation timestamp if booking is no longer confirmed.
         if ($validated['status'] !== 'confirmed') {
             $validated['confirmed_at'] = null;
         }
 
-        // Set cancellation timestamp when booking becomes cancelled.
         if (
             $validated['status'] === 'cancelled' &&
             $restaurant_booking->status !== 'cancelled'
@@ -206,7 +260,6 @@ class RestaurantBookingController extends Controller
             $validated['cancelled_at'] = now();
         }
 
-        // Clear cancellation timestamp if booking is reopened.
         if ($validated['status'] !== 'cancelled') {
             $validated['cancelled_at'] = null;
         }
@@ -214,7 +267,10 @@ class RestaurantBookingController extends Controller
         $restaurant_booking->update($validated);
 
         return redirect()
-            ->route('admin.restaurant-bookings.index')
+            ->route(
+                'admin.restaurant-bookings.restaurant',
+                $restaurant_booking->restaurant_id
+            )
             ->with('success', 'Restaurant booking updated successfully.');
     }
 
@@ -223,10 +279,12 @@ class RestaurantBookingController extends Controller
      */
     public function destroy(RestaurantTableBooking $restaurant_booking)
     {
+        $restaurantId = $restaurant_booking->restaurant_id;
+
         $restaurant_booking->delete();
 
         return redirect()
-            ->route('admin.restaurant-bookings.index')
+            ->route('admin.restaurant-bookings.restaurant', $restaurantId)
             ->with('success', 'Restaurant booking deleted successfully.');
     }
 
@@ -250,9 +308,7 @@ class RestaurantBookingController extends Controller
 
     /**
      * Normalize time inputs.
-     *
-     * HTML time inputs normally submit H:i.
-     * This also handles values submitted as H:i:s.
+     * HTML time inputs normally submit H:i. This also handles H:i:s.
      */
     private function normalizeTimeInputs(Request $request)
     {
@@ -372,23 +428,21 @@ class RestaurantBookingController extends Controller
         array $data,
         $ignoreBookingId = null
     ) {
-        // Get restaurant booking settings.
         $settings = RestaurantBookingSetting::where(
             'restaurant_id',
             $data['restaurant_id']
         )->first();
 
-        // Use defaults when settings have not been saved.
         $minGuests = $settings->min_guests ?? 1;
         $maxGuests = $settings->max_guests ?? 20;
         $maxAdvanceDays = $settings->max_advance_days ?? 30;
 
         $activeBooking = in_array(
             $data['status'],
-            ['pending', 'confirmed']
+            ['pending', 'confirmed'],
+            true
         );
 
-        // Check whether reservations are enabled.
         if (
             $activeBooking &&
             $settings &&
@@ -399,7 +453,6 @@ class RestaurantBookingController extends Controller
             ]);
         }
 
-        // Validate guest limits and booking date for active bookings.
         if ($activeBooking) {
             if ((int) $data['guest_count'] < (int) $minGuests) {
                 throw ValidationException::withMessages([
@@ -414,9 +467,7 @@ class RestaurantBookingController extends Controller
             }
 
             $bookingDate = Carbon::parse($data['booking_date'])->startOfDay();
-
             $today = now()->startOfDay();
-
             $lastBookingDate = $today->copy()->addDays($maxAdvanceDays);
 
             if ($bookingDate->lessThan($today)) {
@@ -431,11 +482,9 @@ class RestaurantBookingController extends Controller
                 ]);
             }
 
-            // Do not allow a booking earlier than the current time today.
             if (
                 $bookingDate->isSameDay($today) &&
-                Carbon::createFromFormat('H:i', $data['booking_time'])
-                    ->format('H:i') <= now()->format('H:i')
+                $data['booking_time'] <= now()->format('H:i')
             ) {
                 throw ValidationException::withMessages([
                     'booking_time' => 'The booking time must be later than the current time.',
@@ -443,7 +492,6 @@ class RestaurantBookingController extends Controller
             }
         }
 
-        // Find the selected active table for this restaurant.
         $table = RestaurantTable::where(
             'id',
             $data['restaurant_table_id']
@@ -458,7 +506,6 @@ class RestaurantBookingController extends Controller
             ]);
         }
 
-        // Check physical table capacity.
         if ((int) $data['guest_count'] > (int) $table->seating_capacity) {
             throw ValidationException::withMessages([
                 'guest_count' => 'This table can accommodate only '
@@ -466,7 +513,6 @@ class RestaurantBookingController extends Controller
             ]);
         }
 
-        // Convert requested times.
         $requestedStart = Carbon::createFromFormat(
             'H:i',
             $data['booking_time']
@@ -477,19 +523,16 @@ class RestaurantBookingController extends Controller
             $data['end_time']
         );
 
-        // End time must be later than start time.
         if ($requestedEnd->lessThanOrEqualTo($requestedStart)) {
             throw ValidationException::withMessages([
                 'end_time' => 'End time must be later than booking start time.',
             ]);
         }
 
-        // Cancelled, completed and no-show bookings do not reserve a table.
         if (!$activeBooking) {
             return;
         }
 
-        // Find existing active bookings for the same table and date.
         $existingBookings = RestaurantTableBooking::where(
             'restaurant_table_id',
             $data['restaurant_table_id']
@@ -508,12 +551,10 @@ class RestaurantBookingController extends Controller
         foreach ($existingBookings as $booking) {
             $existingStart = Carbon::parse($booking->booking_time);
 
-            // Existing bookings without an end time use a 60-minute duration.
             $existingEnd = $booking->end_time
                 ? Carbon::parse($booking->end_time)
                 : $existingStart->copy()->addMinutes(60);
 
-            // Check whether the requested time overlaps an existing booking.
             $hasConflict = $requestedStart->lessThan($existingEnd)
                 && $requestedEnd->greaterThan($existingStart);
 

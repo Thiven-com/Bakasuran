@@ -14,40 +14,45 @@ class RestaurantTableController extends Controller
      * Display all restaurant tables.
      */
 
-    public function index(Request $request)
-    {
-        $query = Restaurant::query()
-            ->withCount('tables')
-            ->with([
-                'tables:id,restaurant_id,status,seating_capacity'
-            ])
-            ->orderBy('name');
+   public function index(Request $request)
+{
+    $query = Restaurant::query()
+        ->withCount([
+            'tables',
+            'bookingHours',
+        ])
+        ->with([
+            'tables:id,restaurant_id,status,seating_capacity'
+        ])
+        ->orderBy('name');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+    if ($request->filled('search')) {
+        $search = $request->search;
 
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $restaurants = $query->paginate(12)->withQueryString();
-
-        $totalRestaurants = Restaurant::count();
-
-        $totalTables = RestaurantTable::count();
-
-        $totalCapacity = RestaurantTable::where('status', 1)
-            ->sum('seating_capacity');
-
-        return view(
-            'admin.catalog.restaurant-tables.index',
-            compact(
-                'restaurants',
-                'totalRestaurants',
-                'totalTables',
-                'totalCapacity'
-            )
-        );
+        $query->where('name', 'like', "%{$search}%");
     }
+
+    $restaurants = $query
+        ->paginate(12)
+        ->withQueryString();
+
+    $totalRestaurants = Restaurant::count();
+
+    $totalTables = RestaurantTable::count();
+
+    $totalCapacity = RestaurantTable::where('status', 1)
+        ->sum('seating_capacity');
+
+    return view(
+        'admin.catalog.restaurant-tables.index',
+        compact(
+            'restaurants',
+            'totalRestaurants',
+            'totalTables',
+            'totalCapacity'
+        )
+    );
+}
 
 
 
@@ -127,7 +132,7 @@ class RestaurantTableController extends Controller
                 'string',
                 'max:50',
                 Rule::unique('restaurant_tables', 'table_number')
-                    ->where('restaurant_id', $request->restaurant_id),
+                    ->where('restaurant_id', $request->restaurant_id)->where('seating_type', $request->seating_type),
             ],
 
             'seating_capacity' => [
@@ -216,6 +221,7 @@ class RestaurantTableController extends Controller
                 'max:50',
                 Rule::unique('restaurant_tables', 'table_number')
                     ->where('restaurant_id', $request->restaurant_id)
+                    ->where('seating_type', $request->seating_type)
                     ->ignore($restaurant_table->id),
             ],
 

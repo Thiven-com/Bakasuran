@@ -1666,7 +1666,7 @@ class PageControllers extends Controller
         }
 
         // 12. Recheck the selected table inside a database transaction
-        $booking = DB::transaction(function () use ($validated, $restaurant, $bookingTime, $endTime, $blockedUntil, $bookingDuration, $cleaningDuration) {
+        $booking = DB::transaction(function () use ($validated, $restaurant, $bookingTime, $endTime, $blockedUntil, $bookingDuration, $cleaningDuration, $matchingSession) {
             $table = RestaurantTable::where(
                 'id',
                 $validated['table_id']
@@ -1726,6 +1726,10 @@ class PageControllers extends Controller
                     strtoupper(\Illuminate\Support\Str::random(6)),
 
                 'restaurant_id' => $restaurant->id,
+
+                // Link customer reservation to the selected booking session
+                'booking_session_id' => $matchingSession->id,
+
                 'restaurant_table_id' => $table->id,
                 'customer_id' => Auth::guard('customer')->id(),
 

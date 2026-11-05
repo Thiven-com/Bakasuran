@@ -58,23 +58,47 @@ class RestaurantBookingSettingController extends Controller
         );
     }
 
+
+    public function restaurantSettings(Restaurant $restaurant)
+{
+    $bookingSetting = RestaurantBookingSetting::where(
+        'restaurant_id',
+        $restaurant->id
+    )->first();
+
+    if ($bookingSetting) {
+        return redirect()->route(
+            'admin.booking-settings.edit',
+            $bookingSetting->id
+        );
+    }
+
+    return redirect()
+        ->route('admin.booking-settings.create', [
+            'restaurant_id' => $restaurant->id
+        ])
+        ->with('info', 'Please configure booking settings for this restaurant.');
+}
+
     /**
      * Show create booking settings page.
      */
-    public function create()
-    {
-        $restaurants = Restaurant::whereNotIn(
-            'id',
-            RestaurantBookingSetting::select('restaurant_id')
-        )
-            ->orderBy('name')
-            ->get();
+   public function create(Request $request)
+{
+    $restaurants = Restaurant::whereNotIn(
+        'id',
+        RestaurantBookingSetting::select('restaurant_id')
+    )
+        ->orderBy('name')
+        ->get();
 
-        return view(
-            'admin.catalog.booking-settings.create',
-            compact('restaurants')
-        );
-    }
+    $selectedRestaurantId = $request->query('restaurant_id');
+
+    return view(
+        'admin.catalog.booking-settings.create',
+        compact('restaurants', 'selectedRestaurantId')
+    );
+}
 
     /**
      * Store booking settings.
@@ -142,21 +166,21 @@ class RestaurantBookingSettingController extends Controller
             ],
         ]);
 
-        RestaurantBookingSetting::create([
-            'restaurant_id' => $validated['restaurant_id'],
-            'slot_duration' => $validated['slot_duration'],
-            'max_advance_days' => $validated['max_advance_days'],
-            'min_guests' => $validated['min_guests'],
-            'max_guests' => $validated['max_guests'],
-            'is_booking_enabled' => $request->boolean('is_booking_enabled'),
-            'booking_duration' => $validated['booking_duration'],
-            'cleaning_duration' => $validated['cleaning_duration'],
-            'min_notice_minutes' => $validated['min_notice_minutes'],
-        ]);
+     $bookingSetting = RestaurantBookingSetting::create([
+    'restaurant_id' => $validated['restaurant_id'],
+    'slot_duration' => $validated['slot_duration'],
+    'max_advance_days' => $validated['max_advance_days'],
+    'min_guests' => $validated['min_guests'],
+    'max_guests' => $validated['max_guests'],
+    'is_booking_enabled' => $request->boolean('is_booking_enabled'),
+    'booking_duration' => $validated['booking_duration'],
+    'cleaning_duration' => $validated['cleaning_duration'],
+    'min_notice_minutes' => $validated['min_notice_minutes'],
+]);
 
-        return redirect()
-            ->route('admin.booking-settings.index')
-            ->with('success', 'Booking settings created successfully.');
+return redirect()
+    ->route('admin.booking-settings.edit', $bookingSetting->id)
+    ->with('success', 'Booking settings created successfully.');
     }
 
     /**
@@ -253,9 +277,9 @@ class RestaurantBookingSettingController extends Controller
             'min_notice_minutes' => $validated['min_notice_minutes'],
         ]);
 
-        return redirect()
-            ->route('admin.booking-settings.index')
-            ->with('success', 'Booking settings updated successfully.');
+       return redirect()
+    ->route('admin.booking-settings.edit', $booking_setting->id)
+    ->with('success', 'Booking settings updated successfully.');
     }
 
     /**

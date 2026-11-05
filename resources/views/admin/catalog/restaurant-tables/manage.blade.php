@@ -249,6 +249,72 @@
             justify-content: center;
         }
     }
+
+
+    .pagination-wrapper {
+    padding: 18px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: #777;
+}
+
+.pagination-info strong {
+    color: #222;
+}
+
+.custom-pagination .pagination {
+    margin: 0;
+    gap: 5px;
+}
+
+.custom-pagination .page-link {
+    border: 1px solid #e5e5e5;
+    color: #333;
+    border-radius: 7px !important;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #fff;
+    box-shadow: none;
+}
+
+.custom-pagination .page-link:hover {
+    background: #fff0f0;
+    border-color: #ff0000;
+    color: #ff0000;
+}
+
+.custom-pagination .page-item.active .page-link {
+    background: #ff0000;
+    border-color: #ff0000;
+    color: #fff;
+}
+
+.custom-pagination .page-item.disabled .page-link {
+    background: #f8f8f8;
+    color: #aaa;
+    border-color: #eee;
+}
+
+@media (max-width: 650px) {
+    .pagination-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .custom-pagination {
+        width: 100%;
+        overflow-x: auto;
+    }
+}
 </style>
 
 <div class="table-page">
@@ -430,10 +496,22 @@
         </div>
 
         @if($tables->hasPages())
-            <div class="pagination-wrapper">
-                {{ $tables->links() }}
-            </div>
-        @endif
+    <div class="pagination-wrapper">
+        <div class="pagination-info">
+            Showing
+            <strong>{{ $tables->firstItem() }}</strong>
+            to
+            <strong>{{ $tables->lastItem() }}</strong>
+            of
+            <strong>{{ $tables->total() }}</strong>
+            tables
+        </div>
+
+        <div class="custom-pagination">
+            {{ $tables->onEachSide(1)->links('pagination::bootstrap-5') }}
+        </div>
+    </div>
+@endif
 
     </div>
 

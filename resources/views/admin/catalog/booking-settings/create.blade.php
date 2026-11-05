@@ -193,16 +193,14 @@
                         </label>
 
                         <select name="restaurant_id" class="form-select @error('restaurant_id') is-invalid @enderror"
-                            required>
-
+                            required {{ $restaurants->isEmpty() ? 'disabled' : '' }}>
                             <option value="">Choose Restaurant</option>
 
                             @foreach($restaurants as $restaurant)
-                                <option value="{{ $restaurant->id }}" {{ old('restaurant_id') == $restaurant->id ? 'selected' : '' }}>
+                                <option value="{{ $restaurant->id }}" {{ (string) old('restaurant_id', $selectedRestaurantId ?? '') === (string) $restaurant->id ? 'selected' : '' }}>
                                     {{ $restaurant->name }}
                                 </option>
                             @endforeach
-
                         </select>
 
                         @error('restaurant_id')

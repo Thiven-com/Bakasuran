@@ -107,6 +107,11 @@ Route::get(
     Route::resource('restaurant-bookings', RestaurantBookingController::class)
         ->names('admin.restaurant-bookings');
 
+        Route::get(
+    'restaurant-bookings/restaurant/{restaurant}',
+    [RestaurantBookingController::class, 'restaurantBookings']
+)->name('admin.restaurant-bookings.restaurant');
+
     Route::get('restaurant-booking-tables/{restaurantId}',
         [RestaurantBookingController::class, 'getRestaurantTables']
     )->name('admin.restaurant-bookings.tables');
@@ -133,6 +138,11 @@ Route::delete('booking-hours/{restaurant}', [RestaurantBookingHourController::cl
     Route::get('booking-sessions', [RestaurantBookingSessionController::class, 'index'])
     ->name('admin.booking-sessions.index');
 
+    Route::get(
+    'booking-sessions/restaurant/{restaurant}',
+    [RestaurantBookingSessionController::class, 'restaurantSessions']
+)->name('admin.booking-sessions.restaurant');
+
 Route::get('booking-sessions/create', [RestaurantBookingSessionController::class, 'create'])
     ->name('admin.booking-sessions.create');
 
@@ -149,6 +159,11 @@ Route::delete('booking-sessions/{bookingSession}', [RestaurantBookingSessionCont
     ->name('admin.booking-sessions.destroy');
 
 // Booking Settings CRUD
+Route::get(
+    'booking-settings/restaurant/{restaurant}',
+    [RestaurantBookingSettingController::class, 'restaurantSettings']
+)->name('admin.booking-settings.restaurant');
+
 Route::resource(
     'booking-settings',
     RestaurantBookingSettingController::class

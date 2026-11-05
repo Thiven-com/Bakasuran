@@ -54,19 +54,21 @@
                                 Select Restaurant <span class="text-danger">*</span>
                             </label>
 
-                            <select name="restaurant_id"
-                                    class="form-select"
-                                    required
-                                    {{ $restaurants->isEmpty() ? 'disabled' : '' }}>
-                                <option value="">Select Restaurant</option>
+                           <select name="restaurant_id"
+    class="form-select"
+    required
+    {{ $restaurants->isEmpty() ? 'disabled' : '' }}>
 
-                                @foreach($restaurants as $restaurant)
-                                    <option value="{{ $restaurant->id }}"
-                                        {{ old('restaurant_id') == $restaurant->id ? 'selected' : '' }}>
-                                        {{ $restaurant->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+    <option value="">Select Restaurant</option>
+
+    @foreach($restaurants as $restaurant)
+        <option value="{{ $restaurant->id }}"
+            {{ (string) old('restaurant_id', $selectedRestaurantId ?? '') === (string) $restaurant->id ? 'selected' : '' }}>
+            {{ $restaurant->name }}
+        </option>
+    @endforeach
+
+</select>
 
                             @error('restaurant_id')
                                 <small class="text-danger">{{ $message }}</small>

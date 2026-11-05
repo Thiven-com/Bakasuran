@@ -9,6 +9,7 @@ class RestaurantTableBooking extends Model
 {
     protected $fillable = [
         'booking_number',
+        'booking_session_id',
         'restaurant_id',
         'restaurant_table_id',
         'customer_id',
@@ -56,6 +57,14 @@ class RestaurantTableBooking extends Model
     return $this->belongsTo(
         Customer::class,
         'customer_id'
+    );
+}
+
+public function bookingSession(): BelongsTo
+{
+    return $this->belongsTo(
+        RestaurantBookingSession::class,
+        'booking_session_id'
     );
 }
 }

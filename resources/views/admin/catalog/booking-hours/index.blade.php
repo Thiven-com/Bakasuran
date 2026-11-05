@@ -3,6 +3,76 @@
 
 @section('content')
 
+
+<style>
+    .pagination-wrapper {
+    padding: 18px 20px;
+    border-top: 1px solid #eee;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: #777;
+}
+
+.pagination-info strong {
+    color: #222;
+    font-weight: 700;
+}
+
+.pagination-links .pagination {
+    margin: 0;
+    gap: 5px;
+}
+
+.pagination-links .page-link {
+    border: 1px solid #e5e5e5;
+    color: #333;
+    background: #fff;
+    border-radius: 7px !important;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.pagination-links .page-link:hover {
+    background: #fff0f0;
+    border-color: #ff0000;
+    color: #ff0000;
+}
+
+.pagination-links .page-item.active .page-link {
+    background: #ff0000;
+    border-color: #ff0000;
+    color: #fff;
+}
+
+.pagination-links .page-item.disabled .page-link {
+    background: #f8f8f8;
+    border-color: #eee;
+    color: #aaa;
+}
+
+@media(max-width:650px) {
+    .pagination-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pagination-links {
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+</style>
+
 <div class="booking-hours-page" style="margin-top:70px;">
     <div class="container-fluid py-4">
 
@@ -185,9 +255,25 @@
                     </table>
                 </div>
 
-                <div class="mt-3">
-                    {{ $restaurants->links() }}
-                </div>
+                @if($restaurants->hasPages())
+    <div class="pagination-wrapper">
+
+        <div class="pagination-info">
+            Showing
+            <strong>{{ $restaurants->firstItem() }}</strong>
+            to
+            <strong>{{ $restaurants->lastItem() }}</strong>
+            of
+            <strong>{{ $restaurants->total() }}</strong>
+            restaurants
+        </div>
+
+        <div class="pagination-links">
+            {{ $restaurants->onEachSide(1)->links('pagination::bootstrap-5') }}
+        </div>
+
+    </div>
+@endif
 
             </div>
         </div>

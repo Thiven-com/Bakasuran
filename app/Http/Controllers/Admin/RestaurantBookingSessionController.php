@@ -15,32 +15,93 @@ class RestaurantBookingSessionController extends Controller
     /**
      * Display all booking sessions.
      */
-    public function index()
-    {
-        $sessions = RestaurantBookingSession::with('restaurant')
-            ->orderBy('restaurant_id')
-            ->orderBy('day_of_week')
-            ->orderBy('start_time')
-            ->paginate(15);
+    public function index(Request $request)
+{
+    $query = Restaurant::withCount('bookingSessions')
+        ->orderBy('name');
 
-        return view(
-            'admin.catalog.booking-sessions.index',
-            compact('sessions')
-        );
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%');
     }
+
+    $restaurants = $query->paginate(10)->withQueryString();
+
+    $totalRestaurants = Restaurant::count();
+
+    $totalSessions = RestaurantBookingSession::count();
+
+    $activeSessions = RestaurantBookingSession::where('is_active', true)->count();
+
+    $restaurantsWithSessions = Restaurant::whereHas('bookingSessions')->count();
+
+    return view(
+        'admin.catalog.booking-sessions.index',
+        compact(
+            'restaurants',
+            'totalRestaurants',
+            'totalSessions',
+            'activeSessions',
+            'restaurantsWithSessions'
+        )
+    );
+}
+
+
+
+public function restaurantSessions(Request $request, Restaurant $restaurant)
+{
+    $query = RestaurantBookingSession::where(
+        'restaurant_id',
+        $restaurant->id
+    );
+
+    if ($request->filled('search')) {
+        $query->where('session_name', 'like', '%' . $request->search . '%');
+    }
+
+    $sessions = $query
+        ->orderBy('day_of_week')
+        ->orderBy('start_time')
+        ->paginate(20)
+        ->withQueryString();
+
+    $totalSessions = RestaurantBookingSession::where(
+        'restaurant_id',
+        $restaurant->id
+    )->count();
+
+    $activeSessions = RestaurantBookingSession::where('restaurant_id', $restaurant->id)
+        ->where('is_active', true)
+        ->count();
+
+    $inactiveSessions = $totalSessions - $activeSessions;
+
+    return view(
+        'admin.catalog.booking-sessions.restaurant-index',
+        compact(
+            'restaurant',
+            'sessions',
+            'totalSessions',
+            'activeSessions',
+            'inactiveSessions'
+        )
+    );
+}
 
     /**
      * Show create form.
      */
-    public function create()
-    {
-        $restaurants = Restaurant::orderBy('name')->get();
+    public function create(Request $request)
+{
+    $restaurants = Restaurant::orderBy('name')->get();
 
-        return view(
-            'admin.catalog.booking-sessions.create',
-            compact('restaurants')
-        );
-    }
+    $selectedRestaurantId = $request->query('restaurant_id');
+
+    return view(
+        'admin.catalog.booking-sessions.create',
+        compact('restaurants', 'selectedRestaurantId')
+    );
+}
 
     /**
      * Store a new booking session.
@@ -65,9 +126,9 @@ class RestaurantBookingSessionController extends Controller
 
         RestaurantBookingSession::create($validated);
 
-        return redirect()
-            ->route('admin.booking-sessions.index')
-            ->with('success', 'Booking session created successfully.');
+       return redirect()
+    ->route('admin.booking-sessions.restaurant', $validated['restaurant_id'])
+    ->with('success', 'Booking session created successfully.');
     }
 
     /**
@@ -109,21 +170,32 @@ class RestaurantBookingSessionController extends Controller
         $bookingSession->update($validated);
 
         return redirect()
-            ->route('admin.booking-sessions.index')
-            ->with('success', 'Booking session updated successfully.');
+    ->route('admin.booking-sessions.restaurant', $bookingSession->restaurant_id)
+    ->with('success', 'Booking session updated successfully.');
     }
 
     /**
      * Delete a booking session.
      */
-    public function destroy(RestaurantBookingSession $bookingSession)
-    {
-        $bookingSession->delete();
+   public function destroy(RestaurantBookingSession $bookingSession)
+{
+    $restaurantId = $bookingSession->restaurant_id;
 
+    if ($bookingSession->bookings()->exists()) {
         return redirect()
-            ->route('admin.booking-sessions.index')
-            ->with('success', 'Booking session deleted successfully.');
+            ->route('admin.booking-sessions.restaurant', $restaurantId)
+            ->with(
+                'error',
+                'This session cannot be deleted because customer bookings are associated with it.'
+            );
     }
+
+    $bookingSession->delete();
+
+    return redirect()
+        ->route('admin.booking-sessions.restaurant', $restaurantId)
+        ->with('success', 'Booking session deleted successfully.');
+}
 
     /**
      * Validate session against restaurant opening hours
