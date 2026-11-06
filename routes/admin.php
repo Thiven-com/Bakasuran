@@ -15,6 +15,13 @@ use App\Http\Controllers\admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\TestimonialController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AddonGroupController;
+use App\Http\Controllers\Admin\AddonOptionController;
+use App\Http\Controllers\Admin\RestaurantTableController;
+use App\Http\Controllers\Admin\RestaurantBookingController;
+use App\Http\Controllers\Admin\RestaurantBookingHourController;
+use App\Http\Controllers\Admin\RestaurantBookingSettingController;
+use App\Http\Controllers\Admin\RestaurantBookingSessionController;
 
 
 /*
@@ -58,6 +65,14 @@ Route::group(['middleware' => 'admin'], function () {
     Route::resource('brands', BrandController::class)->names('admin.brands');
     Route::resource('banners', BannerController::class)->names('admin.banners');
     Route::resource('products', ProductController::class)->names('admin.products');
+
+    // Add-on Groups
+    Route::resource('addon-groups', AddonGroupController::class)
+        ->names('admin.addon-groups');
+
+
+    Route::resource('addon-options', AddonOptionController::class)
+        ->names('admin.addon-options');
     // Restaurants
 // Restaurants
     Route::get('restaurants', [RestaurantController::class, 'index'])
@@ -80,6 +95,85 @@ Route::group(['middleware' => 'admin'], function () {
 
     Route::get('restaurants/{restaurant}', [RestaurantController::class, 'show'])
         ->name('admin.restaurants.show');
+
+    // Restaurant Table Management
+    Route::resource('restaurant-tables', RestaurantTableController::class)
+        ->names('admin.restaurant-tables');
+        
+Route::get(
+    'restaurant-tables/{restaurant}/manage',
+    [RestaurantTableController::class, 'manage']
+)->name('admin.restaurant-tables.manage');
+
+    Route::resource('restaurant-bookings', RestaurantBookingController::class)
+        ->names('admin.restaurant-bookings');
+
+        Route::get(
+    'restaurant-bookings/restaurant/{restaurant}',
+    [RestaurantBookingController::class, 'restaurantBookings']
+)->name('admin.restaurant-bookings.restaurant');
+
+    Route::get('restaurant-booking-tables/{restaurantId}',
+        [RestaurantBookingController::class, 'getRestaurantTables']
+    )->name('admin.restaurant-bookings.tables');
+
+Route::get('booking-hours', [RestaurantBookingHourController::class, 'index'])
+    ->name('admin.booking-hours.index');
+
+Route::get('booking-hours/create', [RestaurantBookingHourController::class, 'create'])
+    ->name('admin.booking-hours.create');
+
+Route::post('booking-hours', [RestaurantBookingHourController::class, 'store'])
+    ->name('admin.booking-hours.store');
+
+Route::get('booking-hours/{restaurant}/edit', [RestaurantBookingHourController::class, 'edit'])
+    ->name('admin.booking-hours.edit');
+
+Route::put('booking-hours/{restaurant}', [RestaurantBookingHourController::class, 'update'])
+    ->name('admin.booking-hours.update');
+
+Route::delete('booking-hours/{restaurant}', [RestaurantBookingHourController::class, 'destroy'])
+    ->name('admin.booking-hours.destroy');
+
+
+    Route::get('booking-sessions', [RestaurantBookingSessionController::class, 'index'])
+    ->name('admin.booking-sessions.index');
+
+    Route::get(
+    'booking-sessions/restaurant/{restaurant}',
+    [RestaurantBookingSessionController::class, 'restaurantSessions']
+)->name('admin.booking-sessions.restaurant');
+
+Route::get('booking-sessions/create', [RestaurantBookingSessionController::class, 'create'])
+    ->name('admin.booking-sessions.create');
+
+Route::post('booking-sessions', [RestaurantBookingSessionController::class, 'store'])
+    ->name('admin.booking-sessions.store');
+
+Route::get('booking-sessions/{bookingSession}/edit', [RestaurantBookingSessionController::class, 'edit'])
+    ->name('admin.booking-sessions.edit');
+
+Route::put('booking-sessions/{bookingSession}', [RestaurantBookingSessionController::class, 'update'])
+    ->name('admin.booking-sessions.update');
+
+Route::delete('booking-sessions/{bookingSession}', [RestaurantBookingSessionController::class, 'destroy'])
+    ->name('admin.booking-sessions.destroy');
+
+// Booking Settings CRUD
+Route::get(
+    'booking-settings/restaurant/{restaurant}',
+    [RestaurantBookingSettingController::class, 'restaurantSettings']
+)->name('admin.booking-settings.restaurant');
+
+Route::resource(
+    'booking-settings',
+    RestaurantBookingSettingController::class
+)->parameters([
+    'booking-settings' => 'booking_setting'
+])->names('admin.booking-settings');
+
+    
+
     // Route::resource('coupons', CouponController::class)->names('admin.coupons');
     Route::resource('orders', OrderController::class)->names('admin.orders');
     Route::resource('flash-sales', FlashSaleController::class)->names('admin.flash-sales');

@@ -9,6 +9,7 @@ class RestaurantTableBooking extends Model
 {
     protected $fillable = [
         'booking_number',
+        'booking_session_id',
         'restaurant_id',
         'restaurant_table_id',
         'customer_id',
@@ -19,14 +20,22 @@ class RestaurantTableBooking extends Model
         'booking_time',
         'end_time',
         'guest_count',
+        'seating_type',
+        'occasion',
         'special_requests',
         'status',
+        'confirmed_at',
+        'cancelled_at',
+        'admin_notes',
     ];
 
     protected function casts(): array
     {
         return [
             'booking_date' => 'date:Y-m-d',
+            'guest_count' => 'integer',
+            'confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -37,6 +46,25 @@ class RestaurantTableBooking extends Model
 
     public function restaurantTable()
     {
-        return $this->belongsTo(RestaurantTable::class, 'restaurant_table_id');
+        return $this->belongsTo(
+            RestaurantTable::class,
+            'restaurant_table_id'
+        );
     }
+
+    public function customer(): BelongsTo
+{
+    return $this->belongsTo(
+        Customer::class,
+        'customer_id'
+    );
+}
+
+public function bookingSession(): BelongsTo
+{
+    return $this->belongsTo(
+        RestaurantBookingSession::class,
+        'booking_session_id'
+    );
+}
 }

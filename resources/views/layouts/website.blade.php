@@ -820,7 +820,7 @@
 
         </div> -->
 
-<!-- 
+        <!-- 
         <style>
             /* =========================================
    SUDHEERA SAREES
@@ -1411,506 +1411,494 @@
 
 
         {{-- BAKASURAN CINEMATIC PAGE LOADER --}}
-<div id="pageLoader" aria-label="Loading BAKASURAN" role="status">
+        <div id="pageLoader" aria-label="Loading BAKASURAN" role="status">
 
-    <div class="bakasuran-loader-bg"></div>
-    <div class="bakasuran-loader-grid"></div>
+            <div class="bakasuran-loader-bg"></div>
+            <div class="bakasuran-loader-grid"></div>
 
-    <div class="bakasuran-loader-light"></div>
+            <div class="bakasuran-loader-light"></div>
 
-    <div class="bakasuran-loader-content">
+            <div class="bakasuran-loader-content">
 
-        {{-- Animated Logo --}}
-        <div class="bakasuran-loader-logo-wrap">
+                {{-- Animated Logo --}}
+                <div class="bakasuran-loader-logo-wrap">
 
-            <div class="bakasuran-loader-ring"></div>
-            <div class="bakasuran-loader-ring bakasuran-loader-ring-two"></div>
+                    <div class="bakasuran-loader-ring"></div>
+                    <div class="bakasuran-loader-ring bakasuran-loader-ring-two"></div>
 
-            <div class="bakasuran-loader-logo">
-                <img
-                    src="{{ asset('website/images/logobaka.png') }}"
-                    alt="BAKASURAN"
-                >
+                    <div class="bakasuran-loader-logo">
+                        <img src="{{ asset('website/images/logobaka.png') }}" alt="BAKASURAN">
+                    </div>
+
+                </div>
+
+                {{-- Brand --}}
+                <h1 class="bakasuran-loader-brand">
+                    BAKASURAN
+                </h1>
+
+                <div class="bakasuran-loader-subbrand">
+                    RESTAURANT COMMERCE PLATFORM
+                </div>
+
+                <div class="bakasuran-loader-divider">
+                    <span></span>
+                </div>
+
+                <p class="bakasuran-loader-tagline">
+                    BIG FLAVOURS. UNFORGETTABLE CRAVINGS.
+                </p>
+
+                {{-- Loading indicator --}}
+                <div class="bakasuran-loader-progress">
+                    <span></span>
+                </div>
+
+                <div class="bakasuran-loader-status">
+                    PREPARING YOUR EXPERIENCE
+                    <span class="bakasuran-loader-dots">...</span>
+                </div>
+
             </div>
 
         </div>
 
-        {{-- Brand --}}
-        <h1 class="bakasuran-loader-brand">
-            BAKASURAN
-        </h1>
 
-        <div class="bakasuran-loader-subbrand">
-            RESTAURANT COMMERCE PLATFORM
-        </div>
-
-        <div class="bakasuran-loader-divider">
-            <span></span>
-        </div>
-
-        <p class="bakasuran-loader-tagline">
-            BIG FLAVOURS. UNFORGETTABLE CRAVINGS.
-        </p>
-
-        {{-- Loading indicator --}}
-        <div class="bakasuran-loader-progress">
-            <span></span>
-        </div>
-
-        <div class="bakasuran-loader-status">
-            PREPARING YOUR EXPERIENCE
-            <span class="bakasuran-loader-dots">...</span>
-        </div>
-
-    </div>
-
-</div>
-
-
-<style>
-/* ==========================================
+        <style>
+            /* ==========================================
    BAKASURAN CINEMATIC LOADER
 ========================================== */
 
-#pageLoader {
-    position: fixed;
-    inset: 0;
-    z-index: 999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    isolation: isolate;
-    background: #050303;
-    opacity: 1;
-    visibility: visible;
-     transition:
-        opacity 4s ease-in-out,
-        visibility 4s ease-in-out;
-}
+            #pageLoader {
+                position: fixed;
+                inset: 0;
+                z-index: 999999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                isolation: isolate;
+                background: #050303;
+                opacity: 1;
+                visibility: visible;
+                transition:
+                    opacity 4s ease-in-out,
+                    visibility 4s ease-in-out;
+            }
 
 
-#pageLoader.loader-hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
+            #pageLoader.loader-hidden {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
 
-/* Background glow */
+            /* Background glow */
 
-.bakasuran-loader-bg {
-    position: absolute;
-    inset: -20%;
-    z-index: -3;
-    background:
-        radial-gradient(
-            ellipse at 50% 45%,
-            rgba(135, 0, 0, 0.30),
-            transparent 43%
-        ),
-        radial-gradient(
-            circle at 15% 80%,
-            rgba(255, 0, 0, 0.10),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 85% 15%,
-            rgba(255, 45, 0, 0.10),
-            transparent 30%
-        ),
-        #050303;
-    animation: bakasuranBgPulse 4s ease-in-out infinite;
-}
+            .bakasuran-loader-bg {
+                position: absolute;
+                inset: -20%;
+                z-index: -3;
+                background:
+                    radial-gradient(ellipse at 50% 45%,
+                        rgba(135, 0, 0, 0.30),
+                        transparent 43%),
+                    radial-gradient(circle at 15% 80%,
+                        rgba(255, 0, 0, 0.10),
+                        transparent 30%),
+                    radial-gradient(circle at 85% 15%,
+                        rgba(255, 45, 0, 0.10),
+                        transparent 30%),
+                    #050303;
+                animation: bakasuranBgPulse 4s ease-in-out infinite;
+            }
 
-@keyframes bakasuranBgPulse {
-    0%, 100% {
-        transform: scale(1);
-        filter: brightness(0.85);
-    }
+            @keyframes bakasuranBgPulse {
 
-    50% {
-        transform: scale(1.06);
-        filter: brightness(1.15);
-    }
-}
+                0%,
+                100% {
+                    transform: scale(1);
+                    filter: brightness(0.85);
+                }
 
-/* Subtle background grid */
+                50% {
+                    transform: scale(1.06);
+                    filter: brightness(1.15);
+                }
+            }
 
-.bakasuran-loader-grid {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    opacity: 0.12;
-    background-image:
-        linear-gradient(
-            rgba(255, 0, 0, 0.15) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255, 0, 0, 0.15) 1px,
-            transparent 1px
-        );
-    background-size: 55px 55px;
-    mask-image: radial-gradient(
-        ellipse at center,
-        black,
-        transparent 75%
-    );
-}
+            /* Subtle background grid */
 
-/* Cinematic light sweep */
+            .bakasuran-loader-grid {
+                position: absolute;
+                inset: 0;
+                z-index: -2;
+                opacity: 0.12;
+                background-image:
+                    linear-gradient(rgba(255, 0, 0, 0.15) 1px,
+                        transparent 1px),
+                    linear-gradient(90deg,
+                        rgba(255, 0, 0, 0.15) 1px,
+                        transparent 1px);
+                background-size: 55px 55px;
+                mask-image: radial-gradient(ellipse at center,
+                        black,
+                        transparent 75%);
+            }
 
-.bakasuran-loader-light {
-    position: absolute;
-    top: -30%;
-    left: -60%;
-    width: 35%;
-    height: 160%;
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 0, 0, 0.04),
-        rgba(255, 255, 255, 0.12),
-        rgba(255, 0, 0, 0.08),
-        transparent
-    );
-    transform: skewX(-20deg);
-    animation: bakasuranLightSweep 3.5s ease-in-out infinite;
-}
+            /* Cinematic light sweep */
 
-@keyframes bakasuranLightSweep {
-    0% {
-        left: -60%;
-    }
+            .bakasuran-loader-light {
+                position: absolute;
+                top: -30%;
+                left: -60%;
+                width: 35%;
+                height: 160%;
+                z-index: -1;
+                pointer-events: none;
+                background: linear-gradient(90deg,
+                        transparent,
+                        rgba(255, 0, 0, 0.04),
+                        rgba(255, 255, 255, 0.12),
+                        rgba(255, 0, 0, 0.08),
+                        transparent);
+                transform: skewX(-20deg);
+                animation: bakasuranLightSweep 3.5s ease-in-out infinite;
+            }
 
-    100% {
-        left: 130%;
-    }
-}
+            @keyframes bakasuranLightSweep {
+                0% {
+                    left: -60%;
+                }
 
-/* Main content */
+                100% {
+                    left: 130%;
+                }
+            }
 
-.bakasuran-loader-content {
-    width: min(90%, 600px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 25px 15px;
-    animation: bakasuranContentReveal 1s cubic-bezier(.16, 1, .3, 1) both;
-}
+            /* Main content */
 
-@keyframes bakasuranContentReveal {
-    from {
-        opacity: 0;
-        transform: translateY(22px) scale(0.96);
-    }
+            .bakasuran-loader-content {
+                width: min(90%, 600px);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 25px 15px;
+                animation: bakasuranContentReveal 1s cubic-bezier(.16, 1, .3, 1) both;
+            }
 
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+            @keyframes bakasuranContentReveal {
+                from {
+                    opacity: 0;
+                    transform: translateY(22px) scale(0.96);
+                }
 
-/* Logo and rings */
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
 
-.bakasuran-loader-logo-wrap {
-    position: relative;
-    width: 205px;
-    height: 205px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 4px;
-}
+            /* Logo and rings */
 
-.bakasuran-loader-ring,
-.bakasuran-loader-ring-two {
-    position: absolute;
-    inset: 3px;
-    border: 1px solid rgba(255, 0, 0, 0.8);
-    border-radius: 50%;
-    box-shadow:
-        0 0 12px rgba(255, 0, 0, 0.18),
-        inset 0 0 12px rgba(255, 0, 0, 0.08);
-    animation: bakasuranRingPulse 2.5s ease-in-out infinite;
-}
+            .bakasuran-loader-logo-wrap {
+                position: relative;
+                width: 205px;
+                height: 205px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 4px;
+            }
 
-.bakasuran-loader-ring-two {
-    inset: 13px;
-    border-color: rgba(255, 45, 20, 0.4);
-    animation-delay: 0.7s;
-}
+            .bakasuran-loader-ring,
+            .bakasuran-loader-ring-two {
+                position: absolute;
+                inset: 3px;
+                border: 1px solid rgba(255, 0, 0, 0.8);
+                border-radius: 50%;
+                box-shadow:
+                    0 0 12px rgba(255, 0, 0, 0.18),
+                    inset 0 0 12px rgba(255, 0, 0, 0.08);
+                animation: bakasuranRingPulse 2.5s ease-in-out infinite;
+            }
 
-@keyframes bakasuranRingPulse {
-    0%, 100% {
-        transform: scale(0.97);
-        opacity: 0.45;
-    }
+            .bakasuran-loader-ring-two {
+                inset: 13px;
+                border-color: rgba(255, 45, 20, 0.4);
+                animation-delay: 0.7s;
+            }
 
-    50% {
-        transform: scale(1.04);
-        opacity: 1;
-    }
-}
+            @keyframes bakasuranRingPulse {
 
-.bakasuran-loader-logo {
-    position: relative;
-    z-index: 2;
-    width: 170px;
-    height: 170px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: bakasuranLogoFloat 3s ease-in-out infinite;
-}
+                0%,
+                100% {
+                    transform: scale(0.97);
+                    opacity: 0.45;
+                }
 
-.bakasuran-loader-logo img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter:
-        drop-shadow(0 0 12px rgba(255, 0, 0, 0.28));
-}
+                50% {
+                    transform: scale(1.04);
+                    opacity: 1;
+                }
+            }
 
-@keyframes bakasuranLogoFloat {
-    0%, 100% {
-        transform: translateY(0);
-    }
+            .bakasuran-loader-logo {
+                position: relative;
+                z-index: 2;
+                width: 170px;
+                height: 170px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: bakasuranLogoFloat 3s ease-in-out infinite;
+            }
 
-    50% {
-        transform: translateY(-6px);
-    }
-}
+            .bakasuran-loader-logo img {
+                display: block;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                filter:
+                    drop-shadow(0 0 12px rgba(255, 0, 0, 0.28));
+            }
 
-/* Brand name */
+            @keyframes bakasuranLogoFloat {
 
-.bakasuran-loader-brand {
-    margin: 10px 0 0;
-    color: #ffffff;
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: clamp(32px, 5vw, 49px);
-    font-weight: 900;
-    line-height: 1.15;
-    letter-spacing: 5px;
-    text-shadow:
-        0 2px 0 #790000,
-        0 0 20px rgba(255, 0, 0, 0.30);
-    animation: bakasuranBrandGlow 2.5s ease-in-out infinite;
-}
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
 
-@keyframes bakasuranBrandGlow {
-    0%, 100% {
-        text-shadow:
-            0 2px 0 #790000,
-            0 0 12px rgba(255, 0, 0, 0.18);
-    }
+                50% {
+                    transform: translateY(-6px);
+                }
+            }
 
-    50% {
-        text-shadow:
-            0 2px 0 #790000,
-            0 0 25px rgba(255, 0, 0, 0.48);
-    }
-}
+            /* Brand name */
 
-/* Subbrand */
+            .bakasuran-loader-brand {
+                margin: 10px 0 0;
+                color: #ffffff;
+                font-family: Impact, "Arial Black", sans-serif;
+                font-size: clamp(32px, 5vw, 49px);
+                font-weight: 900;
+                line-height: 1.15;
+                letter-spacing: 5px;
+                text-shadow:
+                    0 2px 0 #790000,
+                    0 0 20px rgba(255, 0, 0, 0.30);
+                animation: bakasuranBrandGlow 2.5s ease-in-out infinite;
+            }
 
-.bakasuran-loader-subbrand {
-    margin-top: 8px;
-    color: #ff3030;
-    font-family: Arial, sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 3px;
-}
+            @keyframes bakasuranBrandGlow {
 
-/* Divider */
+                0%,
+                100% {
+                    text-shadow:
+                        0 2px 0 #790000,
+                        0 0 12px rgba(255, 0, 0, 0.18);
+                }
 
-.bakasuran-loader-divider {
-    position: relative;
-    width: 185px;
-    height: 2px;
-    margin-top: 23px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.12);
-}
+                50% {
+                    text-shadow:
+                        0 2px 0 #790000,
+                        0 0 25px rgba(255, 0, 0, 0.48);
+                }
+            }
 
-.bakasuran-loader-divider span {
-    position: absolute;
-    inset: 0;
-    width: 40%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        #ff1010,
-        #ffb347,
-        #ff1010,
-        transparent
-    );
-    animation: bakasuranDividerSweep 1.5s ease-in-out infinite;
-}
+            /* Subbrand */
 
-@keyframes bakasuranDividerSweep {
-    0% {
-        transform: translateX(-120%);
-    }
+            .bakasuran-loader-subbrand {
+                margin-top: 8px;
+                color: #ff3030;
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 3px;
+            }
 
-    100% {
-        transform: translateX(350%);
-    }
-}
+            /* Divider */
 
-/* Tagline */
+            .bakasuran-loader-divider {
+                position: relative;
+                width: 185px;
+                height: 2px;
+                margin-top: 23px;
+                overflow: hidden;
+                background: rgba(255, 255, 255, 0.12);
+            }
 
-.bakasuran-loader-tagline {
-    margin: 17px 0 0;
-    color: #e6e0e0;
-    font-family: Arial, sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 2.5px;
-    line-height: 1.7;
-}
+            .bakasuran-loader-divider span {
+                position: absolute;
+                inset: 0;
+                width: 40%;
+                background: linear-gradient(90deg,
+                        transparent,
+                        #ff1010,
+                        #ffb347,
+                        #ff1010,
+                        transparent);
+                animation: bakasuranDividerSweep 1.5s ease-in-out infinite;
+            }
 
-/* Progress bar */
+            @keyframes bakasuranDividerSweep {
+                0% {
+                    transform: translateX(-120%);
+                }
 
-.bakasuran-loader-progress {
-    position: relative;
-    width: 180px;
-    height: 3px;
-    margin-top: 27px;
-    overflow: hidden;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.13);
-}
+                100% {
+                    transform: translateX(350%);
+                }
+            }
 
-.bakasuran-loader-progress span {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 35%;
-    border-radius: inherit;
-    background: linear-gradient(
-        90deg,
-        #a50000,
-        #ff1010,
-        #ff9a47
-    );
-    box-shadow: 0 0 12px rgba(255, 0, 0, 0.65);
-    animation: bakasuranProgress 1.5s ease-in-out infinite;
-}
+            /* Tagline */
 
-@keyframes bakasuranProgress {
-    0% {
-        transform: translateX(-110%);
-    }
+            .bakasuran-loader-tagline {
+                margin: 17px 0 0;
+                color: #e6e0e0;
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 2.5px;
+                line-height: 1.7;
+            }
 
-    100% {
-        transform: translateX(400%);
-    }
-}
+            /* Progress bar */
 
-/* Loading status */
+            .bakasuran-loader-progress {
+                position: relative;
+                width: 180px;
+                height: 3px;
+                margin-top: 27px;
+                overflow: hidden;
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.13);
+            }
 
-.bakasuran-loader-status {
-    margin-top: 14px;
-    color: #999;
-    font-family: Arial, sans-serif;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 2px;
-}
+            .bakasuran-loader-progress span {
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: 35%;
+                border-radius: inherit;
+                background: linear-gradient(90deg,
+                        #a50000,
+                        #ff1010,
+                        #ff9a47);
+                box-shadow: 0 0 12px rgba(255, 0, 0, 0.65);
+                animation: bakasuranProgress 1.5s ease-in-out infinite;
+            }
 
-.bakasuran-loader-dots {
-    display: inline-block;
-    width: 15px;
-    overflow: hidden;
-    vertical-align: bottom;
-    animation: bakasuranDots 1s steps(4, end) infinite;
-}
+            @keyframes bakasuranProgress {
+                0% {
+                    transform: translateX(-110%);
+                }
 
-@keyframes bakasuranDots {
-    0% {
-        width: 0;
-    }
+                100% {
+                    transform: translateX(400%);
+                }
+            }
 
-    100% {
-        width: 15px;
-    }
-}
+            /* Loading status */
 
-/* Mobile */
+            .bakasuran-loader-status {
+                margin-top: 14px;
+                color: #999;
+                font-family: Arial, sans-serif;
+                font-size: 9px;
+                font-weight: 600;
+                letter-spacing: 2px;
+            }
 
-@media (max-width: 600px) {
-    .bakasuran-loader-logo-wrap {
-        width: 160px;
-        height: 160px;
-    }
+            .bakasuran-loader-dots {
+                display: inline-block;
+                width: 15px;
+                overflow: hidden;
+                vertical-align: bottom;
+                animation: bakasuranDots 1s steps(4, end) infinite;
+            }
 
-    .bakasuran-loader-logo {
-        width: 132px;
-        height: 132px;
-    }
+            @keyframes bakasuranDots {
+                0% {
+                    width: 0;
+                }
 
-    .bakasuran-loader-brand {
-        font-size: 31px;
-        letter-spacing: 3px;
-    }
+                100% {
+                    width: 15px;
+                }
+            }
 
-    .bakasuran-loader-subbrand {
-        font-size: 8px;
-        letter-spacing: 2px;
-    }
+            /* Mobile */
 
-    .bakasuran-loader-tagline {
-        max-width: 290px;
-        font-size: 8px;
-        letter-spacing: 1.5px;
-    }
+            @media (max-width: 600px) {
+                .bakasuran-loader-logo-wrap {
+                    width: 160px;
+                    height: 160px;
+                }
 
-    .bakasuran-loader-divider {
-        width: 145px;
-    }
-}
+                .bakasuran-loader-logo {
+                    width: 132px;
+                    height: 132px;
+                }
 
-@media (max-width: 360px) {
-    .bakasuran-loader-logo-wrap {
-        width: 135px;
-        height: 135px;
-    }
+                .bakasuran-loader-brand {
+                    font-size: 31px;
+                    letter-spacing: 3px;
+                }
 
-    .bakasuran-loader-logo {
-        width: 110px;
-        height: 110px;
-    }
+                .bakasuran-loader-subbrand {
+                    font-size: 8px;
+                    letter-spacing: 2px;
+                }
 
-    .bakasuran-loader-brand {
-        font-size: 26px;
-        letter-spacing: 2px;
-    }
+                .bakasuran-loader-tagline {
+                    max-width: 290px;
+                    font-size: 8px;
+                    letter-spacing: 1.5px;
+                }
 
-    .bakasuran-loader-tagline {
-        font-size: 7px;
-        letter-spacing: 1px;
-    }
-}
+                .bakasuran-loader-divider {
+                    width: 145px;
+                }
+            }
 
-/* Respect reduced-motion accessibility settings */
+            @media (max-width: 360px) {
+                .bakasuran-loader-logo-wrap {
+                    width: 135px;
+                    height: 135px;
+                }
 
-@media (prefers-reduced-motion: reduce) {
-    #pageLoader *,
-    #pageLoader *::before,
-    #pageLoader *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-    }
-}
-</style>
+                .bakasuran-loader-logo {
+                    width: 110px;
+                    height: 110px;
+                }
+
+                .bakasuran-loader-brand {
+                    font-size: 26px;
+                    letter-spacing: 2px;
+                }
+
+                .bakasuran-loader-tagline {
+                    font-size: 7px;
+                    letter-spacing: 1px;
+                }
+            }
+
+            /* Respect reduced-motion accessibility settings */
+
+            @media (prefers-reduced-motion: reduce) {
+
+                #pageLoader *,
+                #pageLoader *::before,
+                #pageLoader *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    scroll-behavior: auto !important;
+                }
+            }
+        </style>
 
 
         <!-- NAVBAR -->
@@ -1960,15 +1948,22 @@
                     </div> -->
 
                     {{-- EXPLORE FOOD --}}
-                    <a href="{{ route('shop') }}"
+                    <!-- <a href="{{ route('shop') }}"
                         class="nav-link {{ request()->routeIs('shop', 'productdetails') ? 'active' : '' }}">
                         Explore Food
-                    </a>
+                    </a> -->
+
+                   
 
                     {{-- RESTAURANTS / ABOUT US --}}
                     <a href="{{ route('aboutus') }}"
                         class="nav-link {{ request()->routeIs('aboutus') ? 'active' : '' }}">
                         About Us
+                    </a>
+
+                     <a href="{{ route('restaurants') }}"
+                        class="nav-link {{ request()->routeIs('restaurants') ? 'active' : '' }}">
+                        Restaurants
                     </a>
 
                     {{-- OFFERS --}}
@@ -5111,7 +5106,7 @@
     </script>
 
 
-<!-- <script>
+    <!-- <script>
 (function () {
     const loader = document.getElementById('pageLoader');
 
@@ -5146,42 +5141,42 @@
 </script> -->
 
 
-<script>
-(function () {
-    const loader = document.getElementById('pageLoader');
+    <script>
+        (function () {
+            const loader = document.getElementById('pageLoader');
 
-    if (!loader) return;
+            if (!loader) return;
 
-    let dismissed = false;
+            let dismissed = false;
 
-    function hideLoader() {
-        if (dismissed) return;
+            function hideLoader() {
+                if (dismissed) return;
 
-        dismissed = true;
+                dismissed = true;
 
-        // Start the slow fade-out animation
-        loader.classList.add('loader-hidden');
+                // Start the slow fade-out animation
+                loader.classList.add('loader-hidden');
 
-        // Remove only after the animation completes
-        window.setTimeout(function () {
-            if (loader.parentNode) {
-                loader.parentNode.removeChild(loader);
+                // Remove only after the animation completes
+                window.setTimeout(function () {
+                    if (loader.parentNode) {
+                        loader.parentNode.removeChild(loader);
+                    }
+                }, 2000);
             }
-        }, 2000);
-    }
 
-    // Hide after the page and its assets finish loading
-    window.addEventListener('load', hideLoader, { once: true });
+            // Hide after the page and its assets finish loading
+            window.addEventListener('load', hideLoader, { once: true });
 
-    // Fallback if loading takes too long
-    window.setTimeout(hideLoader, 5000);
+            // Fallback if loading takes too long
+            window.setTimeout(hideLoader, 5000);
 
-    // Handle pages that have already loaded
-    if (document.readyState === 'complete') {
-        hideLoader();
-    }
-})();
-</script>
+            // Handle pages that have already loaded
+            if (document.readyState === 'complete') {
+                hideLoader();
+            }
+        })();
+    </script>
 
 
 </body>

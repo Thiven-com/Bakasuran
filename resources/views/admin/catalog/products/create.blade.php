@@ -1,913 +1,855 @@
 <?php $page = 'add-product'; ?>
+
 @extends('layout.mainlayout')
+
+
+
 @section('content')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <div class="page-wrapper">
-        <div class="content">
-            @component('components.breadcrumb')
-            @slot('title')
-            New Product
-            @endslot
-            @slot('li_1')
-            Create new product
-            @endslot
-            @slot('li_2')
-            product-list
-            @endslot
-            @slot('li_3')
-            Back to Product
-            @endslot
-            @endcomponent
-            <!-- /add -->
-            <style>
-                .subcategory-grid {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 10px;
-                }
 
-                .subcategory-grid label {
-                    font-size: 16px;
-                    color: black;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                }
-            </style>
-            <form action="{{route('admin.products.store')}}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="card">
-                    <div class="card-body add-product pb-0">
-                        <div class="accordion-card-one accordion" id="accordionExample">
-                            <div class="accordion-item">
-                                <div class="accordion-header" id="headingOne">
-                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                                        aria-controls="collapseOne">
-                                        <div class="addproduct-icon">
-                                            <h5><i data-feather="info" class="add-info"></i><span>Product Information</span>
-                                            </h5>
-                                            <a href="javascript:void(0);"><i data-feather="chevron-down"
-                                                    class="chevron-down-add"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                            
-<div class="mb-3 add-product">
-    <label class="form-label">Product Name</label>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <input
-        type="text"
-        class="form-control"
-        name="title"
-        id="productName"
-        value="{{ old('title') ?? '' }}"
-        placeholder="Enter product name"
-        required
-    >
-</div>
+<div class="page-wrapper">
 
-<div class="mb-3 add-product">
-    <label class="form-label">Product Slug</label>
+<div class="content">
 
-    <input
-        type="text"
-        class="form-control"
-        name="slug"
-        id="productSlug"
-        value="{{ old('slug') ?? '' }}"
-        placeholder="Auto-generated product slug"
-        readonly
-    >
+    @component('components.breadcrumb')
 
-    <small class="text-muted">
-        Automatically generated from product name.
-    </small>
-</div>
-</div>
+        @slot('title') New Food Product @endslot
 
+        @slot('li_1') Catalog @endslot
 
-                                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                                <div class="mb-3 add-product">
-                                                    <div class="add-newplus">
-                                                        <label class="form-label">Brand</label>
-                                                    </div>
-                                                    <select class="select" name="brand_id">
-                                                        @foreach ($brands as $brand)
-                                                            <option value="{{ $brand->id }}" @if (old('brand_id') == $brand->id)
-                                                            selected @endif> {{ $brand->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="addservice-info">
-                                            <div class="row">
-                                                <div class="col-lg-6 col-md-6 col-sm-6">
-                                                    <div class="mb-3 add-product">
-                                                        <div class="add-newplus">
-                                                            <label class="form-label">Category</label>
-                                                        </div>
-                                                        <select class="select" name="category_id" id="categorySelect"
-                                                            required>
-                                                            <option value=""> Select Category</option>
+        @slot('li_2') product-list @endslot
 
-                                                            @foreach ($categories as $cat)
-                                                                <option value="{{ $cat->id }}" data-title="{{ $cat->title }}"
-                                                                    @if (old('category_id') == $cat->id) selected @endif>
-                                                                    {{ $cat->title }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
+        @slot('li_3') Back to Products @endslot
 
-                                                {{-- <div class="col-lg-6 col-md-6 col-sm-6">
-                                                    <label class="form-label">Primary Category</label>
-                                                    <input type="text" id="primaryCategory" class="form-control" readonly>
-                                                </div>
-
-                                                <div id="subcategorySection" class="mt-3 mb-3" style="display:none;">
-                                                    <input type="text" id="subcategorySearch" placeholder="Search here..."
-                                                        class="form-control mb-2">
-                                                    <div id="subcategoryList" class="subcategory-grid"
-                                                        style="max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:10px;">
-                                                    </div>
-                                                </div> --}}
-
-                                                <div class="col-lg-6 col-md-6 col-sm-6">
-    <div class="mb-3 add-product">
-        <label class="form-label">Restaurant</label>
-        <select class="select" name="restaurant_id" id="restaurantSelect">
-            <option value="">Select Restaurant (Optional)</option>
-
-            @foreach ($restaurants as $restaurant)
-                <option
-                    value="{{ $restaurant->id }}"
-                    {{ old('restaurant_id') == $restaurant->id ? 'selected' : '' }}
-                >
-                    {{ $restaurant->name }}
-                </option>
-            @endforeach
-        </select>
-
-        @error('restaurant_id')
-            <small class="text-danger">{{ $message }}</small>
-        @enderror
-    </div>
-</div>
-                                            </div>
-
-                                           
+    @endcomponent
 
 
 
-                                            <div class="add-product-new">
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-3">
-                                                        <label class="form-label">Status</label>
-                                                        <select class="select" name="status">
-                                                            <option value="show">Show</option>
-                                                            <option value="hide">Hide</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-3">
-                                                        <label class="form-label">Product Code</label>
-                                                        <input type="text" class="form-control" name="hsn_code"
-                                                            value="{{ old('hsn_code') ?? '' }}" required>
-                                                    </div>
+    <style>
 
-                                                    <div class="col-lg-12">
-                                                        <div class="input-blocks summer-description-box transfer mb-3">
-                                                            <label>Description</label>
-                                                            <textarea class="form-control h-100" rows="5" id="  "
-                                                                name="description">{!! old('description') !!}</textarea>
-                                                            {{-- <p class="mt-1">Maximum 60 Characters</p> --}}
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-12">
-                                                        <div class="input-blocks summer-description-box transfer mb-3">
-                                                            <label>Short Description</label>
-                                                            <textarea class="form-control h-100" rows="2" minlength="20"
-                                                                maxlength="200"
-                                                                name="short_description">{!! old('short_description') !!}</textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+        .food-page{--accent:#e85d2a;--soft:#fff3ed}
 
-                                            <label class="form-label">Product Image (450x600 px)</label>
-                                            <div class="profile-pic-upload mb-3">
-                                                <div class="profile-pic brand-pic" id="imagePreview">
-                                                    <span id="uploadText">
-                                                        <i data-feather="plus-circle"></i> Add Image
-                                                    </span>
-                                                </div>
-                                                <button type="button" class="remove-btn" id="removeImage"
-                                                    style="display:none;">&times;</button>
-                                                <input type="file" name="image" id="imageInput" accept="image/*"
-                                                    style="display:none;">
-                                            </div>
+        .food-page .section-card{border:1px solid #edf0f2;border-radius:14px;margin-bottom:20px;overflow:hidden}
 
-                                            <div class="mb-0">
-                                                <div
-                                                    class="status-toggle modal-status d-flex justify-content-between align-items-center">
-                                                    <span class="status-label">Is Feature</span>
-                                                    <input type="checkbox" id="user2" class="check" name="is_feature"
-                                                        checked="">
-                                                    <label for="user2" class="checktoggle"
-                                                        style="margin-right:1050px"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+        .food-page .section-head{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid #edf0f2}
+
+        .food-page .section-icon{width:38px;height:38px;border-radius:10px;background:var(--soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
+
+        .food-page .section-head h5{margin:0;font-size:16px;font-weight:700}.food-page .section-head p{margin:3px 0 0;color:#858d96;font-size:12px}
+
+        .food-page .section-body{padding:22px}.food-page .form-label{font-weight:600;color:#39424c;margin-bottom:7px}
+
+        .food-page .form-control,.food-page .form-select{min-height:43px;border-radius:8px}
+
+        .food-page textarea.form-control{min-height:95px}.food-page .help{font-size:12px;color:#89919a;margin-top:5px;display:block}
+
+        .food-page .required{color:#dc3545}.food-page .upload-box{height:155px;border:1.5px dashed #d7dce1;border-radius:12px;background:#fafbfc;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;background-position:center;background-size:cover}
+
+        .food-page .upload-box i{font-size:25px;color:var(--accent);margin-bottom:8px}.food-page .upload-box span{font-size:13px;color:#69727c}
+
+        .food-page .toggle-box{height:100%;display:flex;justify-content:space-between;align-items:center;padding:13px;border:1px solid #edf0f2;border-radius:10px}
+
+        .food-page .toggle-box strong{display:block;font-size:13px}.food-page .toggle-box small{font-size:11px;color:#89919a}
+
+        .food-page .attribute-box,.food-page .variant-card,.food-page .addon-box{border:1px solid #edf0f2;border-radius:11px;padding:15px;margin-bottom:13px}
+
+        .food-page .variant-image-preview{width:100%;height:130px;border:1px dashed #d7dce1;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafbfc;color:#89919a;font-size:12px}
+        .food-page .variant-image-preview img{width:100%;height:100%;object-fit:cover}
+        .food-page .variant-value{display:inline-flex;align-items:center;gap:7px;border:1px solid #e7eaed;border-radius:8px;padding:7px 10px;margin:5px 5px 0 0;font-size:13px}
+
+        .food-page .variant-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+
+        .food-page .pill{background:var(--soft);color:#d94f20;border-radius:20px;padding:5px 9px;font-size:11px;font-weight:600}
+
+        .food-page .sticky-actions{position:sticky;bottom:0;z-index:5;background:rgba(255,255,255,.97);border:1px solid #edf0f2;border-radius:12px;padding:14px 18px;box-shadow:0 -5px 20px #17212b0d}
+
+        .food-page .btn-food{background:var(--accent);border-color:var(--accent);color:#fff}
+
+        @media(max-width:767px){.food-page .section-body{padding:16px}.food-page .section-head{padding:15px 16px}.food-page .sticky-actions{position:static}}
+
+    </style>
+
+
+
+    <div class="food-page">
+
+        @if ($errors->any())
+
+            <div class="alert alert-danger"><strong>Please correct these errors:</strong><ul class="mb-0 mt-2">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+
+        @endif
+
+
+
+        <form id="productCreateForm" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+
+            @csrf
+
+
+
+            *{{-- BASIC INFORMATION --}}*
+
+            <div class="card section-card">
+
+                <div class="section-head"><div class="section-icon"><i data-feather="package"></i></div><div><h5>Basic Information</h5><p>Product identity, brand and restaurant details</p></div></div>
+
+                <div class="section-body">
+
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+
+                            <label class="form-label">Product Name <span class="required">*</span></label>
+
+                            <input class="form-control" type="text" name="title" id="productName" value="{{ old('title') }}" placeholder="e.g. Chicken Dum Biryani" required>
+
                         </div>
-                    </div>
-                </div>
 
-                <div class="card">
-                    <div class="card-body add-product pb-0">
-                        <div class="accordion-card-one accordion" id="accordionExample">
-                            <div class="accordion-item">
-                                <div class="accordion-header" id="headingOne">
-                                    <div class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                                        aria-controls="collapseOne">
-                                        <div class="addproduct-icon">
-                                            <h5><i data-feather="info" class="add-info"></i><span>Product Variants</span>
-                                            </h5>
-                                            <a href="javascript:void(0);"><i data-feather="chevron-down"
-                                                    class="chevron-down-add"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                                    data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
+                        <div class="col-lg-6">
 
-                                        <div class="addservice-info">
-                                            <div class="row">
-                                                <div class="col-lg-12">
-                                                    <h5 class="mt-4 mb-3">Product Variants</h5>
-                                                    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#bulkUpdateModal" style="float: inline-end;">
-    Bulk Update Variants
-</button>
-                                                </div>
+                            <label class="form-label">Product Slug</label>
 
-                                                <div class="row">
-                                                    @foreach($variantAttributes as $attribute)
-                                                        <div class="col-lg-12 mb-3">
-                                                            <div class="d-flex justify-content-between">
-                                                                <label class="form-label fw-bold">{{ucwords( $attribute->name) }}</label>
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-primary open-modal mx-2"
-                                                                    data-attribute-id="{{ $attribute->id }}"
-                                                                    data-attribute-name="{{ $attribute->name }}">
-                                                                    + Add
-                                                                </button>
-                                                            </div>
-                                                             @if (str_contains(strtolower($attribute->name), 'color'))
-    <input type="text"
-        class="form-control mt-2 attribute-search"
-        placeholder="Search {{ $attribute->name }}..." style="width:min-content"
-        data-attribute-id="{{ $attribute->id }}">
-@endif
-                                                            <div class="row attribute-values mt-2"
-                                                                data-attribute-id="{{ $attribute->id }}">
-                                                                @foreach($attribute->attributeValues as $value)
-                                                                    <div class="col-lg-2 attribute-item">
-                                                                        <label class="form-check-label">
-                                                                            <input type="checkbox"
-                                                                                name="variant_attributes[{{ $attribute->id }}][]"
-                                                                                value="{{ $value->name }}"
-                                                                                class="form-check-input variant-checkbox" {{ in_array($value->name, old('variant_attributes.'.$attribute->id, [])) ? 'checked' : '' }}>
-                                                                            <b class="text-dark">{{ $value->name }}</b>
-                                                                        </label>
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
+                            <input class="form-control" type="text" name="slug" id="productSlug" value="{{ old('slug') }}" placeholder="Auto-generated" readonly>
 
-                                                        </div>
-                                                    @endforeach
-                                                </div>
+                            <small class="help">Automatically generated from product name.</small>
 
-                                                <div id="variantPreview" class="mt-4 mb-3">
-                                                    <h5>Variant Combinations:</h5>
-                                                    <div id="variantList"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-12">
-                    <div class="btn-addproduct mb-4">
-                        <button type="button" class="btn btn-cancel me-2">Cancel</button>
-                        <button type="submit" class="btn btn-submit">Save Product</button>
-                    </div>
-                </div>
-            </form>
-            <!-- /add -->
 
-        </div>
-    </div>
+                        <div class="col-lg-4 col-md-6">
 
-    <div class="modal fade" id="addValueModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Value</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                            <label class="form-label">Brand <span class="required">*</span></label>
 
-                <div class="modal-body">
-                    <input type="hidden" id="modalAttributeId">
+                            <select class="form-select select" name="brand_id" required>
 
-                    <div class="mb-3">
-                        <label id="modalLabel"></label>
-                        <input type="text" id="newValueInput" class="form-control" onkeydown="if(event.key === ' '){ event.preventDefault(); }
-        if(event.key === 'Enter'){
-            event.preventDefault();
-            this.value = this.value.replace(/\s+/g,'');
-        }" placeholder="Enter value">
-                    </div>
-                </div>
+                                <option value="">Select Brand</option>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveValueBtn">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
+                                @foreach($brands as $brand)
 
-        <div class="modal fade" id="bulkUpdateModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
 
-        <form >
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Bulk Update Variants</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+                                @endforeach
 
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-4 mt-3">
-                        <label>Actual Price</label>
-                        <input type="text" id="bulk_actual_price" name="actual_price" class="form-control">
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label>Sale Price</label>
-                        <input type="text" id="bulk_sale_price" name="price" class="form-control">
-                    </div>
+                            </select>
 
-                   
-                    
+                        </div>
 
-                    <div class="col-md-4 mt-3">
-                        <label>Height</label>
-                        <input type="number" min="1" id="bulk_height" name="height" class="form-control">
-                    </div>
+                        <div class="col-lg-4 col-md-6">
 
-                    <div class="col-md-4 mt-3">
-                        <label>Width</label>
-                        <input type="number" min="1" id="bulk_width" name="width" class="form-control">
-                    </div>
+                            <label class="form-label">Category <span class="required">*</span></label>
 
-                    <div class="col-md-4 mt-3">
-                        <label>Length</label>
-                        <input type="number" min="1" id="bulk_length" name="length" class="form-control">
-                    </div>
+                            <select class="form-select select" name="category_id" id="categorySelect" required>
 
-                    <div class="col-md-4 mt-3">
-                        <label>Weight</label>
-                        <input type="number"  step="0.01" min="0.1" id="bulk_weight" name="weight"  class="form-control">
-                    </div>
+                                <option value="">Select Category</option>
 
-                     <div class="col-md-4 mt-3">
-                        <label>Stock</label>
-                        <input type="number" min="0" id="bulk_stock" name="stock" class="form-control">
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label>Preorder Stock</label>
-                        <input type="number" min="0" name="preorder_stock" id="preorder_stock" class="form-control">
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label>Low Stock Alert</label>
-                        <input type="number" min="0" name="low_stock_alert" id="low_stock_alert" class="form-control">
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label>Min Order</label>
-                        <input type="number" min="0" name="product_min_order" id="product_min_order" class="form-control">
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label>Max Order</label>
-                        <input type="number" min="0" name="product_max_order" id="product_max_order" class="form-control">
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label>Preorder</label>
-                        <select class="form-control" name="preorder" id="preorder">
-                            <option value="">Select</option>
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label>Status</label>
-                        <select class="form-control" name="status" id="status">
-                            <option value="">Select Status</option>
-                            <option value="show">Show</option>
-                            <option value="hide">Hide</option>
-                        </select>
+                                @foreach($categories as $cat)
+
+                                    <option value="{{ $cat->id }}" data-title="{{ $cat->title }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->title }}</option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-lg-4 col-md-6">
+
+                            <label class="form-label">Restaurant</label>
+
+                            <select class="form-select select" name="restaurant_id">
+
+                                <option value="">Select Restaurant (Optional)</option>
+
+                                @foreach($restaurants as $restaurant)
+
+                                    <option value="{{ $restaurant->id }}" {{ old('restaurant_id') == $restaurant->id ? 'selected' : '' }}>{{ $restaurant->name }}</option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-lg-4 col-md-6">
+
+                            <label class="form-label">Product Code (HSN) <span class="required">*</span></label>
+
+                            <input class="form-control" type="text" name="hsn_code" value="{{ old('hsn_code') }}" placeholder="Unique product code" required>
+
+                            <small class="help">Required by your current ProductController.</small>
+
+                        </div>
+
+                        <div class="col-lg-4 col-md-6">
+
+                            <label class="form-label">Food Type <span class="required">*</span></label>
+
+                            <select class="form-select" name="food_type" required>
+
+                                <option value="veg" {{ old('food_type','veg') == 'veg' ? 'selected' : '' }}>Vegetarian</option>
+
+                                <option value="non_veg" {{ old('food_type') == 'non_veg' ? 'selected' : '' }}>Non-Vegetarian</option>
+
+                                <option value="egg" {{ old('food_type') == 'egg' ? 'selected' : '' }}>Contains Egg</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-lg-4 col-md-6">
+
+                            <label class="form-label">Status</label>
+
+                            <select class="form-select" name="status">
+
+                                <option value="show" {{ old('status','show') == 'show' ? 'selected' : '' }}>Active</option>
+
+                                <option value="hide" {{ old('status') == 'hide' ? 'selected' : '' }}>Inactive</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <label class="form-label">Short Description</label>
+
+                            <textarea class="form-control" name="short_description" rows="2" maxlength="200" placeholder="Short customer-facing description">{{ old('short_description') }}</textarea>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <label class="form-label">Full Description</label>
+
+                            <textarea class="form-control" name="description" rows="4" placeholder="Describe the dish, taste and serving details">{{ old('description') }}</textarea>
+
+                        </div>
+
                     </div>
 
                 </div>
+
             </div>
 
-            <div class="modal-footer">
-                <button type="submit" id="applyBulkUpdate" class="btn btn-success">
-                    Apply Changes
-                </button>
+
+
+            *{{-- IMAGE --}}*
+
+            <div class="card section-card">
+
+                <div class="section-head"><div class="section-icon"><i data-feather="image"></i></div><div><h5>Product Image</h5><p>Main image displayed to customers</p></div></div>
+
+                <div class="section-body">
+
+                    <div class="col-lg-4 col-md-6 px-0">
+
+                        <label class="form-label">Main Product Image</label>
+
+                        <label class="upload-box w-100" for="imageInput" id="imagePreview">
+
+                            <i data-feather="upload-cloud" id="uploadIcon"></i><span id="uploadText">Click to upload product image</span><small class="text-muted mt-1">JPG, PNG or WEBP</small>
+
+                        </label>
+
+                        <input type="file" name="image" id="imageInput" accept="image/jpeg,image/png,image/webp" class="d-none">
+
+                        <button type="button" class="btn btn-sm btn-light mt-2 d-none" id="removeImage">Remove image</button>
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
+
+
+
+            *{{-- FOOD SETTINGS --}}*
+
+            <div class="card section-card">
+
+                <div class="section-head"><div class="section-icon"><i data-feather="coffee"></i></div><div><h5>Food Details & Availability</h5><p>Preparation time, allergens and customer-facing settings</p></div></div>
+
+                <div class="section-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-lg-4 col-md-6"><label class="form-label">Preparation Time (minutes)</label><input class="form-control" type="number" min="0" name="preparation_time" value="{{ old('preparation_time') }}" placeholder="e.g. 25"></div>
+
+                        <div class="col-lg-4 col-md-6"><label class="form-label">Sort Order</label><input class="form-control" type="number" min="0" name="sort_order" value="{{ old('sort_order',0) }}"></div>
+
+                        <div class="col-lg-4 col-md-6"><label class="form-label">Allergen Information</label><input class="form-control" type="text" name="allergen_info" value="{{ old('allergen_info') }}" placeholder="e.g. Dairy, nuts, gluten"></div>
+
+                        <div class="col-lg-4 col-md-6"><div class="toggle-box"><div><strong>Available</strong><small class="d-block">Customers can order it</small></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="is_available" value="1" {{ old('is_available','1') ? 'checked' : '' }}></div></div></div>
+
+                        <div class="col-lg-4 col-md-6"><div class="toggle-box"><div><strong>Recommended</strong><small class="d-block">Mark as recommended</small></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="is_recommended" value="1" {{ old('is_recommended') ? 'checked' : '' }}></div></div></div>
+
+                        <div class="col-lg-4 col-md-6"><div class="toggle-box"><div><strong>Featured</strong><small class="d-block">Show in featured areas</small></div><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="is_feature" value="1" {{ old('is_feature') ? 'checked' : '' }}></div></div></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            *{{-- VARIANTS --}}*
+
+            <div class="card section-card">
+
+                <div class="section-head">
+
+                    <div class="section-icon"><i data-feather="sliders"></i></div>
+
+                    <div class="flex-grow-1"><h5>Variants & Pricing</h5><p>Select portion sizes or other options to generate variants</p></div>
+
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkUpdateModal"><i data-feather="edit-3" class="me-1"></i>Bulk Update</button>
+
+                </div>
+
+                <div class="section-body">
+
+                    @forelse($variantAttributes as $attribute)
+
+                        <div class="attribute-box">
+
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                                <div><label class="form-label mb-0">{{ ucwords($attribute->name) }}</label><small class="help">Select one or more values.</small></div>
+
+                                <button type="button" class="btn btn-sm btn-outline-primary open-modal" data-attribute-id="{{ $attribute->id }}" data-attribute-name="{{ $attribute->name }}">+ Add value</button>
+
+                            </div>
+
+                            @if(str_contains(strtolower($attribute->name),'color'))
+
+                                <input type="text" class="form-control form-control-sm mt-3 attribute-search" placeholder="Search {{ $attribute->name }}" data-attribute-id="{{ $attribute->id }}">
+
+                            @endif
+
+                            <div class="mt-2 attribute-values" data-attribute-id="{{ $attribute->id }}">
+
+                                @foreach($attribute->attributeValues as $value)
+
+                                    <label class="variant-value attribute-item"><input type="checkbox" class="form-check-input variant-checkbox" name="variant_attributes[{{ $attribute->id }}][]" value="{{ $value->name }}" {{ in_array($value->name, old('variant_attributes.'.$attribute->id,[])) ? 'checked' : '' }}> {{ $value->name }}</label>
+
+                                @endforeach
+
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <div class="alert alert-warning">No active variant attributes found. Add attributes before creating a product.</div>
+
+                    @endforelse
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 mb-3"><div><h6 class="fw-bold mb-1">Generated Variants</h6><small class="text-muted">Set pricing, stock and optional preorder details for each combination.</small></div><span class="pill" id="variantCount">0 variants</span></div>
+
+                    <div id="variantList"><div class="text-center text-muted py-4 border rounded">Select variant values above to generate combinations.</div></div>
+
+                </div>
+
+            </div>
+
+
+
+            *{{-- ADDONS --}}*
+
+            <div class="card section-card">
+
+                <div class="section-head"><div class="section-icon"><i data-feather="plus-square"></i></div><div><h5>Add-on Groups</h5><p>Attach existing extras and customization groups</p></div></div>
+
+                <div class="section-body">
+
+                    @if(isset($addonGroups) && $addonGroups->count())
+
+                        <div class="row">
+
+                            @foreach($addonGroups as $group)
+
+                                <div class="col-lg-6">
+
+                                    <label class="addon-box d-flex gap-3">
+
+                                        <input class="form-check-input mt-1" type="checkbox" name="addon_groups[]" value="{{ $group->id }}" {{ in_array($group->id,old('addon_groups',[])) ? 'checked' : '' }}>
+
+                                        <span><strong class="d-block">{{ $group->name }}</strong>
+
+                                            <small class="text-muted">{{ ucfirst($group->selection_type) }} · {{ $group->is_required ? 'Required' : 'Optional' }} · Min {{ $group->min_select }} / Max {{ $group->max_select }}</small>
+
+                                            @if($group->options && $group->options->count())<small class="d-block mt-2 text-muted">@foreach($group->options as $option){{ $option->name }} (₹{{ number_format($option->price,2) }})@if(!$loop->last), @endif @endforeach</small>@endif
+
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+                    @else
+
+                        <div class="alert alert-light border mb-0">Add-on groups will appear here after ProductController create() loads the active groups.</div>
+
+                    @endif
+
+                </div>
+
+            </div>
+
+
+
+            <div class="sticky-actions d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+                <a href="{{ route('admin.products.index') }}" class="btn btn-light">Cancel</a>
+
+                <button type="submit" class="btn btn-food px-4"><i data-feather="save" class="me-1"></i>Save Product</button>
+
+            </div>
+
         </form>
+
     </div>
+
 </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-
-            // Click anywhere on upload area to trigger file input
-            $('#imagePreview').on('click', function () {
-                $('#imageInput').click();
-            });
-
-            // When a file is selected
-            $('#imageInput').on('change', function (event) {
-                let file = event.target.files[0];
-                if (file) {
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        $('#imagePreview')
-                            .css('background-image', 'url(' + e.target.result + ')')
-                            .css('border', 'none'); // remove dashed border
-                        $('#uploadText').hide();
-                        $('#removeImage').show();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // Remove image
-            $('#removeImage').on('click', function () {
-                $('#imagePreview')
-                    .css('background-image', 'none')
-                    .css('border', '2px dashed #ccc');
-                $('#uploadText').show();
-                $('#imageInput').val('');
-                $(this).hide();
-            });
-
-        });
+</div>
 
 
-        $(document).ready(function () {
-            $('select.form-control[multiple]').select2();
-        });
-    </script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+*{{-- ADD ATTRIBUTE VALUE --}}*
 
-    <script>
-        $(document).ready(function () {
-            $('#mainUnit').on('change', function () {
-                var unitId = $(this).val();
+<div class="modal fade" id="addValueModal" tabindex="-1">
 
-                if (unitId) {
-                    $.ajax({
-                        url: '{{ route("products.getAttributeValues", ":id") }}'.replace(':id', unitId),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            $('#mainUnit_unit_attributes').empty();
-                            $('#mainUnit_unit_attributes').append('<option value="">Select Attribute</option>');
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
 
-                            $.each(data, function (key, value) {
-                                $('#mainUnit_unit_attributes').append('<option value="' + value.id + '">' + value.name + '</option>');
-                            });
-                        }
-                    });
-                } else {
-                    $('#mainUnit_unit_attributes').empty();
-                    $('#mainUnit_unit_attributes').append('<option value="">Select Attribute</option>');
-                }
-            });
-        });
-    </script>
+        <div class="modal-header"><h5 class="modal-title">Add Attribute Value</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
 
-    <script>
-        function getCombinations(arrays) {
-            if (arrays.length === 0) return [[]];
-            const restCombinations = getCombinations(arrays.slice(1));
-            return arrays[0].flatMap(item => restCombinations.map(rest => [item, ...rest]));
-        }
+        <div class="modal-body"><input type="hidden" id="modalAttributeId"><label class="form-label" id="modalLabel">Value</label><input type="text" id="newValueInput" class="form-control" placeholder="e.g. Half, Full, Family Pack"></div>
 
-        function updateVariantPreview() {
-            let selectedAttributes = {};
+        <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-food" id="saveValueBtn">Save Value</button></div>
 
-            $('input.variant-checkbox:checked').each(function () {
-                const name = $(this).attr('name');
-                const match = name ? name.match(/variant_attributes\[(\d+)\]/) : null;
-                if (match) {
-                    const attrId = match[1];
-                    const value = $(this).parent().text().trim();
+    </div></div>
 
-                    if (!selectedAttributes[attrId]) {
-                        selectedAttributes[attrId] = [];
-                    }
-                    selectedAttributes[attrId].push(value);
-                }
-            });
-
-            const valuesArray = Object.values(selectedAttributes);
-            const combinations = getCombinations(valuesArray);
-            const $variantList = $('#variantList');
-            $variantList.empty();
-
-            if (combinations.length > 0) {
-                combinations.forEach(combo => {
-                    const combinationName = combo.join(' + ');
-                    const inputKey = combo.map(val => val.replace(/\s+/g, '_')).join('_');
-
-                     const oldData = oldVariants[inputKey] || {};
-
-                    const variantBlock = `
-                                                                                            <div class="border rounded p-3 mb-3">
-                                                                                                <h6 class="mb-3">${combinationName}</h6>
-                                                                                                <div class="demo mb-4" style="align-items:center; gap:5px;">
-                                                                                                    <label class="form-label">Image  (450x600 px)</label>
-                                                                                                    <input type="file" class="form-control w-25" name="variants[${inputKey}][image]" accept="image/*" required>
-                                                                                                </div>
-                                                                                                <div class="row g-3">
-                                                                                                     <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">SKU</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][sku]" value="${oldData.sku || ''}" required>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div class="row g-3">
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Actual Price</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][actual_price]"  value="${oldData.actual_price || ''}" required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Sale Price</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][sale_price]" value="${oldData.sale_price || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Weight</label>
-                                                                                                        <input type="number" step="0.01" min="0.1" class="form-control" name="variants[${inputKey}][weight]" value="${oldData.weight || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Height</label>
-                                                                                                        <input type="number" min="1" class="form-control" name="variants[${inputKey}][height]" value="${oldData.height || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Width</label>
-                                                                                                        <input type="number" min="1" class="form-control" name="variants[${inputKey}][width]" value="${oldData.width || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Length</label>
-                                                                                                        <input type="number" min="1" class="form-control" name="variants[${inputKey}][length]" value="${oldData.length || ''}"  required>
-                                                                                                    </div>
-                                                                                                    
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Stock</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][stock]" value="${oldData.stock || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Low Stock Alert</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][low_stock_alert]" value="${oldData.low_stock_alert || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Product Min Order</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][product_min_order]" value="${oldData.product_min_order || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Product Max Order</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][product_max_order]" value="${oldData.product_max_order || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Preorder Stock</label>
-                                                                                                        <input type="text" class="form-control" name="variants[${inputKey}][preorder_stock]" value="${oldData.preorder_stock || ''}"  required>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Preorder</label>
-                                                                                                        <select class="form-control" name="variants[${inputKey}][preorder]" value="${oldData.preorder || ''}"  required>
-                                                                                                            <option value="0">No</option>
-                                                                                                            <option value="1">Yes</option>
-                                                                                                        </select>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4 mt-3">
-                                                                                                        <label class="form-label">Status</label>
-                                                                                                        <select class="form-control" name="variants[${inputKey}][status]" value="${oldData.status || ''}"  required>
-                                                                                                            <option value="show">Show</option>
-                                                                                                            <option value="hide">Hide</option>
-                                                                                                        </select>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        `;
-
-                    $variantList.append(variantBlock);
-                });
-            } else {
-                $variantList.append(`<p class="text-muted">No combinations selected.</p>`);
-            }
-        }
-
-        $(document).on('change', 'input.variant-checkbox', function () {
-            updateVariantPreview();
-        });
-
-        $(document).ready(function () {
-            updateVariantPreview();
-        });
+</div>
 
 
-        $(document).ready(function () {
-            $('#categorySelect').on('change', function () {
-                let categoryId = $(this).val();
-                let categoryTitle = $(this).find(':selected').data('title');
 
-                if (categoryId) {
+*{{-- BULK UPDATE --}}*
 
-                    $('#primaryCategory').val(categoryTitle);
+<div class="modal fade" id="bulkUpdateModal" tabindex="-1">
 
-                    $.ajax({
-                        url: '/admin/get-subcategories/' + categoryId,
-                        type: 'GET',
-                        success: function (data) {
-                            let html = '';
-                            if (data.length > 0) {
-                                data.forEach(function (subcat) {
-                                    html += `<div>
-                                                                                                                    <input type="checkbox" name="subcategories[]" value="${subcat.id}">
-                                                                                                                    ${subcat.title}
-                                                                                                                </div>`;
-                                });
-                            } else {
-                                html = '<p>No subcategories found.</p>';
-                            }
-                            $('#subcategoryList').html(html);
-                            $('#subcategorySection').show();
-                        }
-                    });
-                } else {
-                    $('#primaryCategory').val('');
-                    $('#subcategorySection').hide();
-                }
-            });
+    <div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content">
 
-            $('#subcategorySearch').on('keyup', function () {
-                let value = $(this).val().toLowerCase();
-                $("#subcategoryList div").filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                });
-            });
-        });
+        <div class="modal-header"><div><h5 class="modal-title mb-1">Bulk Update Variants</h5><small class="text-muted">Only entered values will be applied.</small></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
 
-    </script>
-    <!-- Place the first <script> tag in your HTML's <head> -->
-    {{--
-    <script src="https://cdn.tiny.cloud/1/go8pzwa1dd7ty2i742u6zj35grs3eqd1bc2687khmkr5zpa6/tinymce/8/tinymce.min.js"
-        referrerpolicy="origin" crossorigin="anonymous"></script>
+        <div class="modal-body"><div class="row g-3">
 
-    <!-- Place the following <script> and <textarea> tags your HTML's <body> -->
-    <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: [
-                // Core editing features
-                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                // Your account includes a free trial of TinyMCE premium features
-                // Try the most popular premium features until Dec 15, 2025:
-                'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'ai', 'uploadcare', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
-            ],
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-            mergetags_list: [
-                { value: 'First.Name', title: 'First Name' },
-                { value: 'Email', title: 'Email' },
-            ],
-            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
-            uploadcare_public_key: 'ea9008fbc6453a2f3a30',
-        });
-    </script> --}}
+            <div class="col-md-4"><label class="form-label">Actual Price (₹)</label><input type="number" min="0" step=".01" id="bulk_actual_price" class="form-control"></div>
 
-    <script>
-    let oldVariants = @json(old('variants', []));
-</script>
+            <div class="col-md-4"><label class="form-label">Selling Price (₹)</label><input type="number" min="0" step=".01" id="bulk_sale_price" class="form-control"></div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // ✅ SAVE VALUE (AJAX)
-            let btn = document.getElementById("saveValueBtn");
+            <div class="col-md-4"><label class="form-label">Weight (kg, optional)</label><input type="number" min="0" step=".001" id="bulk_weight" class="form-control"></div>
 
-            if (btn) {
-                btn.addEventListener("click", function () {
+            <div class="col-md-4"><label class="form-label">Stock Quantity</label><input type="number" min="0" id="bulk_stock" class="form-control"></div>
 
-                    let attrId = document.getElementById("modalAttributeId").value;
-                    let value = document.getElementById("newValueInput").value.trim();
+            <div class="col-md-4"><label class="form-label">Low Stock Alert</label><input type="number" min="0" id="bulk_low_stock" class="form-control"></div>
 
-                    if (!value) return;
+            <div class="col-md-4"><label class="form-label">Minimum Order</label><input type="number" min="1" id="bulk_min_order" class="form-control"></div>
 
-                    let container = document.querySelector(`.attribute-values[data-attribute-id="${attrId}"]`);
+            <div class="col-md-4"><label class="form-label">Maximum Order</label><input type="number" min="1" id="bulk_max_order" class="form-control"></div>
 
-                    // ✅ Prevent duplicate (frontend)
-                    let already = [...container.querySelectorAll("input")]
-                        .some(i => i.value.toLowerCase() === value.toLowerCase());
+            <div class="col-md-4"><label class="form-label">Preorder (optional)</label><select id="bulk_preorder" class="form-select"><option value="">Do not change</option><option value="0">No</option><option value="1">Yes</option></select></div>
 
-                    if (already) {
-                        alert("Already exists");
-                        return;
-                    }
+            <div class="col-md-4"><label class="form-label">Preorder Stock</label><input type="number" min="0" id="bulk_preorder_stock" class="form-control"></div>
 
-                    // ✅ AJAX CALL
-                    fetch('/admin/add-value', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({
-                            attribute_id: attrId,
-                            value: value
-                        })
-                    })
-                        .then(res => res.json())
-                        .then(data => {
+            <div class="col-md-4"><label class="form-label">Variant Status</label><select id="bulk_status" class="form-select"><option value="">Do not change</option><option value="show">Active</option><option value="hide">Inactive</option></select></div>
 
-                            if (data.error) {
-                                alert("Already exists");
-                                return;
-                            }
+        </div></div>
 
-                            // ✅ Add checkbox dynamically
-                            container.insertAdjacentHTML('beforeend', `
-                                                    <div class="col-lg-2">
-                                                        <label>
-                                                            <input type="checkbox"
-                                                                name="variant_attributes[${attrId}][]"
-                                                                value="${data.name}" checked class="form-check-input variant-checkbox">
-                                                            ${data.name}
-                                                        </label>
-                                                    </div>
-                                                `);
+        <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-food" id="applyBulkUpdate">Apply to Variants</button></div>
 
-                            // clear input
-                            document.getElementById("newValueInput").value = "";
+    </div></div>
 
-                            // close modal
-                            bootstrap.Modal.getInstance(document.getElementById('addValueModal')).hide();
-
-                            updateVariantPreview();
+</div>
 
 
-                        })
-                        .catch(() => {
-                            alert("Something went wrong");
-                        });
 
-                });
-            }
+<script>
 
-            // ✅ RESET BUTTON FIX (no error)
-            let resetButton = document.getElementById("resetButton");
+const oldVariants = @json(old('variants', []));
 
-            if (resetButton) {
-                resetButton.addEventListener('click', resetThemeAndSidebarThemeAndColorAndBg);
-            }
 
-        });
 
-        $(document).on('click', '.open-modal', function () {
-            let attrId = $(this).data('attribute-id');
-            let attrName = $(this).data('attribute-name');
+function escapeHtml(value) {
 
-            $('#modalAttributeId').val(attrId);
-            $('#modalLabel').text("Add " + attrName);
-            $('#newValueInput').val('');
+    return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 
-            let modal = new bootstrap.Modal(document.getElementById('addValueModal'));
-            modal.show();
-        });
-    </script>
+}
 
-    <script>
-    $(document).on('keyup', '.attribute-search', function () {
-        let searchText = $(this).val().toLowerCase();
-    let attributeId = $(this).data('attribute-id');
+// Keep generated variant keys compatible with Laravel/PHP array-key handling.
+// PHP converts spaces and dots in submitted array keys to underscores.
+function normalizeVariantKeyPart(value) {
+    return String(value ?? '').trim().replace(/[ .]+/g, '_');
+}
 
-    let container = $('.attribute-values[data-attribute-id="' + attributeId + '"]');
+function combinations(arrays) {
 
-    container.find('.attribute-item').each(function () {
-        let labelText = $(this).text().toLowerCase();
+    return arrays.reduce((result, values) => result.flatMap(row => values.map(value => [...row,value])), [[]]);
 
-    if (labelText.includes(searchText)) {
-        $(this).show();
-        } else {
-        $(this).hide();
-        }
+}
+
+function updateVariantPreview() {
+
+    const selected = [];
+
+    document.querySelectorAll('.attribute-values').forEach(box => {
+
+        const values = [...box.querySelectorAll('.variant-checkbox:checked')].map(input => input.value);
+
+        if (values.length) selected.push(values);
+
     });
+
+    const list = document.getElementById('variantList');
+
+    const count = document.getElementById('variantCount');
+
+    list.innerHTML = '';
+
+    if (!selected.length) {
+
+        list.innerHTML = '<div class="text-center text-muted py-4 border rounded">Select variant values above to generate combinations.</div>';
+
+        count.textContent = '0 variants'; return;
+
+    }
+
+    const rows = combinations(selected);
+
+    count.textContent = rows.length + (rows.length === 1 ? ' variant' : ' variants');
+
+    rows.forEach(combo => {
+
+        // Must match ProductController's normalized $variantKey exactly.
+        const key = combo.map(normalizeVariantKeyPart).join('_');
+
+        const old = oldVariants[key] || {};
+
+        const card = document.createElement('div');
+
+        card.className = 'variant-card';
+
+        card.innerHTML = `
+
+            <div class="variant-title"><h6 class="mb-0 fw-bold">${escapeHtml(combo.join(' + '))}</h6><span class="pill">Food variant</span></div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Variant Image</label>
+                    <input
+                        type="file"
+                        class="form-control variant-image-input"
+                        name="variants[${escapeHtml(key)}][image]"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+                    <div class="variant-image-preview mt-2">
+                        <span>Image preview</span>
+                    </div>
+                    <small class="help">Upload an image for this specific variant.</small>
+                </div>
+
+                <div class="col-md-4"><label class="form-label">SKU <span class="text-danger">*</span></label><input class="form-control" name="variants[${escapeHtml(key)}][sku]" value="${escapeHtml(old.sku || '')}" required></div>
+
+                <div class="col-md-4"><label class="form-label">Actual Price (₹) <span class="text-danger">*</span></label><input type="number" min="0" step=".01" class="form-control variant-actual" name="variants[${escapeHtml(key)}][actual_price]" value="${escapeHtml(old.actual_price || '')}" required></div>
+
+                <div class="col-md-4"><label class="form-label">Selling Price (₹) <span class="text-danger">*</span></label><input type="number" min="0" step=".01" class="form-control variant-sale" name="variants[${escapeHtml(key)}][sale_price]" value="${escapeHtml(old.sale_price || '')}" required></div>
+
+                <div class="col-md-4"><label class="form-label">Weight (kg, optional)</label><input type="number" min="0" step=".001" class="form-control variant-weight" name="variants[${escapeHtml(key)}][weight]" value="${escapeHtml(old.weight || '')}" placeholder="e.g. 0.5"><small class="help">Leave blank when not applicable.</small></div>
+
+                <div class="col-md-4"><label class="form-label">Stock Quantity</label><input type="number" min="0" class="form-control variant-stock" name="variants[${escapeHtml(key)}][stock]" value="${escapeHtml(old.stock ?? 0)}"></div>
+
+                <div class="col-md-4"><label class="form-label">Low Stock Alert</label><input type="number" min="0" class="form-control variant-low" name="variants[${escapeHtml(key)}][low_stock_alert]" value="${escapeHtml(old.low_stock_alert ?? 0)}"></div>
+
+                <div class="col-md-4"><label class="form-label">Minimum Order</label><input type="number" min="1" class="form-control variant-min" name="variants[${escapeHtml(key)}][product_min_order]" value="${escapeHtml(old.product_min_order ?? 1)}"></div>
+
+                <div class="col-md-4"><label class="form-label">Maximum Order</label><input type="number" min="1" class="form-control variant-max" name="variants[${escapeHtml(key)}][product_max_order]" value="${escapeHtml(old.product_max_order ?? 10)}"></div>
+
+                <div class="col-md-4"><label class="form-label">Preparation Time (minutes)</label><input type="number" min="0" class="form-control" name="variants[${escapeHtml(key)}][preparation_time]" value="${escapeHtml(old.preparation_time || '')}" placeholder="Optional"></div>
+
+                <div class="col-md-4"><label class="form-label">Variant Available</label><select class="form-select" name="variants[${escapeHtml(key)}][is_available]"><option value="1" ${String(old.is_available ?? '1') === '1' ? 'selected' : ''}>Available</option><option value="0" ${String(old.is_available) === '0' ? 'selected' : ''}>Unavailable</option></select></div>
+
+                <div class="col-md-4"><label class="form-label">Preorder (optional)</label><select class="form-select variant-preorder" name="variants[${escapeHtml(key)}][preorder]"><option value="0" ${String(old.preorder ?? '0') === '0' ? 'selected' : ''}>No</option><option value="1" ${String(old.preorder) === '1' ? 'selected' : ''}>Yes</option></select></div>
+
+                <div class="col-md-4 preorder-wrap" style="display:${String(old.preorder) === '1' ? 'block' : 'none'}"><label class="form-label">Preorder Stock</label><input type="number" min="0" class="form-control variant-preorder-stock" name="variants[${escapeHtml(key)}][preorder_stock]" value="${escapeHtml(old.preorder_stock ?? 0)}"></div>
+
+                <div class="col-md-4"><label class="form-label">Variant Status</label><select class="form-select" name="variants[${escapeHtml(key)}][status]"><option value="show" ${String(old.status || 'show') === 'show' ? 'selected' : ''}>Active</option><option value="hide" ${String(old.status) === 'hide' ? 'selected' : ''}>Inactive</option></select></div>
+
+            </div>`;
+
+        list.appendChild(card);
+
+    });
+
+}
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const productName = document.getElementById('productName');
+
+    const productSlug = document.getElementById('productSlug');
+
+    productName.addEventListener('input', () => {
+
+        productSlug.value = productName.value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');
+
+    });
+
+
+
+    const imageInput = document.getElementById('imageInput');
+
+    const preview = document.getElementById('imagePreview');
+
+    const removeImage = document.getElementById('removeImage');
+
+    imageInput.addEventListener('change', event => {
+
+        const file = event.target.files[0]; if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = e => {
+
+            preview.style.backgroundImage = `url("${e.target.result}")`;
+
+            document.getElementById('uploadText').textContent = file.name;
+
+            document.getElementById('uploadIcon').style.display = 'none';
+
+            removeImage.classList.remove('d-none');
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+    removeImage.addEventListener('click', () => {
+
+        imageInput.value = ''; preview.style.backgroundImage = '';
+
+        document.getElementById('uploadText').textContent = 'Click to upload product image';
+
+        document.getElementById('uploadIcon').style.display = '';
+
+        removeImage.classList.add('d-none');
+
+    });
+
+
+
+    document.querySelectorAll('.attribute-search').forEach(search => search.addEventListener('input', () => {
+
+        const box = document.querySelector(`.attribute-values[data-attribute-id="${search.dataset.attributeId}"]`);
+
+        box.querySelectorAll('.attribute-item').forEach(item => item.style.display = item.textContent.toLowerCase().includes(search.value.toLowerCase()) ? 'inline-flex' : 'none');
+
+    }));
+
     updateVariantPreview();
 
 });
 
-</script>
 
-<script>
-    $(document).on('click', '#applyBulkUpdate', function (e) {
-    e.preventDefault();
 
-    // Get bulk values
-    let actual_price = $('#bulk_actual_price').val();
-    let sale_price   = $('#bulk_sale_price').val();
-    let height       = $('#bulk_height').val();
-    let width        = $('#bulk_width').val();
-    let length       = $('#bulk_length').val();
-    let weight       = $('#bulk_weight').val();
-    let stock        = $('#bulk_stock').val();
-    let preorder_stock        = $('#preorder_stock').val();
-    let low_stock        = $('#low_stock_alert').val();
-    let min_order        = $('#product_min_order').val();
-    let max_order        = $('#product_max_order').val();
-    let preorder        = $('#preorder').val();
-    let status        = $('#status').val();
+document.addEventListener('change', event => {
+    if (event.target.classList.contains('variant-image-input')) {
+        const input = event.target;
+        const file = input.files && input.files[0];
+        const preview = input.closest('.variant-card').querySelector('.variant-image-preview');
 
-    // Loop all variants
-    $('#variantList').find('.border').each(function () {
+        if (!file) {
+            preview.innerHTML = '<span>Image preview</span>';
+            return;
+        }
 
-        if (actual_price) $(this).find('input[name*="[actual_price]"]').val(actual_price);
-        if (sale_price)   $(this).find('input[name*="[sale_price]"]').val(sale_price);
-        if (height)       $(this).find('input[name*="[height]"]').val(height);
-        if (width)        $(this).find('input[name*="[width]"]').val(width);
-        if (length)       $(this).find('input[name*="[length]"]').val(length);
-        if (weight)       $(this).find('input[name*="[weight]"]').val(weight);
-        if (stock)        $(this).find('input[name*="[stock]"]').val(stock);
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            alert('Please select a JPG, PNG or WEBP image.');
+            input.value = '';
+            preview.innerHTML = '<span>Image preview</span>';
+            return;
+        }
 
-        if (preorder_stock) $(this).find('input[name*="[preorder_stock]"]').val(preorder_stock);
-        if (low_stock)      $(this).find('input[name*="[low_stock_alert]"]').val(low_stock);
-        if (min_order)      $(this).find('input[name*="[product_min_order]"]').val(min_order);
-        if (max_order)      $(this).find('input[name*="[product_max_order]"]').val(max_order);
-
-        if (preorder !== "") $(this).find('select[name*="[preorder]"]').val(preorder);
-        if (status !== "")   $(this).find('select[name*="[status]"]').val(status);
-    });
-
-    // Close modal
-    $('#bulkUpdateModal').modal('hide');
+        const reader = new FileReader();
+        reader.onload = e => {
+            const image = document.createElement('img');
+            image.src = e.target.result;
+            image.alt = 'Variant image preview';
+            preview.replaceChildren(image);
+        };
+        reader.readAsDataURL(file);
+    }
 });
-</script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('change', event => {
 
-    const productName = document.getElementById("productName");
-    const productSlug = document.getElementById("productSlug");
+    if (event.target.classList.contains('variant-checkbox')) updateVariantPreview();
 
-    function generateSlug(value) {
+    if (event.target.classList.contains('variant-preorder')) {
 
-        return value
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-")
-            .replace(/^-|-$/g, "");
+        event.target.closest('.variant-card').querySelector('.preorder-wrap').style.display = event.target.value === '1' ? 'block' : 'none';
+
     }
 
-    productName.addEventListener("input", function () {
+});
 
-        const slug = generateSlug(this.value);
 
-        productSlug.value = slug;
+
+document.addEventListener('click', event => {
+
+    const button = event.target.closest('.open-modal');
+
+    if (!button) return;
+
+    document.getElementById('modalAttributeId').value = button.dataset.attributeId;
+
+    document.getElementById('modalLabel').textContent = 'New ' + button.dataset.attributeName + ' value';
+
+    document.getElementById('newValueInput').value = '';
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('addValueModal')).show();
+
+});
+
+
+
+document.getElementById('saveValueBtn').addEventListener('click', async () => {
+
+    const attributeId = document.getElementById('modalAttributeId').value;
+
+    const value = document.getElementById('newValueInput').value.trim();
+
+    if (!value) return;
+
+    const container = document.querySelector(`.attribute-values[data-attribute-id="${attributeId}"]`);
+
+    if ([...container.querySelectorAll('input')].some(input => input.value.toLowerCase() === value.toLowerCase())) {
+
+        alert('This value already exists.'); return;
+
+    }
+
+    try {
+
+        const response = await fetch('/admin/add-value', {
+
+            method:'POST',
+
+            headers:{'Content-Type':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]').content,'Accept':'application/json'},
+
+            body:JSON.stringify({attribute_id:attributeId,value})
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) throw new Error(data.error || 'Unable to save value.');
+
+        const label = document.createElement('label');
+
+        label.className = 'variant-value attribute-item';
+
+        label.innerHTML = `<input type="checkbox" class="form-check-input variant-checkbox" name="variant_attributes[${attributeId}][]" value="${escapeHtml(data.name)}" checked> ${escapeHtml(data.name)}`;
+
+        container.appendChild(label);
+
+        bootstrap.Modal.getInstance(document.getElementById('addValueModal')).hide();
+
+        updateVariantPreview();
+
+    } catch(error) { alert(error.message || 'Something went wrong.'); }
+
+});
+
+
+
+document.getElementById('applyBulkUpdate').addEventListener('click', () => {
+
+    const map = [
+
+        ['bulk_actual_price','.variant-actual'],['bulk_sale_price','.variant-sale'],['bulk_weight','.variant-weight'],
+
+        ['bulk_stock','.variant-stock'],['bulk_low_stock','.variant-low'],['bulk_min_order','.variant-min'],
+
+        ['bulk_max_order','.variant-max'],['bulk_preorder_stock','.variant-preorder-stock']
+
+    ];
+
+    document.querySelectorAll('.variant-card').forEach(card => {
+
+        map.forEach(([id,selector]) => {
+
+            const value = document.getElementById(id).value, input = card.querySelector(selector);
+
+            if (value !== '' && input) input.value = value;
+
+        });
+
+        const preorder = document.getElementById('bulk_preorder').value;
+
+        if (preorder !== '') {
+
+            card.querySelector('.variant-preorder').value = preorder;
+
+            card.querySelector('.preorder-wrap').style.display = preorder === '1' ? 'block' : 'none';
+
+        }
+
+        const status = document.getElementById('bulk_status').value;
+
+        if (status) card.querySelector('select[name$="[status]"]').value = status;
 
     });
 
-});
-</script>
+    bootstrap.Modal.getInstance(document.getElementById('bulkUpdateModal')).hide();
 
+});
+
+// Do not submit an empty variant set, and ensure every generated variant has
+// its required SKU and prices before sending the form to Laravel.
+document.getElementById('productCreateForm').addEventListener('submit', event => {
+    const cards = [...document.querySelectorAll('#variantList .variant-card')];
+
+    if (!cards.length) {
+        event.preventDefault();
+        alert('Please select variant values and generate at least one variant.');
+        document.getElementById('variantList').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    for (const card of cards) {
+        const requiredFields = card.querySelectorAll(
+            'input[name$="[sku]"], input[name$="[actual_price]"], input[name$="[sale_price]"]'
+        );
+
+        for (const field of requiredFields) {
+            if (!field.value.trim()) {
+                event.preventDefault();
+                field.focus();
+                alert('Please enter SKU, actual price and selling price for every variant.');
+                return;
+            }
+        }
+    }
+});
+
+</script>
 
 @endsection

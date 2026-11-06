@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -15,6 +14,13 @@ use App\Http\Controllers\Website\OrderController;
 Route::get('/', [PageControllers::class, 'home'])->name('home');
 
 Route::get('/shop', [PageControllers::class, 'shop'])->name('shop');
+
+Route::get('/restaurants', [PageControllers::class, 'restaurants'])
+    ->name('restaurants');
+Route::get('/restaurant/{slug}', [PageControllers::class, 'restaurant_details'])
+    ->name('restaurant.details');
+
+
 
 Route::get('/product/{slug}', [PageControllers::class, 'product_details'])
     ->name('productdetails');
@@ -110,6 +116,64 @@ Route::middleware('auth:customer')->group(function () {
     // Customer order history.
     Route::get('/my-orders', [OrderController::class, 'orders'])
         ->name('customer.orders');
+
+    // Customer restaurant table bookings.
+    Route::get('/my-table-bookings', [PageControllers::class, 'myTableBookings'])
+        ->name('customer.table-bookings');
+
+
+    // ==========================================
+// RESTAURANT TABLE BOOKING - LOGIN REQUIRED
+// ==========================================
+
+    // STEP 1: Booking Details
+    Route::get(
+        '/restaurant/{slug}/book-table',
+        [PageControllers::class, 'table_booking']
+    )
+        ->name('restaurant.table-booking');
+
+    // Check Availability
+    Route::post(
+        '/restaurant/{slug}/check-availability',
+        [PageControllers::class, 'checkAvailability']
+    )
+        ->name('restaurant.check-availability');
+
+    // STEP 2: Select Table
+    Route::get(
+        '/restaurant/{slug}/select-table',
+        [PageControllers::class, 'selectTablePage']
+    )
+        ->name('restaurant.select-table');
+
+    // STEP 3: Booking Confirmation Page
+    Route::get(
+        '/restaurant/{slug}/booking-confirmation',
+        [PageControllers::class, 'confirmBookingPage']
+    )
+        ->name('restaurant.confirm-page');
+
+    // Submit Final Booking
+    Route::post(
+        '/restaurant/{slug}/confirm-booking',
+        [PageControllers::class, 'confirmTableBooking']
+    )
+        ->name('restaurant.confirm-booking');
+
+
+    // Restaurant table booking - LOGIN REQUIRED
+    // Route::get('/restaurant/{slug}/book-table',
+    //     [PageControllers::class, 'table_booking'])
+    //     ->name('restaurant.table-booking');
+
+    // Route::post('/restaurant/{slug}/check-availability',
+    //     [PageControllers::class, 'checkAvailability'])
+    //     ->name('restaurant.check-availability');
+
+    // Route::post('/restaurant/{slug}/confirm-booking',
+    //     [PageControllers::class, 'confirmTableBooking'])
+    //     ->name('restaurant.confirm-booking');
 
     // Customer addresses.
     Route::post('/addresses/store', [AccountController::class, 'storeAddress'])

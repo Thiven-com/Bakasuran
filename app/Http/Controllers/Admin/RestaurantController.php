@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class RestaurantController extends Controller
 {
@@ -32,27 +32,46 @@ class RestaurantController extends Controller
             'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+
             'address' => 'required|string|max:500',
             'city' => 'required|string|max:100',
             'state' => 'required|string|max:100',
             'pincode' => 'required|string|max:10',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
+
             'opening_time' => 'required|date_format:H:i',
             'closing_time' => 'required|date_format:H:i',
             'delivery_time' => 'required|integer|min:1',
             'delivery_fee' => 'required|numeric|min:0',
             'minimum_order' => 'required|numeric|min:0',
+
+            'price_for_two' => 'required|numeric|min:0',
+            'discount_percentage' => 'nullable|integer|between:0,100',
+            'is_featured' => 'required|boolean',
+            'sort_order' => 'nullable|integer|min:0',
+
             'average_rating' => 'nullable|numeric|between:0,5',
             'is_active' => 'required|boolean',
             'is_open' => 'required|boolean',
         ]);
 
-        $slug = Str::slug($validated['name']);
+        // Use safe defaults for optional fields.
+        $validated['discount_percentage'] = $validated['discount_percentage'] ?? 0;
+        $validated['is_featured'] = $validated['is_featured'] ?? 0;
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        $validated['average_rating'] = $validated['average_rating'] ?? 0;
 
-        $baseSlug = $slug;
+        // Generate a unique slug, including a fallback for names with no slug characters.
+        $baseSlug = Str::slug($validated['name']);
+        if ($baseSlug === '') {
+            $baseSlug = 'restaurant';
+        }
+
+        $slug = $baseSlug;
         $counter = 1;
 
         while (Restaurant::where('slug', $slug)->exists()) {
@@ -62,38 +81,30 @@ class RestaurantController extends Controller
 
         $validated['slug'] = $slug;
 
-        // Create image directories if they don't exist
         $logoDir = public_path('uploads/restaurants/logos');
         $coverDir = public_path('uploads/restaurants/covers');
 
         File::ensureDirectoryExists($logoDir);
         File::ensureDirectoryExists($coverDir);
 
-        // Upload restaurant logo
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-
             $filename = uniqid('logo_', true) . '.' . $file->extension();
-
             $file->move($logoDir, $filename);
 
             $validated['logo'] = 'uploads/restaurants/logos/' . $filename;
         }
 
-        // Upload restaurant cover image
         if ($request->hasFile('cover_image')) {
             $file = $request->file('cover_image');
-
             $filename = uniqid('cover_', true) . '.' . $file->extension();
-
             $file->move($coverDir, $filename);
 
             $validated['cover_image'] = 'uploads/restaurants/covers/' . $filename;
         }
-        // Save restaurant details to the database
-        $restaurant = Restaurant::create($validated);
 
-        // Redirect to the restaurant listing
+        Restaurant::create($validated);
+
         return redirect()
             ->route('admin.restaurants.index')
             ->with('success', 'Restaurant created successfully!');
@@ -103,21 +114,13 @@ class RestaurantController extends Controller
     {
         $restaurant->loadCount('products');
 
-        return view(
-            'admin.catalog.restaurants.show',
-            compact('restaurant')
-        );
+        return view('admin.catalog.restaurants.show', compact('restaurant'));
     }
-
 
     public function edit(Restaurant $restaurant)
     {
-        return view(
-            'admin.catalog.restaurants.edit',
-            compact('restaurant')
-        );
+        return view('admin.catalog.restaurants.edit', compact('restaurant'));
     }
-
 
     public function update(Request $request, Restaurant $restaurant)
     {
@@ -127,27 +130,45 @@ class RestaurantController extends Controller
             'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+
             'address' => 'required|string|max:500',
             'city' => 'required|string|max:100',
             'state' => 'required|string|max:100',
             'pincode' => 'required|string|max:10',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
+
             'opening_time' => 'required|date_format:H:i',
             'closing_time' => 'required|date_format:H:i',
             'delivery_time' => 'required|integer|min:1',
             'delivery_fee' => 'required|numeric|min:0',
             'minimum_order' => 'required|numeric|min:0',
+
+            'price_for_two' => 'required|numeric|min:0',
+            'discount_percentage' => 'nullable|integer|between:0,100',
+            'is_featured' => 'required|boolean',
+            'sort_order' => 'nullable|integer|min:0',
+
             'average_rating' => 'nullable|numeric|between:0,5',
             'is_active' => 'required|boolean',
             'is_open' => 'required|boolean',
         ]);
 
-        // Generate a unique slug, excluding this restaurant.
-        $slug = \Illuminate\Support\Str::slug($validated['name']);
-        $baseSlug = $slug;
+        $validated['discount_percentage'] = $validated['discount_percentage'] ?? 0;
+        $validated['is_featured'] = $validated['is_featured'] ?? 0;
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        $validated['average_rating'] = $validated['average_rating'] ?? 0;
+
+        // Regenerate a unique slug, excluding this restaurant.
+        $baseSlug = Str::slug($validated['name']);
+        if ($baseSlug === '') {
+            $baseSlug = 'restaurant';
+        }
+
+        $slug = $baseSlug;
         $counter = 1;
 
         while (
@@ -161,19 +182,21 @@ class RestaurantController extends Controller
 
         $validated['slug'] = $slug;
 
-        // Keep the current images unless replacements are uploaded.
+        // Keep existing images unless a replacement is uploaded.
         unset($validated['logo'], $validated['cover_image']);
 
         $logoDir = public_path('uploads/restaurants/logos');
         $coverDir = public_path('uploads/restaurants/covers');
 
-        \Illuminate\Support\Facades\File::ensureDirectoryExists($logoDir);
-        \Illuminate\Support\Facades\File::ensureDirectoryExists($coverDir);
+        File::ensureDirectoryExists($logoDir);
+        File::ensureDirectoryExists($coverDir);
+
+        $oldLogo = $restaurant->logo;
+        $oldCoverImage = $restaurant->cover_image;
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $filename = uniqid('logo_', true) . '.' . $file->extension();
-
             $file->move($logoDir, $filename);
 
             $validated['logo'] = 'uploads/restaurants/logos/' . $filename;
@@ -182,13 +205,27 @@ class RestaurantController extends Controller
         if ($request->hasFile('cover_image')) {
             $file = $request->file('cover_image');
             $filename = uniqid('cover_', true) . '.' . $file->extension();
-
             $file->move($coverDir, $filename);
 
             $validated['cover_image'] = 'uploads/restaurants/covers/' . $filename;
         }
 
         $restaurant->update($validated);
+
+        // Remove old files only after the database update succeeds.
+        if (isset($validated['logo']) && $oldLogo) {
+            $oldLogoPath = public_path($oldLogo);
+            if (is_file($oldLogoPath)) {
+                File::delete($oldLogoPath);
+            }
+        }
+
+        if (isset($validated['cover_image']) && $oldCoverImage) {
+            $oldCoverPath = public_path($oldCoverImage);
+            if (is_file($oldCoverPath)) {
+                File::delete($oldCoverPath);
+            }
+        }
 
         return redirect()
             ->route('admin.restaurants.index')
@@ -197,7 +234,7 @@ class RestaurantController extends Controller
 
     public function destroy(Restaurant $restaurant)
     {
-        // Prevent deletion if products are associated.
+        // Prevent deletion when products are associated with this restaurant.
         if ($restaurant->products()->exists()) {
             return redirect()
                 ->route('admin.restaurants.index')
@@ -207,21 +244,14 @@ class RestaurantController extends Controller
                 );
         }
 
-        // Delete uploaded logo if it exists.
-        if ($restaurant->logo) {
-            $logoPath = public_path($restaurant->logo);
+        // Delete uploaded images if they exist.
+        foreach ([$restaurant->logo, $restaurant->cover_image] as $imagePath) {
+            if ($imagePath) {
+                $fullPath = public_path($imagePath);
 
-            if (is_file($logoPath)) {
-                unlink($logoPath);
-            }
-        }
-
-        // Delete uploaded cover image if it exists.
-        if ($restaurant->cover_image) {
-            $coverPath = public_path($restaurant->cover_image);
-
-            if (is_file($coverPath)) {
-                unlink($coverPath);
+                if (is_file($fullPath)) {
+                    File::delete($fullPath);
+                }
             }
         }
 
@@ -231,7 +261,4 @@ class RestaurantController extends Controller
             ->route('admin.restaurants.index')
             ->with('success', 'Restaurant deleted successfully!');
     }
-
-
-
 }

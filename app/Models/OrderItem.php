@@ -25,8 +25,15 @@ class OrderItem extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
+
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    // Selected Add-ons
+    public function addons()
+    {
+        return $this->hasMany(OrderItemAddon::class, 'order_item_id');
     }
 }
