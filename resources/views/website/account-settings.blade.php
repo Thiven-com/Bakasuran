@@ -4,8 +4,8 @@
 
     <style>
         /* =========================================================
-               SUDHEERA SAREES - STATIC ACCOUNT PAGE
-            ========================================================= */
+                       SUDHEERA SAREES - STATIC ACCOUNT PAGE
+                    ========================================================= */
 
         .sudheera-account-page {
             background: #fbf8f3;
@@ -15,8 +15,8 @@
         }
 
         /* =========================================================
-               BREADCRUMB
-            ========================================================= */
+                       BREADCRUMB
+                    ========================================================= */
 
         .sudheera-breadcrumb-section {
             padding-bottom: 10px;
@@ -38,7 +38,7 @@
         }
 
         .sudheera-breadcrumb-list a {
-            color: #76001f;
+            color: #d71313;
             text-decoration: none;
             font-weight: 600;
         }
@@ -48,16 +48,16 @@
         }
 
         /* =========================================================
-               ACCOUNT LAYOUT
-            ========================================================= */
+                       ACCOUNT LAYOUT
+                    ========================================================= */
 
         .sudheera-account-wrapper {
             padding-top: 45px;
         }
 
         /* =========================================================
-               SIDEBAR
-            ========================================================= */
+                       SIDEBAR
+                    ========================================================= */
 
         .sudheera-sidebar {
             background: #fff;
@@ -118,8 +118,8 @@
         }
 
         /* =========================================================
-               MAIN CONTENT
-            ========================================================= */
+                       MAIN CONTENT
+                    ========================================================= */
 
         .sudheera-account-content {
             display: flex;
@@ -150,8 +150,8 @@
         }
 
         /* =========================================================
-               CARD HEADER
-            ========================================================= */
+                       CARD HEADER
+                    ========================================================= */
 
         .sudheera-card-title {
             display: flex;
@@ -181,8 +181,8 @@
         }
 
         /* =========================================================
-               PERSONAL INFORMATION
-            ========================================================= */
+                       PERSONAL INFORMATION
+                    ========================================================= */
 
         .sudheera-info-grid {
             display: grid;
@@ -213,8 +213,8 @@
         }
 
         /* =========================================================
-               ADDRESS
-            ========================================================= */
+                       ADDRESS
+                    ========================================================= */
 
         .sudheera-address {
             display: flex;
@@ -254,8 +254,8 @@
         }
 
         /* =========================================================
-               TESTIMONIAL
-            ========================================================= */
+                       TESTIMONIAL
+                    ========================================================= */
 
         .sudheera-testimonial-intro {
             margin-bottom: 22px;
@@ -322,8 +322,8 @@
         }
 
         /* =========================================================
-               BUTTON
-            ========================================================= */
+                       BUTTON
+                    ========================================================= */
 
         .sudheera-submit-btn {
             display: inline-flex;
@@ -345,16 +345,16 @@
         .sudheera-submit-btn:hover {
             background: linear-gradient(135deg,
                     #420916,
-                    #76001f,
+                    #d71313,
                     #a85c17);
-            border-color: #76001f;
+            border-color: #d71313;
             transform: translateY(-1px);
             color: #fff;
         }
 
         /* =========================================================
-               RESPONSIVE
-            ========================================================= */
+                       RESPONSIVE
+                    ========================================================= */
 
         @media (max-width: 991px) {
 
@@ -450,8 +450,8 @@
         }
 
         /* =========================================================
-               SIDEBAR
-            ========================================================= */
+                       SIDEBAR
+                    ========================================================= */
 
         .sudheera-sidebar {
             background: #fff;
@@ -529,13 +529,13 @@
     </style>
 
     <!-- =========================================================
-             ACCOUNT PAGE
-        ========================================================= -->
+                     ACCOUNT PAGE
+                ========================================================= -->
 
     <main class="sudheera-account-page">
         <!-- =====================================================
-             BREADCRUMB
-        ====================================================== -->
+                     BREADCRUMB
+                ====================================================== -->
 
         <section class="sudheera-breadcrumb-section">
 
@@ -567,8 +567,8 @@
 
 
         <!-- =====================================================
-             ACCOUNT
-        ====================================================== -->
+                     ACCOUNT
+                ====================================================== -->
 
         <section class="sudheera-account-wrapper">
 
@@ -578,8 +578,8 @@
 
 
                     <!-- =================================================
-                             SIDEBAR
-                        ================================================== -->
+                                     SIDEBAR
+                                ================================================== -->
 
                     <div class="col-lg-4 col-xl-3">
 
@@ -609,6 +609,28 @@
 
                                 <span>
                                     My Orders
+                                </span>
+
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
+                            </a>
+                            <a href="{{ route('favorite-restaurants') }}" class="sudheera-nav-item">
+
+                                <i class="icon icon-Box"></i>
+
+                                <span>
+                                    Favorite Restaurants
+                                </span>
+
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
+                            </a>
+                            <a href="{{ route('customer.table-bookings') }}" class="sudheera-nav-item">
+
+                                <i class="icon icon-Box"></i>
+
+                                <span>
+                                    My Table Bookings
                                 </span>
 
                                 <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
@@ -671,8 +693,8 @@
 
 
                     <!-- =================================================
-                         MAIN CONTENT
-                    ================================================== -->
+                                 MAIN CONTENT
+                            ================================================== -->
 
                     <div class="col-lg-8 col-xl-9">
 
@@ -681,8 +703,8 @@
 
 
                             <!-- =================================================
-         PERSONAL INFORMATION
-    ================================================== -->
+                 PERSONAL INFORMATION
+            ================================================== -->
 
                             <div class="sudheera-dashboard-card">
 
@@ -774,8 +796,8 @@
 
 
                             <!-- =================================================
-         DEFAULT ADDRESS
-    ================================================== -->
+                 DEFAULT ADDRESS
+            ================================================== -->
 
                             <div class="sudheera-dashboard-card">
 
@@ -817,35 +839,35 @@
 
                                                     @if($address->address_type)
 
-                                                                        <span style="
-                                                            display:inline-block;
-                                                            margin-left:8px;
-                                                            padding:3px 8px;
-                                                            border-radius:20px;
-                                                            background:#fbf3e5;
-                                                            color:#8f3b16;
-                                                            font-size:10px;
-                                                            font-weight:700;
-                                                        ">
-                                                                            {{ $address->address_type }}
-                                                                        </span>
+                                                        <span style="
+                                                                                    display:inline-block;
+                                                                                    margin-left:8px;
+                                                                                    padding:3px 8px;
+                                                                                    border-radius:20px;
+                                                                                    background:#fbf3e5;
+                                                                                    color:#8f3b16;
+                                                                                    font-size:10px;
+                                                                                    font-weight:700;
+                                                                                ">
+                                                            {{ $address->address_type }}
+                                                        </span>
 
                                                     @endif
 
                                                     @if($address->is_default)
 
-                                                                        <span style="
-                                                            display:inline-block;
-                                                            margin-left:5px;
-                                                            padding:3px 8px;
-                                                            border-radius:20px;
-                                                            background:#420916;
-                                                            color:#fff;
-                                                            font-size:10px;
-                                                            font-weight:700;
-                                                        ">
-                                                                            Default
-                                                                        </span>
+                                                        <span style="
+                                                                                    display:inline-block;
+                                                                                    margin-left:5px;
+                                                                                    padding:3px 8px;
+                                                                                    border-radius:20px;
+                                                                                    background:#420916;
+                                                                                    color:#fff;
+                                                                                    font-size:10px;
+                                                                                    font-weight:700;
+                                                                                ">
+                                                            Default
+                                                        </span>
 
                                                     @endif
 
@@ -938,8 +960,8 @@
 
 
                             <!-- =================================================
-                                 SHARE YOUR EXPERIENCE
-                            ================================================== -->
+                                         SHARE YOUR EXPERIENCE
+                                    ================================================== -->
 
                             <div class="sudheera-dashboard-card">
 

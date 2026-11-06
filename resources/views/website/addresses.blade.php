@@ -68,7 +68,7 @@
         }
 
         .sudheera-breadcrumb a {
-            color: #76001f;
+            color: #d71313;
             text-decoration: none;
             font-weight: 600;
         }
@@ -127,7 +127,7 @@
         .sudheera-add-address-btn:hover {
             background: linear-gradient(135deg,
                     #420916,
-                    #76001f,
+                    #d71313,
                     #a85c17);
             color: #fff;
             transform: translateY(-2px);
@@ -216,7 +216,7 @@
             border: 1px solid #eadfce;
             border-radius: 8px;
             background: #fff;
-            color: #76001f;
+            color: #d71313;
             cursor: pointer;
             transition: all .3s ease;
         }
@@ -379,9 +379,9 @@
         .sudheera-save-btn:hover {
             background: linear-gradient(135deg,
                     #420916,
-                    #76001f,
+                    #d71313,
                     #a85c17);
-            border-color: #76001f;
+            border-color: #d71313;
             color: #fff;
         }
 
@@ -684,9 +684,9 @@
         #modalEditAddress .sudheera-save-btn:hover {
             background: linear-gradient(135deg,
                     #420916,
-                    #76001f,
+                    #d71313,
                     #a85c17);
-            border-color: #76001f;
+            border-color: #d71313;
             color: #fff;
             transform: translateY(-1px);
             box-shadow: 0 6px 15px rgba(66, 9, 22, .15);

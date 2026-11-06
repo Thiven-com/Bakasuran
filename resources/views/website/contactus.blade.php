@@ -194,7 +194,7 @@
             }
 
             .sudheera-contact-card a {
-                color: #76001f;
+                color: #d71313;
                 text-decoration: none;
                 font-weight: 600;
                 transition: .3s ease;

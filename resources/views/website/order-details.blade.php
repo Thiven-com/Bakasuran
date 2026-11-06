@@ -70,7 +70,7 @@
     }
 
     .sudheera-breadcrumb a {
-        color: #76001f;
+        color: #d71313;
         text-decoration: none;
         font-weight: 600;
     }
@@ -157,10 +157,10 @@
         background: linear-gradient(
             135deg,
             #420916,
-            #76001f,
+            #d71313,
             #a85c17
         );
-        border-color: #76001f;
+        border-color: #d71313;
     }
 
     /* DETAIL CARD */
@@ -219,7 +219,7 @@
     }
 
     .sudheera-total {
-        color: #76001f;
+        color: #d71313;
         font-size: 29px;
         font-weight: 800;
         line-height: 1.2;
@@ -321,7 +321,7 @@
     }
 
     .sudheera-product-price {
-        color: #76001f;
+        color: #d71313;
         font-size: 16px;
         font-weight: 800;
         white-space: nowrap;
@@ -382,7 +382,7 @@
     }
 
     .sudheera-summary-total strong:last-child {
-        color: #76001f;
+        color: #d71313;
         font-size: 22px;
     }
 
@@ -437,7 +437,7 @@
     }
 
     .sudheera-amount-due {
-        color: #76001f;
+        color: #d71313;
         font-size: 25px;
         font-weight: 800;
     }

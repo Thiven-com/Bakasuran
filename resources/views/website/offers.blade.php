@@ -543,7 +543,7 @@
             border: none;
             border-radius: 50%;
             background: #fff;
-            color: #650019;
+            color: #ff0000;
             font-size: 24px;
             cursor: pointer;
 
@@ -573,8 +573,8 @@
         .add-cart-btn {
             width: 100%;
             height: 40px;
-            border: 1px solid #650019;
-            background: #650019;
+            border: 1px solid #ff0000;
+            background: #ff0000;
             color: #fff;
             border-radius: 8px;
             font-size: 11px;
@@ -584,7 +584,7 @@
 
         .add-cart-btn:hover {
             background: #fff;
-            color: #650019;
+            color: #ff0000;
         }
 
         @media (max-width: 767px) {

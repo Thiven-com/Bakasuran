@@ -1048,8 +1048,13 @@ class PageControllers extends Controller
             ->latest()
             ->paginate(12)
             ->withQueryString();
+        $cuisines = Restaurant::whereNotNull('cuisine_type')
+            ->where('cuisine_type', '!=', '')
+            ->distinct()
+            ->orderBy('cuisine_type')
+            ->pluck('cuisine_type');
 
-        return view('website.restaurants', compact('restaurants'));
+        return view('website.restaurants', compact('restaurants', 'cuisines'));
     }
 
 
@@ -1462,70 +1467,70 @@ class PageControllers extends Controller
 
 
     public function selectTablePage($slug)
-{
-    $restaurant = Restaurant::where('slug', $slug)
-        ->where('is_active', true)
-        ->firstOrFail();
+    {
+        $restaurant = Restaurant::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
 
-    // Verify that availability was checked for this restaurant.
-    if (
-        !session('availability_checked') ||
-        session('booking_slug') !== $slug ||
-        !is_array(session('booking_details'))
-    ) {
-        return redirect()
-            ->route('restaurant.table-booking', ['slug' => $slug])
-            ->withErrors([
-                'booking_date' => 'Please enter your booking details first.',
-            ]);
-    }
+        // Verify that availability was checked for this restaurant.
+        if (
+            !session('availability_checked') ||
+            session('booking_slug') !== $slug ||
+            !is_array(session('booking_details'))
+        ) {
+            return redirect()
+                ->route('restaurant.table-booking', ['slug' => $slug])
+                ->withErrors([
+                    'booking_date' => 'Please enter your booking details first.',
+                ]);
+        }
 
-    $bookingDetails = session('booking_details');
+        $bookingDetails = session('booking_details');
 
-    $tableIds = collect(session('available_table_ids', []))
-        ->map(fn ($id) => (int) $id)
-        ->all();
+        $tableIds = collect(session('available_table_ids', []))
+            ->map(fn($id) => (int) $id)
+            ->all();
 
-    if (empty($tableIds)) {
-        return redirect()
-            ->route('restaurant.table-booking', ['slug' => $slug])
-            ->withErrors([
-                'table_id' => 'No available tables found. Please check availability again.',
-            ]);
-    }
+        if (empty($tableIds)) {
+            return redirect()
+                ->route('restaurant.table-booking', ['slug' => $slug])
+                ->withErrors([
+                    'table_id' => 'No available tables found. Please check availability again.',
+                ]);
+        }
 
-    // Load only tables previously returned as available.
-    $availableTables = RestaurantTable::where(
-        'restaurant_id',
-        $restaurant->id
-    )
-        ->whereIn('id', $tableIds)
-        ->where('status', 1)
-        ->where('seating_type', $bookingDetails['seating'])
-        ->where('seating_capacity', '>=', $bookingDetails['guests'])
-        ->get();
-
-    if ($availableTables->isEmpty()) {
-        return redirect()
-            ->route('restaurant.table-booking', ['slug' => $slug])
-            ->withErrors([
-                'table_id' => 'Available tables have changed. Please check again.',
-            ]);
-    }
-
-    $restaurantName = $restaurant->name;
-
-    return view(
-        'website.table-booking.select-table',
-        compact(
-            'slug',
-            'restaurant',
-            'restaurantName',
-            'bookingDetails',
-            'availableTables'
+        // Load only tables previously returned as available.
+        $availableTables = RestaurantTable::where(
+            'restaurant_id',
+            $restaurant->id
         )
-    );
-}
+            ->whereIn('id', $tableIds)
+            ->where('status', 1)
+            ->where('seating_type', $bookingDetails['seating'])
+            ->where('seating_capacity', '>=', $bookingDetails['guests'])
+            ->get();
+
+        if ($availableTables->isEmpty()) {
+            return redirect()
+                ->route('restaurant.table-booking', ['slug' => $slug])
+                ->withErrors([
+                    'table_id' => 'Available tables have changed. Please check again.',
+                ]);
+        }
+
+        $restaurantName = $restaurant->name;
+
+        return view(
+            'website.table-booking.select-table',
+            compact(
+                'slug',
+                'restaurant',
+                'restaurantName',
+                'bookingDetails',
+                'availableTables'
+            )
+        );
+    }
 
 
     public function confirmTableBooking(Request $request, $slug)
@@ -1804,45 +1809,45 @@ class PageControllers extends Controller
 
 
     public function confirmBookingPage($slug)
-{
-    $restaurant = Restaurant::where('slug', $slug)
-      ->where('is_active', true)
-        ->firstOrFail();
+    {
+        $restaurant = Restaurant::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
 
-    $bookingDetails = session('booking_details');
-    $availableTableIds = session('available_table_ids', []);
+        $bookingDetails = session('booking_details');
+        $availableTableIds = session('available_table_ids', []);
 
-    if (
-        !session('availability_checked') ||
-        session('booking_slug') !== $slug ||
-        !is_array($bookingDetails) ||
-        empty($bookingDetails['table_id'])
-    ) {
-        return redirect()
-            ->route('restaurant.table-booking', ['slug' => $slug])
-            ->with('error', 'Please select your booking details and table first.');
+        if (
+            !session('availability_checked') ||
+            session('booking_slug') !== $slug ||
+            !is_array($bookingDetails) ||
+            empty($bookingDetails['table_id'])
+        ) {
+            return redirect()
+                ->route('restaurant.table-booking', ['slug' => $slug])
+                ->with('error', 'Please select your booking details and table first.');
+        }
+
+        $selectedTable = RestaurantTable::where('restaurant_id', $restaurant->id)
+            ->whereIn('id', $availableTableIds)
+            ->where('id', $bookingDetails['table_id'])
+            ->where('status', 1)
+            ->first();
+
+        if (!$selectedTable) {
+            return redirect()
+                ->route('restaurant.select-table', ['slug' => $slug])
+                ->with('error', 'Your selected table is no longer available.');
+        }
+
+        return view('website.table-booking.booking-confirmation', [
+            'slug' => $slug,
+            'restaurant' => $restaurant,
+            'restaurantName' => $restaurant->name,
+            'bookingDetails' => $bookingDetails,
+            'selectedTable' => $selectedTable,
+        ]);
     }
-
-    $selectedTable = RestaurantTable::where('restaurant_id', $restaurant->id)
-        ->whereIn('id', $availableTableIds)
-        ->where('id', $bookingDetails['table_id'])
-        ->where('status', 1)
-        ->first();
-
-    if (!$selectedTable) {
-        return redirect()
-            ->route('restaurant.select-table', ['slug' => $slug])
-            ->with('error', 'Your selected table is no longer available.');
-    }
-
-    return view('website.table-booking.booking-confirmation', [
-        'slug' => $slug,
-        'restaurant' => $restaurant,
-        'restaurantName' => $restaurant->name,
-        'bookingDetails' => $bookingDetails,
-        'selectedTable' => $selectedTable,
-    ]);
-}
 
 
 

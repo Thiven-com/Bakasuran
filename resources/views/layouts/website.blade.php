@@ -20,6 +20,8 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         /*=========
@@ -58,7 +60,7 @@
             width: 100%;
             height: 40px;
 
-            /* background: #76001f; */
+            /* background: #d71313; */
 
             background: #000;
             color: #ffffff;
@@ -161,7 +163,7 @@
         .top-bar {
             width: 100%;
             height: 40px;
-            background: #76001f;
+            background: #d71313;
             color: #ffffff;
 
             display: flex;
@@ -1953,7 +1955,7 @@
                         Explore Food
                     </a> -->
 
-                   
+
 
                     {{-- RESTAURANTS / ABOUT US --}}
                     <a href="{{ route('aboutus') }}"
@@ -1961,7 +1963,7 @@
                         About Us
                     </a>
 
-                     <a href="{{ route('restaurants') }}"
+                    <a href="{{ route('restaurants') }}"
                         class="nav-link {{ request()->routeIs('restaurants') ? 'active' : '' }}">
                         Restaurants
                     </a>
@@ -2167,7 +2169,7 @@
 
                     <button type="button" aria-label="Search"
                         onclick="document.getElementById('mobileSearchModal').style.display='flex'; document.body.style.overflow='hidden';"
-                        style="transform:scaleX(-1);display:flex;align-items:center;justify-content:center;width:30px;height:38px;padding:0;border:none;background:transparent;color:#650019;font-size:30px;cursor:pointer;margin-bottom:5px;">
+                        style="transform:scaleX(-1);display:flex;align-items:center;justify-content:center;width:30px;height:38px;padding:0;border:none;background:transparent;color:#ff0000;font-size:30px;cursor:pointer;margin-bottom:5px;">
                         ⌕
                     </button>
 
@@ -2180,12 +2182,12 @@
 
                             <!-- Close Button -->
                             <button type="button" aria-label="Close search" onclick="closeMobileSearchModal()"
-                                style="position:absolute; right:12px; top:8px; border:none; background:transparent; font-size:28px; color:#650019; cursor:pointer;">
+                                style="position:absolute; right:12px; top:8px; border:none; background:transparent; font-size:28px; color:#ff0000; cursor:pointer;">
                                 &times;
                             </button>
 
                             <!-- Title -->
-                            <h3 style="margin:0 0 18px; color:#650019; font-size:18px;">
+                            <h3 style="margin:0 0 18px; color:#ff0000; font-size:18px;">
                                 Search Products
                             </h3>
 
@@ -2197,7 +2199,7 @@
                                     style="flex:1; min-width:0; height:44px; padding:0 12px; border:1px solid #ddd; border-radius:5px; font-size:14px; outline:none;">
 
                                 <button type="submit" aria-label="Search"
-                                    style="height:44px; padding:0 16px; border:none; border-radius:5px; background:#650019; color:#fff; font-size:16px; cursor:pointer;">
+                                    style="height:44px; padding:0 16px; border:none; border-radius:5px; background:#ff0000; color:#fff; font-size:16px; cursor:pointer;">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                 </button>
 
@@ -2208,12 +2210,12 @@
                     <!-- Account Icon -->
                     @if(Auth::guard('customer')->check())
                         <a href="{{ route('account') }}" title="My Account" aria-label="My Account"
-                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#650019; font-size:19px; text-decoration:none;">
+                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#ff0000; font-size:19px; text-decoration:none;">
                             <i class="fa-regular fa-user"></i>
                         </a>
                     @else
                         <a href="{{ route('login') }}" title="Login" aria-label="Login"
-                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#650019; font-size:19px; text-decoration:none;">
+                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#ff0000; font-size:19px; text-decoration:none;">
                             <i class="fa-regular fa-user"></i>
                         </a>
                     @endif
@@ -2229,12 +2231,12 @@
                         @endphp
 
                         <a href="{{ route('cart') }}" title="My Cart" aria-label="My Cart"
-                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#650019; font-size:19px; text-decoration:none; position:relative;">
+                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#ff0000; font-size:19px; text-decoration:none; position:relative;">
 
                             <i class="fa-solid fa-cart-shopping"></i>
 
                             <span id="mobile-cart-count"
-                                style="position:absolute; top:0; right:-5px; min-width:15px; height:15px; padding:0 3px; display:flex; align-items:center; justify-content:center; background:#650019; color:#fff; border-radius:50%; font-size:10px; line-height:15px;">
+                                style="position:absolute; top:0; right:-5px; min-width:15px; height:15px; padding:0 3px; display:flex; align-items:center; justify-content:center; background:#ff0000; color:#fff; border-radius:50%; font-size:10px; line-height:15px;">
                                 {{ $cartCount }}
                             </span>
 
@@ -2243,12 +2245,12 @@
                     @else
 
                         <a href="{{ route('login') }}" title="Login" aria-label="Login"
-                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#650019; font-size:19px; text-decoration:none; position:relative;">
+                            style="display:flex; align-items:center; justify-content:center; width:30px; height:38px; color:#ff0000; font-size:19px; text-decoration:none; position:relative;">
 
                             <i class="fa-solid fa-cart-shopping"></i>
 
                             <span id="mobile-cart-count"
-                                style="position:absolute; top:0; right:-5px; min-width:15px; height:15px; padding:0 3px; display:flex; align-items:center; justify-content:center; background:#650019; color:#fff; border-radius:50%; font-size:10px; line-height:15px;">
+                                style="position:absolute; top:0; right:-5px; min-width:15px; height:15px; padding:0 3px; display:flex; align-items:center; justify-content:center; background:#ff0000; color:#fff; border-radius:50%; font-size:10px; line-height:15px;">
                                 0
                             </span>
 
@@ -2491,7 +2493,7 @@
                                 #fff7f3,
                                 #f9eee9);
 
-                        color: #651027;
+                        color: #d71313;
 
                         padding-left: 23px;
                     }
@@ -2526,7 +2528,7 @@
 
                         transform: rotate(180deg);
 
-                        color: #651027;
+                        color: #d71313;
                     }
 
 
@@ -2659,7 +2661,7 @@
 
                             background: #fff8f4;
 
-                            color: #651027;
+                            color: #d71313;
 
                             font-size: 19px;
 
@@ -2676,11 +2678,11 @@
                         .mobile-menu-btn:hover,
                         .mobile-menu-btn.active {
 
-                            background: #651027;
+                            background: #d71313;
 
                             color: #ffffff;
 
-                            border-color: #651027;
+                            border-color: #d71313;
 
                             box-shadow:
                                 0 5px 15px rgba(101, 16, 39, 0.20);
@@ -2973,7 +2975,7 @@
 
                             background: #f9eee9;
 
-                            color: #651027;
+                            color: #d71313;
 
                             padding-left: 18px;
                         }
@@ -3001,7 +3003,7 @@
 
                             background: #f8ebe5;
 
-                            color: #651027;
+                            color: #d71313;
 
                             font-size: 10px;
 
@@ -3013,7 +3015,7 @@
 
                             transform: rotate(180deg);
 
-                            background: #651027;
+                            background: #d71313;
 
                             color: #ffffff;
                         }
@@ -3442,7 +3444,7 @@
                     transparent 5%),
                 linear-gradient(135deg,
                     #9c1534,
-                    #650019 45%,
+                    #ff0000 45%,
                     #3d0010 100%);
 
             box-shadow:

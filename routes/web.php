@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FavoriteRestaurantController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageControllers;
 use App\Http\Controllers\Website\AccountController;
@@ -197,6 +198,22 @@ Route::middleware('auth:customer')->group(function () {
 
     Route::put('/cart/update/{id}', [AccountController::class, 'updateCartQuantity'])
         ->name('cart.update');
+
+
+    Route::get(
+        '/favorite-restaurants',
+        [FavoriteRestaurantController::class, 'index']
+    )->name('favorite-restaurants');
+
+    Route::post(
+        '/favorite-restaurants/toggle',
+        [FavoriteRestaurantController::class, 'toggle']
+    )->name('favorite-restaurants.toggle');
+
+    Route::delete(
+        '/favorite-restaurants/{id}',
+        [FavoriteRestaurantController::class, 'destroy']
+    )->name('favorite-restaurants.destroy');
 });
 
 /*

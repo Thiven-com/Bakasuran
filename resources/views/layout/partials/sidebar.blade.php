@@ -84,20 +84,20 @@
                                                 <li class="submenu">
                                                         <a href="javascript:void(0);"
                                                                 class="{{ Request::is('admin/products', 'admin/categories', 'admin/brands', 'admin/banners', 'admin/units', 'admin/attributes') ? 'active subdrop' : '' }}"><i
-                                                                        class="ti ti-article fs-16 me-2"></i><span>Restaurant
-                                                                        Managem-<br>ent</span><span
+                                                                        class="ti ti-article fs-16 me-2"></i><span>
+                                                                        Management</span><span
                                                                         class="menu-arrow"></span></a>
 
                                                         <ul>
 
-                                                                <li
+                                                                {{-- <li
                                                                         class="{{ Request::is('restaurants') ? 'active' : '' }}">
                                                                         <a
                                                                                 href="{{ route('admin.restaurants.index') }}">
                                                                                 <i data-feather="coffee"></i>
                                                                                 <span>Restaurants</span>
                                                                         </a>
-                                                                </li>
+                                                                </li> --}}
 
                                                                 {{-- Table Management --}}
                                                                 <li>
@@ -222,6 +222,12 @@
                                                                 </li>
 
                                                         </ul>
+                                                </li>
+                                                <li class="{{ Request::is('restaurants') ? 'active' : '' }}">
+                                                        <a href="{{ route('admin.restaurants.index') }}">
+                                                                <i data-feather="coffee"></i>
+                                                                <span>Restaurants</span>
+                                                        </a>
                                                 </li>
                                                 @if (isset($admin->role) && $admin->role == 'super_admin')
 

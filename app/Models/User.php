@@ -45,4 +45,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function favoriteRestaurants()
+    {
+        return $this->belongsToMany(
+            Restaurant::class,
+            'favorite_restaurants',
+            'user_id',
+            'restaurant_id'
+        )->withTimestamps();
+    }
 }

@@ -497,6 +497,11 @@
 </style>
 
 <div class="booking-3d">
+    <div class="luxury-decor decor-one"></div>
+<div class="luxury-decor decor-two"></div>
+<div class="luxury-orb orb-one"></div>
+<div class="luxury-orb orb-two"></div>
+<div class="luxury-light"></div>
 
     <div class="booking-container">
 

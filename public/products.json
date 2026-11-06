@@ -1,122 +1,182 @@
 [
     {
-        "name": "Kanchipuram Silk Sare",
-        "image": "media\/products\/1791442770.webp",
-        "sale_price": "5499",
-        "actual_price": "6000",
-        "product_id": 1,
-        "product_variant_id": 1,
-        "stock": "55",
-        "sku": "SILK"
-    },
-    {
-        "name": "Banarasi Silk Saree",
-        "image": "media\/products\/1791443153.webp",
-        "sale_price": "6299",
-        "actual_price": "8000",
-        "product_id": 2,
-        "product_variant_id": 2,
-        "stock": "5",
-        "sku": "Sudhee1234"
-    },
-    {
-        "name": "Handloom Cotton Saree",
-        "image": "media\/products\/1791443236.webp",
-        "sale_price": "1899",
-        "actual_price": "2000",
-        "product_id": 3,
-        "product_variant_id": 3,
-        "stock": "5",
-        "sku": "iygikjrfv"
-    },
-    {
-        "name": "Premium Cotton Saree",
-        "image": "media\/products\/1791443340.webp",
-        "sale_price": "2199",
-        "actual_price": "3000",
-        "product_id": 4,
-        "product_variant_id": 4,
-        "stock": "5",
-        "sku": "ljkbvjvdb"
-    },
-    {
-        "name": "Party Wear Saree",
-        "image": "media\/products\/1791445036.webp",
-        "sale_price": "3499",
-        "actual_price": "5499",
-        "product_id": 5,
-        "product_variant_id": 5,
-        "stock": "5",
-        "sku": "sku005"
-    },
-    {
-        "name": "Elegant Party Saree",
-        "image": "media\/products\/1791445356.webp",
-        "sale_price": "4299",
-        "actual_price": "6499",
+        "name": "Chicken Hakka Noodles",
+        "image": "media\/products\/1791868209.jpg",
+        "sale_price": "149",
+        "actual_price": "179",
         "product_id": 6,
         "product_variant_id": 6,
-        "stock": "5",
+        "stock": "50",
         "sku": "sku006"
     },
     {
-        "name": "Designer Party Wear",
-        "image": "media\/products\/1791448499.webp",
-        "sale_price": "3499",
-        "actual_price": "6499",
-        "product_id": 7,
-        "product_variant_id": 7,
-        "stock": "5",
-        "sku": "sku007"
+        "name": "Chicken Dum Biryani",
+        "image": "media\/products\/1791809962.jpeg",
+        "sale_price": "249",
+        "actual_price": "299",
+        "product_id": 13,
+        "product_variant_id": 13,
+        "stock": "49",
+        "sku": "BAK-BIR-001-F"
     },
     {
-        "name": "Royal Designer Saree",
-        "image": "media\/products\/1791448652.webp",
-        "sale_price": "4999",
-        "actual_price": "7999",
-        "product_id": 8,
-        "product_variant_id": 8,
-        "stock": "5",
-        "sku": "sku008"
+        "name": "Hyderabadi Mutton Biryani",
+        "image": "media\/products\/1791870076.webp",
+        "sale_price": "349",
+        "actual_price": "399",
+        "product_id": 1,
+        "product_variant_id": 14,
+        "stock": "28",
+        "sku": "1234"
     },
     {
-        "name": "Chanderi Party Saree",
-        "image": "media\/products\/1791448893.webp",
-        "sale_price": "2499",
-        "actual_price": "3999",
-        "product_id": 9,
-        "product_variant_id": 9,
-        "stock": "5",
-        "sku": "sku009"
+        "name": "Classic Chicken Burger",
+        "image": "media\/products\/1791865191.jpg",
+        "sale_price": "149",
+        "actual_price": "179",
+        "product_id": 2,
+        "product_variant_id": 15,
+        "stock": "38",
+        "sku": "1235"
     },
     {
-        "name": "Linen Silk Saree",
-        "image": "media\/products\/1791449004.jpg",
-        "sale_price": "2499",
-        "actual_price": "3999",
-        "product_id": 10,
-        "product_variant_id": 10,
-        "stock": "5",
-        "sku": "sku000"
+        "name": "Crispy Fried Chicken",
+        "image": "media\/products\/1791865572.webp",
+        "sale_price": "179",
+        "actual_price": "199",
+        "product_id": 3,
+        "product_variant_id": 16,
+        "stock": "40",
+        "sku": "1236"
     },
     {
-        "name": "Organza Floral Saree",
-        "image": "media\/products\/1791449222.webp",
-        "sale_price": "2799",
-        "actual_price": "4499",
+        "name": "Spicy Hot Wings",
+        "image": "media\/products\/1791865724.webp",
+        "sale_price": "229",
+        "actual_price": "249",
+        "product_id": 4,
+        "product_variant_id": 17,
+        "stock": "29",
+        "sku": "1237"
+    },
+    {
+        "name": "Chicken Tikka Wrap",
+        "image": "media\/products\/1791867537.webp",
+        "sale_price": "149",
+        "actual_price": "179",
+        "product_id": 5,
+        "product_variant_id": 18,
+        "stock": "39",
+        "sku": "1238"
+    },
+    {
+        "name": "Chicken Hakka Noodles",
+        "image": "media\/products\/1791868209.jpg",
+        "sale_price": "149",
+        "actual_price": "179",
+        "product_id": 6,
+        "product_variant_id": 19,
+        "stock": "50",
+        "sku": "1239"
+    },
+    {
+        "name": "Veg Schezwan Noodles",
+        "image": "media\/products\/1791868444.jpg",
+        "sale_price": "119",
+        "actual_price": "149",
         "product_id": 11,
-        "product_variant_id": 11,
-        "stock": "5",
-        "sku": "sku001"
+        "product_variant_id": 20,
+        "stock": "33",
+        "sku": "2314"
     },
     {
-        "name": "Rose Pink Designer Saree",
-        "image": "media\/products\/1791449379.jpg",
-        "sale_price": "3499",
-        "actual_price": "5499",
+        "name": "Classic Veg Sandwich",
+        "image": "media\/products\/1791868905.webp",
+        "sale_price": "99",
+        "actual_price": "129",
+        "product_id": 7,
+        "product_variant_id": 21,
+        "stock": "40",
+        "sku": "1230"
+    },
+    {
+        "name": "Grilled Cheese Sandwich",
+        "image": "media\/products\/1791869046.webp",
+        "sale_price": "129",
+        "actual_price": "159",
+        "product_id": 8,
+        "product_variant_id": 22,
+        "stock": "26",
+        "sku": "1231"
+    },
+    {
+        "name": "Double Cheese Veg Burger",
+        "image": "media\/products\/1791869241.jpg",
+        "sale_price": "199",
+        "actual_price": "229",
+        "product_id": 9,
+        "product_variant_id": 23,
+        "stock": "27",
+        "sku": "1232"
+    },
+    {
+        "name": "Chicken Club Sandwich",
+        "image": "media\/products\/1791869387.webp",
+        "sale_price": "179",
+        "actual_price": "219",
         "product_id": 12,
-        "product_variant_id": 12,
-        "stock": "5",
-        "sku": "sku002"
+        "product_variant_id": 24,
+        "stock": "28",
+        "sku": "2315"
+    },
+    {
+        "name": "Chocolate Brownie",
+        "image": "media\/products\/1791869960.webp",
+        "sale_price": "99",
+        "actual_price": "129",
+        "product_id": 10,
+        "product_variant_id": 25,
+        "stock": "34",
+        "sku": "1233"
+    },
+    {
+        "name": "Margherita Pizza",
+        "image": "media\/products\/1791871780.webp",
+        "sale_price": "149",
+        "actual_price": "179",
+        "product_id": 14,
+        "product_variant_id": 26,
+        "stock": "28",
+        "sku": "BAK-PIZ-001-REG"
+    },
+    {
+        "name": "Margherita Pizza",
+        "image": "media\/products\/1791871780.webp",
+        "sale_price": "149",
+        "actual_price": "179",
+        "product_id": 14,
+        "product_variant_id": 27,
+        "stock": "30",
+        "sku": "BAK-PIZ-001"
+    },
+    {
+        "name": "cake",
+        "image": "media\/products\/1791978806.jpg",
+        "sale_price": "100",
+        "actual_price": "150",
+        "product_id": 15,
+        "product_variant_id": 28,
+        "stock": "50",
+        "sku": "BAK-DES-001"
+    },
+    {
+        "name": "cake",
+        "image": "media\/products\/1791978806.jpg",
+        "sale_price": "55",
+        "actual_price": "55",
+        "product_id": 15,
+        "product_variant_id": 29,
+        "stock": "55",
+        "sku": "utdyfuigugvuyg"
     }
 ]

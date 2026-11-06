@@ -826,6 +826,47 @@
             }
         }
     </style>
+    <style>
+        .bk-favorite {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 5;
+
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: none;
+            border-radius: 50%;
+
+            background: rgba(255, 255, 255, 0.95);
+
+            color: #333;
+            font-size: 25px;
+
+            cursor: pointer;
+
+            transition: all 0.25s ease;
+        }
+
+        .bk-favorite:hover {
+            transform: scale(1.12);
+        }
+
+        .bk-favorite.active {
+            color: #e53935;
+            background: #fff0f0;
+        }
+
+        .bk-favorite:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+    </style>
 
     <div class="bk-restaurants">
         <section class="bk-hero" aria-labelledby="bk-restaurant-heading">
@@ -861,28 +902,27 @@
 
             <div class="bk-filterbar">
                 <div class="bk-cuisines" aria-label="Filter by cuisine">
-                    <button type="button" class="bk-cuisine active" data-cuisine="all" aria-pressed="true">All
-                        restaurants</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="North Indian" aria-pressed="false">🍛 North
-                        Indian</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="South Indian" aria-pressed="false">🥘 South
-                        Indian</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="Chinese" aria-pressed="false">🥢 Chinese</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="Italian" aria-pressed="false">🍝 Italian</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="Burgers" aria-pressed="false">🍔 Burgers</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="Pizza" aria-pressed="false">🍕 Pizza</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="Biryani" aria-pressed="false">🍛 Biryani</button>
-                    <button type="button" class="bk-cuisine" data-cuisine="Desserts" aria-pressed="false">🍰
-                        Desserts</button>
+
+                    <button type="button" class="bk-cuisine active" data-cuisine="all" aria-pressed="true">
+                        All restaurants
+                    </button>
+
+                    @foreach ($cuisines as $cuisine)
+                        <button type="button" class="bk-cuisine" data-cuisine="{{ strtolower(trim($cuisine)) }}"
+                            aria-pressed="false">
+                            {{ $cuisine }}
+                        </button>
+                    @endforeach
+
                 </div>
-                <select class="bk-sort" id="bkRestaurantSort" aria-label="Sort restaurants">
+                {{-- <select class="bk-sort" id="bkRestaurantSort" aria-label="Sort restaurants">
                     <option value="default">Sort: Relevance</option>
                     <option value="rating">Sort: Highest rated</option>
                     <option value="offer">Sort: Best offers</option>
                     <option value="price-low">Sort: Price low to high</option>
                     <option value="price-high">Sort: Price high to low</option>
                     <option value="name">Sort: Name A–Z</option>
-                </select>
+                </select> --}}
             </div>
 
             <div class="bk-grid" id="bkRestaurantGrid">
@@ -907,8 +947,23 @@
                             @if ($restaurant->is_featured ?? false)
                                 <span class="bk-featured">★ FEATURED</span>
                             @endif
-                            <button class="bk-favorite" type="button" aria-label="Add {{ $restaurant->name }} to favourites"
-                                aria-pressed="false">♡</button>
+                            @php
+                                $isFavorite = auth()->check()
+                                    ? auth()->user()->favoriteRestaurants()
+                                        ->where('restaurants.id', $restaurant->id)
+                                        ->exists()
+                                    : false;
+                            @endphp
+
+                            <button class="bk-favorite {{ $isFavorite ? 'active' : '' }}" type="button"
+                                data-restaurant-id="{{ $restaurant->id }}"
+                                aria-label="{{ $isFavorite ? 'Remove from' : 'Add to' }} favourites"
+                                aria-pressed="{{ $isFavorite ? 'true' : 'false' }}"
+                                title="{{ $isFavorite ? 'Remove from favourites' : 'Add to favourites' }}">
+
+                                {{ $isFavorite ? '♥' : '♡' }}
+
+                            </button>
                         </div>
 
                         <div class="bk-card-body">
@@ -1062,6 +1117,100 @@
                 });
             });
             updateRestaurants();
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const favoriteButtons = document.querySelectorAll('.bk-favorite');
+
+            favoriteButtons.forEach(function (button) {
+
+                button.addEventListener('click', async function () {
+
+                    const restaurantId = this.dataset.restaurantId;
+
+                    const buttonElement = this;
+
+                    buttonElement.disabled = true;
+
+                    try {
+
+                        const response = await fetch(
+                            "{{ route('favorite-restaurants.toggle') }}",
+                            {
+                                method: 'POST',
+
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+
+                                body: JSON.stringify({
+                                    restaurant_id: restaurantId
+                                })
+                            }
+                        );
+
+                        if (response.status === 401 || response.redirected) {
+                            window.location.href = "{{ route('login') }}";
+                            return;
+                        }
+
+                        const data = await response.json();
+
+                        if (!response.ok || !data.status) {
+                            throw new Error(data.message || 'Unable to update favourite.');
+                        }
+
+                        if (data.is_favorite) {
+
+                            buttonElement.classList.add('active');
+                            buttonElement.innerHTML = '♥';
+                            buttonElement.setAttribute('aria-pressed', 'true');
+                            buttonElement.setAttribute('aria-label', 'Remove from favourites');
+
+                        } else {
+
+                            buttonElement.classList.remove('active');
+                            buttonElement.innerHTML = '♡';
+                            buttonElement.setAttribute('aria-pressed', 'false');
+                            buttonElement.setAttribute('aria-label', 'Add to favourites');
+                        }
+
+                        // Optional toast notification
+                        if (typeof Swal !== 'undefined') {
+
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+
+                        } else {
+
+                            console.log(data.message);
+                        }
+
+                    } catch (error) {
+
+                        console.error('Favorite error:', error);
+
+                        alert(error.message || 'Something went wrong. Please try again.');
+
+                    } finally {
+
+                        buttonElement.disabled = false;
+                    }
+                });
+            });
+
         });
     </script>
 @endsection

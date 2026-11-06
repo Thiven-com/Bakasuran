@@ -1682,6 +1682,7 @@
         }
 
         @media(max-width:380px) {
+
             .rd-logo {
                 width: 60px;
                 height: 60px
@@ -1699,16 +1700,16 @@
                 font-size: 9px
             }
 
+            .rd-menu-banner {
+                flex-wrap: wrap;
+            }
+
             .rd-menu-search {
-                display: none
-            }
-
-            .rd-dish {
-                grid-template-columns: 82px minmax(0, 1fr)
-            }
-
-            .rd-dish-photo {
-                height: 82px
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                margin: 8px 0 0;
+                padding: 11px;
             }
         }
     </style>
@@ -1839,7 +1840,7 @@
 
             </div>
 
-            <div class="rd-gallery" id="rd-gallery">
+            {{-- <div class="rd-gallery" id="rd-gallery">
 
                 <div class="rd-gallery-grid">
 
@@ -1861,9 +1862,9 @@
 
                 </div>
 
-            </div>
+            </div> --}}
 
-            <div class="rd-benefits">
+            {{-- <div class="rd-benefits">
 
                 <div class="rd-benefit"><span class="rd-benefit-icon">♢</span>Hygienic &<br>Safe</div>
 
@@ -1875,7 +1876,7 @@
 
                 <div class="rd-benefit"><span class="rd-benefit-icon">♡</span>Great<br>Taste</div>
 
-            </div>
+            </div> --}}
 
         </section>
 
@@ -1913,19 +1914,21 @@
 
                 <div class="rd-category-list">
 
+                    {{-- Show all menu items --}}
+                    <button type="button" class="rd-category active" data-category="all">
+                        <span>🍽️</span>
+                        <span>All</span>
+                        <span class="rd-count">({{ $products->count() }})</span>
+                    </button>
+
                     @foreach ($categories as $category)
-
-                        <button type="button" class="rd-category {{ $loop->first ? 'active' : '' }}"
-                            data-category="{{ $category['name'] }}">
-
-                            <span>{{ $category['icon'] }}</span>
-
-                            <span>{{ $category['name'] }}</span>
-
-                            <span class="rd-count">({{ $category['count'] }})</span>
-
-                        </button>
-
+                        @if (strtolower(trim($category['name'])) !== 'all')
+                            <button type="button" class="rd-category" data-category="{{ $category['name'] }}">
+                                <span>{{ $category['icon'] }}</span>
+                                <span>{{ $category['name'] }}</span>
+                                <span class="rd-count">({{ $category['count'] }})</span>
+                            </button>
+                        @endif
                     @endforeach
 
                 </div>
@@ -1969,7 +1972,11 @@
                             @php
                                 // These fields match the BAKASURAN admin Product create/edit form.
                                 $itemName = data_get($item, 'title', data_get($item, 'name', 'Menu item'));
-                                $itemCategory = data_get($item, 'category.name', 'Other');
+                                $itemCategory = data_get($item, 'category.name')
+                                    ?: data_get($item, 'category_name')
+                                    ?: data_get($item, 'category.title')
+                                    ?: data_get($item, 'menuCategory.name')
+                                    ?: 'Other';
                                 $itemDescription = data_get($item, 'short_description') ?: data_get($item, 'description', '');
                                 $itemFoodType = strtolower((string) data_get($item, 'food_type', ''));
                                 $itemIsVeg = in_array($itemFoodType, ['veg', 'vegetarian'], true)
@@ -2248,7 +2255,8 @@
                     <div class="rd-review-summary">
                         <div class="rd-rating-card">
                             <div class="rd-rating-number">
-                                {{ $restaurantRating > 0 ? number_format($restaurantRating, 1) : '—' }}</div>
+                                {{ $restaurantRating > 0 ? number_format($restaurantRating, 1) : '—' }}
+                            </div>
                             <div class="rd-rating-stars">{{ $restaurantRating > 0 ? '★★★★★' : '☆☆☆☆☆' }}</div>
                             <small>Out of 5.0</small>
                         </div>
@@ -2623,73 +2631,226 @@
     </style>
 
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
+
+            /* -------------------------------------------------------
+               ELEMENTS
+            ------------------------------------------------------- */
 
             const menuList = document.getElementById('rd-menu-list');
 
+            if (!menuList) {
+                console.error('Menu list #rd-menu-list was not found.');
+                return;
+            }
+
             const dishCards = Array.from(menuList.querySelectorAll('.rd-dish'));
-
-            const categoryButtons = document.querySelectorAll('.rd-category');
-
+            const categoryButtons = Array.from(document.querySelectorAll('.rd-category'));
             const searchInput = document.getElementById('rd-menu-search');
-
             const cartItemsElement = document.getElementById('rd-cart-items');
 
+            const noResults = document.getElementById('rd-no-results');
+            const categoryHeading = document.getElementById('rd-category-heading');
+
+            const addonModal = document.getElementById('rd-addon-modal');
+            const addonGroupsContainer = document.getElementById('rd-addon-groups');
+            const addonConfirmButton = document.getElementById('rd-addon-confirm');
+
             const cartStorageKey = 'bakasuran_cart_restaurant_{{ (int) $restaurant->id }}';
+
+            /* -------------------------------------------------------
+               CART DATA
+            ------------------------------------------------------- */
+
             let cart = {};
+
             try {
                 const savedCart = JSON.parse(localStorage.getItem(cartStorageKey) || '{}');
-                if (savedCart && typeof savedCart === 'object' && !Array.isArray(savedCart)) cart = savedCart;
+
+                if (savedCart && typeof savedCart === 'object' && !Array.isArray(savedCart)) {
+                    cart = savedCart;
+                }
             } catch (error) {
                 console.warn('Saved cart could not be restored:', error);
             }
 
-            let selectedCategory = document.querySelector('.rd-category.active')?.dataset.category || 'All';
+            let selectedCategory = 'all';
             let couponApplied = false;
             let pendingDish = null;
-            const restaurantDeliveryFee = Number(@json((float) ($restaurant->delivery_fee ?? 0)));
-            const restaurantMinimumOrder = Number(@json((float) ($restaurant->minimum_order ?? 0)));
 
-            const money = value => '₹' + Math.round(Number(value || 0)).toLocaleString('en-IN');
-            const addonModal = document.getElementById('rd-addon-modal');
-            const addonGroupsContainer = document.getElementById('rd-addon-groups');
+            const restaurantDeliveryFee = Number(
+                @json((float) ($restaurant->delivery_fee ?? 0))
+            );
+
+            const restaurantMinimumOrder = Number(
+                @json((float) ($restaurant->minimum_order ?? 0))
+            );
+
+            const money = value => {
+                return '₹' + Math.round(Number(value || 0)).toLocaleString('en-IN');
+            };
+
+            /* -------------------------------------------------------
+               TEXT NORMALIZATION
+               Makes category matching case-insensitive and ignores
+               extra spaces, hyphens and underscores.
+            ------------------------------------------------------- */
+
+            function normalizeText(value) {
+                return String(value || '')
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[_-]+/g, ' ')
+                    .replace(/\s+/g, ' ');
+            }
+
+            function normalizeCategory(value) {
+                return normalizeText(value);
+            }
+
+            /* -------------------------------------------------------
+               CATEGORY FILTER + MENU SEARCH
+            ------------------------------------------------------- */
 
             function updateMenu() {
-                const term = (searchInput?.value || '').trim().toLowerCase();
+
+                const term = normalizeText(searchInput ? searchInput.value : '');
+
                 let visibleCount = 0;
 
                 dishCards.forEach(function (card) {
-                    const categoryMatches = selectedCategory === 'All' || card.dataset.category === selectedCategory;
-                    const description = card.querySelector('.rd-dish-description')?.textContent || '';
-                    const searchMatches = !term ||
-                        (card.dataset.name || '').toLowerCase().includes(term) ||
-                        description.toLowerCase().includes(term);
+
+                    const productCategory = normalizeCategory(card.dataset.category);
+                    const productName = normalizeText(card.dataset.name);
+
+                    const description = normalizeText(
+                        card.querySelector('.rd-dish-description')?.textContent
+                    );
+
+                    const variantDetails = normalizeText(
+                        Array.from(card.querySelectorAll('.rd-variant-select option'))
+                            .map(option => option.textContent)
+                            .join(' ')
+                    );
+
+                    /*
+                     * "all" displays every product.
+                     * Other categories match the product's data-category.
+                     */
+                    const categoryMatches =
+                        selectedCategory === 'all' ||
+                        productCategory === selectedCategory;
+
+                    /*
+                     * Search checks product name, description,
+                     * category and variant names.
+                     */
+                    const searchMatches =
+                        !term ||
+                        productName.includes(term) ||
+                        description.includes(term) ||
+                        productCategory.includes(term) ||
+                        variantDetails.includes(term);
 
                     const visible = categoryMatches && searchMatches;
+
                     card.style.display = visible ? '' : 'none';
-                    if (visible) visibleCount++;
+
+                    if (visible) {
+                        visibleCount++;
+                    }
                 });
 
-                document.getElementById('rd-no-results').style.display = visibleCount ? 'none' : 'block';
-                document.getElementById('rd-category-heading').textContent =
-                    selectedCategory === 'All' ? 'All Dishes' : selectedCategory;
+                /* No-results message */
+                if (noResults) {
+
+                    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+
+                    noResults.textContent = term
+                        ? `No menu items found for "${searchInput?.value || ''}".`
+                        : 'No dishes found in this category.';
+                }
+
+                /* Heading */
+                if (categoryHeading) {
+
+                    if (selectedCategory === 'all') {
+
+                        categoryHeading.textContent = 'All Dishes';
+
+                    } else {
+
+                        const activeButton = document.querySelector('.rd-category.active');
+
+                        const categoryName = activeButton
+                            ?.querySelectorAll('span')[1]
+                            ?.textContent.trim();
+
+                        categoryHeading.textContent = categoryName || 'Menu';
+                    }
+                }
             }
 
+            /* -------------------------------------------------------
+               CATEGORY BUTTONS
+            ------------------------------------------------------- */
+
             categoryButtons.forEach(function (button) {
+
                 button.addEventListener('click', function () {
-                    categoryButtons.forEach(item => item.classList.remove('active'));
+
+                    categoryButtons.forEach(function (item) {
+                        item.classList.remove('active');
+                    });
+
                     this.classList.add('active');
-                    selectedCategory = this.dataset.category;
+
+                    selectedCategory = normalizeCategory(this.dataset.category);
+
                     updateMenu();
                 });
             });
 
-            searchInput?.addEventListener('input', updateMenu);
+            /* -------------------------------------------------------
+               SEARCH EVENTS
+            ------------------------------------------------------- */
+
+            if (searchInput) {
+
+                searchInput.addEventListener('input', updateMenu);
+                searchInput.addEventListener('search', updateMenu);
+                searchInput.addEventListener('keyup', updateMenu);
+            }
+
+            /* -------------------------------------------------------
+               INITIAL CATEGORY
+            ------------------------------------------------------- */
+
+            const allButton = categoryButtons.find(function (button) {
+                return normalizeCategory(button.dataset.category) === 'all';
+            });
+
+            if (allButton) {
+
+                categoryButtons.forEach(button => button.classList.remove('active'));
+
+                allButton.classList.add('active');
+
+                selectedCategory = 'all';
+            }
+
+            updateMenu();
+
+            /* -------------------------------------------------------
+               GET SELECTED VARIANT
+            ------------------------------------------------------- */
 
             function getSelectedVariant(card) {
+
                 const select = card.querySelector('.rd-variant-select');
+
                 if (!select) {
+
                     return {
                         id: null,
                         price: Number(card.dataset.price || 0),
@@ -2704,7 +2865,10 @@
                 }
 
                 const option = select.options[select.selectedIndex];
-                if (!option) return null;
+
+                if (!option) {
+                    return null;
+                }
 
                 return {
                     id: option.value,
@@ -2719,57 +2883,100 @@
                 };
             }
 
+            /* -------------------------------------------------------
+               UPDATE VARIANT DETAILS ON PRODUCT CARD
+            ------------------------------------------------------- */
+
             function updateCardVariant(card) {
+
                 const variant = getSelectedVariant(card);
-                if (!variant) return;
+
+                if (!variant) {
+                    return;
+                }
 
                 const priceElement = card.querySelector('.rd-current-price');
-                if (priceElement) priceElement.textContent = variant.price.toFixed(2);
+
+                if (priceElement) {
+                    priceElement.textContent = variant.price.toFixed(2);
+                }
 
                 const oldPrice = card.querySelector('.rd-variant-price-old');
+
                 if (oldPrice) {
+
                     if (variant.actualPrice > variant.price) {
+
                         oldPrice.textContent = money(variant.actualPrice);
                         oldPrice.style.display = '';
+
                     } else {
+
                         oldPrice.style.display = 'none';
                     }
+
                 } else if (variant.actualPrice > variant.price) {
+
                     const old = document.createElement('span');
+
                     old.className = 'rd-variant-price-old';
                     old.textContent = money(variant.actualPrice);
+
                     card.querySelector('.rd-dish-price')?.appendChild(old);
                 }
 
                 const image = card.querySelector('.rd-dish-photo img');
+
                 if (image && variant.image) {
+
                     image.onerror = function () {
                         this.onerror = null;
                         this.src = 'https://placehold.co/400x300/171717/ffffff?text=Food';
                     };
+
                     image.src = variant.image;
                 }
+
                 card.dataset.price = String(variant.price);
                 card.dataset.image = variant.image;
 
                 const sku = card.querySelector('.rd-variant-sku');
                 const prep = card.querySelector('.rd-variant-prep');
-                const selectedOption = card.querySelector('.rd-variant-select')?.selectedOptions?.[0];
+
+                const selectedOption = card.querySelector('.rd-variant-select')
+                    ?.selectedOptions?.[0];
+
                 if (sku && selectedOption) {
-                    sku.textContent = selectedOption.dataset.sku ? 'SKU: ' + selectedOption.dataset.sku : '';
+                    sku.textContent = selectedOption.dataset.sku
+                        ? 'SKU: ' + selectedOption.dataset.sku
+                        : '';
                 }
+
                 if (prep && selectedOption) {
-                    prep.textContent = selectedOption.dataset.prep ? 'Prep: ' + selectedOption.dataset.prep + ' min' : '';
+                    prep.textContent = selectedOption.dataset.prep
+                        ? 'Prep: ' + selectedOption.dataset.prep + ' min'
+                        : '';
                 }
 
                 const addButton = card.querySelector('.rd-add');
+
                 if (addButton) {
-                    addButton.disabled = !variant.available || card.dataset.available === '0';
-                    addButton.textContent = addButton.disabled ? 'Unavailable' : 'Add';
+
+                    addButton.disabled =
+                        !variant.available || card.dataset.available === '0';
+
+                    addButton.textContent = addButton.disabled
+                        ? 'Unavailable'
+                        : 'Add';
                 }
             }
 
+            /* -------------------------------------------------------
+               PRODUCT ADD-ON GROUPS
+            ------------------------------------------------------- */
+
             function getCardAddonGroups(card) {
+
                 try {
                     return JSON.parse(card.dataset.addons || '[]');
                 } catch (error) {
@@ -2778,77 +2985,140 @@
                 }
             }
 
+            /* -------------------------------------------------------
+               OPEN ADD-ON MODAL
+            ------------------------------------------------------- */
+
             function openAddonModal(card) {
+
                 const variant = getSelectedVariant(card);
-                if (!variant || !variant.available || card.dataset.available === '0') return;
+
+                if (!variant || !variant.available || card.dataset.available === '0') {
+                    return;
+                }
 
                 const groups = getCardAddonGroups(card);
-                pendingDish = { card, variant, groups };
 
-                document.getElementById('rd-addon-product-name').textContent = card.dataset.name;
-                addonGroupsContainer.innerHTML = '';
+                pendingDish = {
+                    card,
+                    variant,
+                    groups
+                };
 
-                if (!groups.length) {
+                const productNameElement = document.getElementById('rd-addon-product-name');
+
+                if (productNameElement) {
+                    productNameElement.textContent = card.dataset.name || '';
+                }
+
+                if (!addonGroupsContainer || !addonModal) {
                     addConfiguredDish(card, variant, []);
                     pendingDish = null;
                     return;
                 }
 
+                addonGroupsContainer.innerHTML = '';
+
+                if (!groups.length) {
+
+                    addConfiguredDish(card, variant, []);
+
+                    pendingDish = null;
+
+                    return;
+                }
+
                 groups.forEach(function (group) {
+
                     const section = document.createElement('section');
+
                     section.className = 'rd-addon-group';
                     section.dataset.groupId = group.id;
 
                     const title = document.createElement('div');
+
                     title.className = 'rd-addon-group-title';
 
                     const groupName = document.createElement('span');
+
                     groupName.textContent = group.name;
 
                     const requirement = document.createElement('span');
+
                     requirement.textContent = group.is_required ? 'Required' : 'Optional';
+
                     title.append(groupName, requirement);
 
                     const hint = document.createElement('p');
+
                     hint.className = 'rd-addon-group-hint';
+
                     const min = Number(group.min_select || 0);
                     const max = Number(group.max_select || 1);
+
                     hint.textContent = max > 1
                         ? `Choose ${min} to ${max}`
-                        : (group.is_required ? 'Choose one option' : 'Choose an option if you like');
+                        : (group.is_required
+                            ? 'Choose one option'
+                            : 'Choose an option if you like');
 
                     section.append(title, hint);
 
-                    const isMultiple = String(group.selection_type || '').toLowerCase().includes('multiple');
-                    group.options.forEach(function (option) {
+                    const isMultiple = String(group.selection_type || '')
+                        .toLowerCase()
+                        .includes('multiple');
+
+                    (group.options || []).forEach(function (option) {
+
                         const label = document.createElement('label');
+
                         label.className = 'rd-addon-option';
 
                         const input = document.createElement('input');
+
                         input.type = isMultiple ? 'checkbox' : 'radio';
-                        input.name = isMultiple ? `addon-group-${group.id}[]` : `addon-group-${group.id}`;
+
+                        input.name = isMultiple
+                            ? `addon-group-${group.id}[]`
+                            : `addon-group-${group.id}`;
+
                         input.value = option.id;
                         input.dataset.name = option.name;
                         input.dataset.price = option.price;
+
                         input.addEventListener('change', function () {
+
                             if (isMultiple && this.checked && max > 0) {
+
                                 const checked = section.querySelectorAll('input:checked');
+
                                 if (checked.length > max) {
+
                                     this.checked = false;
-                                    showAddonError(`You can select a maximum of ${max} option(s) for ${group.name}.`);
+
+                                    showAddonError(
+                                        `You can select a maximum of ${max} option(s) for ${group.name}.`
+                                    );
                                 }
                             }
+
                             updateAddonTotal();
                         });
 
                         const name = document.createElement('span');
+
                         name.textContent = option.name;
 
                         const price = document.createElement('span');
+
                         price.className = 'rd-addon-option-price';
-                        price.textContent = option.price > 0 ? '+ ' + money(option.price) : 'Free';
+
+                        price.textContent = option.price > 0
+                            ? '+ ' + money(option.price)
+                            : 'Free';
 
                         label.append(input, name, price);
+
                         section.appendChild(label);
                     });
 
@@ -2856,323 +3126,709 @@
                 });
 
                 const error = document.createElement('p');
+
                 error.className = 'rd-addon-error';
                 error.id = 'rd-addon-error';
                 error.style.display = 'none';
+
                 addonGroupsContainer.appendChild(error);
 
-                document.getElementById('rd-addon-confirm').disabled = false;
+                if (addonConfirmButton) {
+                    addonConfirmButton.disabled = false;
+                }
+
                 updateAddonTotal();
+
                 addonModal.classList.add('open');
+
                 addonModal.setAttribute('aria-hidden', 'false');
             }
 
+            /* -------------------------------------------------------
+               ADD-ON ERROR
+            ------------------------------------------------------- */
+
             function showAddonError(message) {
+
                 const error = document.getElementById('rd-addon-error');
-                if (!error) return;
+
+                if (!error) {
+                    return;
+                }
+
                 error.textContent = message;
+
                 error.style.display = 'block';
             }
 
+            /* -------------------------------------------------------
+               UPDATE ADD-ON TOTAL
+            ------------------------------------------------------- */
+
             function updateAddonTotal() {
-                if (!pendingDish) return;
-                const selected = Array.from(addonGroupsContainer.querySelectorAll('input:checked'));
-                const addonTotal = selected.reduce((sum, input) => sum + Number(input.dataset.price || 0), 0);
-                document.getElementById('rd-addon-total').textContent = money(pendingDish.variant.price + addonTotal);
+
+                if (!pendingDish || !addonGroupsContainer) {
+                    return;
+                }
+
+                const selected = Array.from(
+                    addonGroupsContainer.querySelectorAll('input:checked')
+                );
+
+                const addonTotal = selected.reduce(function (sum, input) {
+                    return sum + Number(input.dataset.price || 0);
+                }, 0);
+
+                const totalElement = document.getElementById('rd-addon-total');
+
+                if (totalElement) {
+                    totalElement.textContent = money(
+                        pendingDish.variant.price + addonTotal
+                    );
+                }
             }
 
+            /* -------------------------------------------------------
+               COLLECT SELECTED ADD-ONS
+            ------------------------------------------------------- */
+
             function collectSelectedAddons() {
+
                 const selected = [];
+
+                if (!pendingDish || !addonGroupsContainer) {
+                    return selected;
+                }
+
                 for (const group of pendingDish.groups) {
-                    const section = addonGroupsContainer.querySelector(`[data-group-id="${group.id}"]`);
-                    const inputs = Array.from(section?.querySelectorAll('input:checked') || []);
+
+                    const section = addonGroupsContainer.querySelector(
+                        `[data-group-id="${group.id}"]`
+                    );
+
+                    const inputs = Array.from(
+                        section?.querySelectorAll('input:checked') || []
+                    );
+
                     const min = Number(group.min_select || 0);
                     const max = Number(group.max_select || 1);
-                    const requiredMin = group.is_required ? Math.max(1, min) : min;
+
+                    const requiredMin = group.is_required
+                        ? Math.max(1, min)
+                        : min;
 
                     if (inputs.length < requiredMin) {
-                        showAddonError(`Please select at least ${requiredMin} option(s) for ${group.name}.`);
-                        return null;
-                    }
-                    if (max > 0 && inputs.length > max) {
-                        showAddonError(`Please select no more than ${max} option(s) for ${group.name}.`);
+
+                        showAddonError(
+                            `Please select at least ${requiredMin} option(s) for ${group.name}.`
+                        );
+
                         return null;
                     }
 
-                    inputs.forEach(input => selected.push({
-                        id: Number(input.value),
-                        name: input.dataset.name,
-                        price: Number(input.dataset.price || 0),
-                        groupId: Number(group.id),
-                        groupName: group.name
-                    }));
+                    if (max > 0 && inputs.length > max) {
+
+                        showAddonError(
+                            `Please select no more than ${max} option(s) for ${group.name}.`
+                        );
+
+                        return null;
+                    }
+
+                    inputs.forEach(function (input) {
+
+                        selected.push({
+                            id: Number(input.value),
+                            name: input.dataset.name,
+                            price: Number(input.dataset.price || 0),
+                            groupId: Number(group.id),
+                            groupName: group.name
+                        });
+                    });
                 }
+
                 return selected;
             }
 
+            /* -------------------------------------------------------
+               CLOSE ADD-ON MODAL
+            ------------------------------------------------------- */
+
             function closeAddonModal() {
+
+                if (!addonModal) {
+                    return;
+                }
+
                 addonModal.classList.remove('open');
+
                 addonModal.setAttribute('aria-hidden', 'true');
+
                 pendingDish = null;
             }
 
-            addonModal.querySelectorAll('[data-addon-close]').forEach(button => {
-                button.addEventListener('click', closeAddonModal);
-            });
+            if (addonModal) {
 
-            document.getElementById('rd-addon-confirm').addEventListener('click', function () {
-                if (!pendingDish) return;
-                const selectedAddons = collectSelectedAddons();
-                if (selectedAddons === null) return;
+                addonModal.querySelectorAll('[data-addon-close]').forEach(function (button) {
+                    button.addEventListener('click', closeAddonModal);
+                });
+            }
 
-                const { card, variant } = pendingDish;
-                addConfiguredDish(card, variant, selectedAddons);
-                closeAddonModal();
-            });
+            if (addonConfirmButton) {
+
+                addonConfirmButton.addEventListener('click', function () {
+
+                    if (!pendingDish) {
+                        return;
+                    }
+
+                    const selectedAddons = collectSelectedAddons();
+
+                    if (selectedAddons === null) {
+                        return;
+                    }
+
+                    const { card, variant } = pendingDish;
+
+                    addConfiguredDish(card, variant, selectedAddons);
+
+                    closeAddonModal();
+                });
+            }
+
+            /* -------------------------------------------------------
+               SAVE CART
+            ------------------------------------------------------- */
 
             function persistCart() {
+
                 try {
-                    localStorage.setItem(cartStorageKey, JSON.stringify(cart));
+
+                    localStorage.setItem(
+                        cartStorageKey,
+                        JSON.stringify(cart)
+                    );
+
                 } catch (error) {
+
                     console.warn('Cart could not be saved in this browser:', error);
                 }
             }
 
+            /* -------------------------------------------------------
+               ADD PRODUCT TO CART
+            ------------------------------------------------------- */
+
             function addConfiguredDish(card, variant, addons) {
+
                 const productId = String(card.dataset.id);
-                const addonKey = addons.map(addon => addon.id).sort((a, b) => a - b).join(',');
+
+                const addonKey = addons
+                    .map(addon => addon.id)
+                    .sort((a, b) => a - b)
+                    .join(',');
+
                 const variantId = variant.id || 'default';
+
                 const key = `${productId}:${variantId}:${addonKey}`;
 
                 const currentQty = cart[key]?.qty || 0;
+
                 if (variant.stock > 0 && currentQty >= variant.stock) {
+
                     alert('Only ' + variant.stock + ' units are available for this variant.');
+
                     return;
                 }
+
                 if (!cart[key]) {
+
                     cart[key] = {
                         id: key,
                         productId,
                         variantId,
                         name: card.dataset.name,
                         variantLabel: variant.label || '',
-                        price: variant.price + addons.reduce((sum, addon) => sum + addon.price, 0),
+                        price: variant.price + addons.reduce(
+                            (sum, addon) => sum + addon.price,
+                            0
+                        ),
                         basePrice: variant.price,
                         image: variant.image || card.dataset.image,
                         stock: Number(variant.stock || 0),
                         addons,
                         qty: 1
                     };
+
                 } else {
+
                     cart[key].qty++;
                 }
 
                 persistCart();
+
                 renderCart();
             }
 
-            function renderCart() {
-                cartItemsElement.innerHTML = '';
-                const items = Object.values(cart).filter(item => item.qty > 0);
-                const itemCount = items.reduce((sum, item) => sum + item.qty, 0);
-                const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+            /* -------------------------------------------------------
+               RENDER CART
+            ------------------------------------------------------- */
 
-                document.getElementById('rd-cart-count').textContent =
-                    '(' + itemCount + (itemCount === 1 ? ' item' : ' items') + ')';
+            function renderCart() {
+
+                if (!cartItemsElement) {
+                    return;
+                }
+
+                cartItemsElement.innerHTML = '';
+
+                const items = Object.values(cart).filter(item => item.qty > 0);
+
+                const itemCount = items.reduce(
+                    (sum, item) => sum + item.qty,
+                    0
+                );
+
+                const subtotal = items.reduce(
+                    (sum, item) => sum + item.price * item.qty,
+                    0
+                );
+
+                const cartCountElement = document.getElementById('rd-cart-count');
+
+                if (cartCountElement) {
+
+                    cartCountElement.textContent =
+                        '(' + itemCount + (itemCount === 1 ? ' item' : ' items') + ')';
+                }
 
                 if (!items.length) {
+
                     cartItemsElement.innerHTML = `
-                            <div class="rd-cart-empty">
-                                <span>🛒</span>
-                                Your cart is waiting.<br>Add delicious dishes to get started!
-                            </div>`;
+                    <div class="rd-cart-empty">
+                        <span>🛒</span>
+                        Your cart is waiting.<br>
+                        Add delicious dishes to get started!
+                    </div>
+                `;
+
                 } else {
+
                     items.forEach(function (item) {
+
                         const row = document.createElement('div');
+
                         row.className = 'rd-cart-item';
 
                         const img = document.createElement('img');
-                        img.src = item.image || 'https://placehold.co/150x120/171717/ffffff?text=Food';
+
+                        img.src = item.image ||
+                            'https://placehold.co/150x120/171717/ffffff?text=Food';
+
                         img.alt = item.name;
 
                         const details = document.createElement('div');
+
                         const name = document.createElement('div');
+
                         name.className = 'rd-cart-item-name';
-                        name.textContent = item.name + (item.variantLabel ? ` (${item.variantLabel})` : '');
+
+                        name.textContent =
+                            item.name +
+                            (item.variantLabel ? ` (${item.variantLabel})` : '');
 
                         const price = document.createElement('div');
+
                         price.className = 'rd-cart-item-price';
+
                         price.textContent = money(item.price * item.qty);
 
                         details.append(name, price);
 
-                        if (item.addons.length) {
+                        if (item.addons && item.addons.length) {
+
                             const addonNames = document.createElement('small');
-                            addonNames.style.cssText = 'display:block;margin-top:3px;color:#71717a;font-size:9px;line-height:1.4';
-                            addonNames.textContent = item.addons.map(addon => addon.name).join(', ');
+
+                            addonNames.style.cssText =
+                                'display:block;margin-top:3px;color:#71717a;font-size:9px;line-height:1.4';
+
+                            addonNames.textContent = item.addons
+                                .map(addon => addon.name)
+                                .join(', ');
+
                             details.appendChild(addonNames);
                         }
 
                         const controls = document.createElement('div');
+
                         controls.className = 'rd-cart-qty';
 
                         const minus = document.createElement('button');
+
                         minus.textContent = '−';
+
                         minus.setAttribute('aria-label', 'Decrease quantity');
 
                         const qty = document.createElement('span');
+
                         qty.textContent = item.qty;
 
                         const plus = document.createElement('button');
+
                         plus.textContent = '+';
+
                         plus.setAttribute('aria-label', 'Increase quantity');
 
-                        minus.addEventListener('click', () => changeQty(item.id, -1));
-                        plus.addEventListener('click', () => changeQty(item.id, 1));
+                        minus.addEventListener('click', function () {
+                            changeQty(item.id, -1);
+                        });
+
+                        plus.addEventListener('click', function () {
+                            changeQty(item.id, 1);
+                        });
+
                         controls.append(minus, qty, plus);
 
                         const remove = document.createElement('button');
+
                         remove.className = 'rd-cart-delete';
+
                         remove.textContent = '×';
+
                         remove.setAttribute('aria-label', 'Remove item');
-                        remove.addEventListener('click', () => {
+
+                        remove.addEventListener('click', function () {
+
                             delete cart[item.id];
+
                             persistCart();
+
                             renderCart();
                         });
 
                         row.append(img, details, controls, remove);
+
                         cartItemsElement.appendChild(row);
                     });
                 }
 
-                // Use restaurant-configured delivery fee. Tax/coupon are not guessed here;
-                // the Laravel checkout page calculates them from its own configured records.
-                const delivery = subtotal === 0 ? 0 : restaurantDeliveryFee;
+                /* Cart totals */
+
+                const delivery = subtotal === 0
+                    ? 0
+                    : restaurantDeliveryFee;
+
                 const tax = 0;
                 const discount = 0;
+
                 const total = Math.max(0, subtotal + delivery);
 
-                document.getElementById('rd-subtotal').textContent = money(subtotal);
-                document.getElementById('rd-delivery').textContent =
-                    delivery === 0 && subtotal > 0 ? 'FREE' : money(delivery);
-                document.getElementById('rd-tax').textContent = money(tax);
-                document.getElementById('rd-discount').textContent = '−' + money(discount);
-                document.getElementById('rd-discount-row').style.display = discount ? 'flex' : 'none';
-                document.getElementById('rd-total').textContent = money(total);
-                const belowMinimum = restaurantMinimumOrder > 0 && subtotal > 0 && subtotal < restaurantMinimumOrder;
-                document.getElementById('rd-checkout').disabled = itemCount === 0 || belowMinimum;
-                document.getElementById('rd-saved').textContent =
-                    belowMinimum ? 'Minimum order is ' + money(restaurantMinimumOrder) + '. Add ' + money(restaurantMinimumOrder - subtotal) + ' more.' :
-                        subtotal > 0 ? 'Delivery fee is based on this restaurant.' :
-                            'Add items to see your order total.';
+                const subtotalElement = document.getElementById('rd-subtotal');
+                const deliveryElement = document.getElementById('rd-delivery');
+                const taxElement = document.getElementById('rd-tax');
+                const discountElement = document.getElementById('rd-discount');
+                const discountRow = document.getElementById('rd-discount-row');
+                const totalElement = document.getElementById('rd-total');
+                const checkoutButton = document.getElementById('rd-checkout');
+                const savedElement = document.getElementById('rd-saved');
+
+                if (subtotalElement) {
+                    subtotalElement.textContent = money(subtotal);
+                }
+
+                if (deliveryElement) {
+                    deliveryElement.textContent =
+                        delivery === 0 && subtotal > 0
+                            ? 'FREE'
+                            : money(delivery);
+                }
+
+                if (taxElement) {
+                    taxElement.textContent = money(tax);
+                }
+
+                if (discountElement) {
+                    discountElement.textContent = '−' + money(discount);
+                }
+
+                if (discountRow) {
+                    discountRow.style.display = discount ? 'flex' : 'none';
+                }
+
+                if (totalElement) {
+                    totalElement.textContent = money(total);
+                }
+
+                const belowMinimum =
+                    restaurantMinimumOrder > 0 &&
+                    subtotal > 0 &&
+                    subtotal < restaurantMinimumOrder;
+
+                if (checkoutButton) {
+                    checkoutButton.disabled = itemCount === 0 || belowMinimum;
+                }
+
+                if (savedElement) {
+
+                    savedElement.textContent = belowMinimum
+                        ? 'Minimum order is ' + money(restaurantMinimumOrder) +
+                        '. Add ' + money(restaurantMinimumOrder - subtotal) + ' more.'
+                        : subtotal > 0
+                            ? 'Delivery fee is based on this restaurant.'
+                            : 'Add items to see your order total.';
+                }
 
                 syncDishControls();
             }
 
+            /* -------------------------------------------------------
+               CHANGE CART QUANTITY
+            ------------------------------------------------------- */
+
             function changeQty(id, change) {
-                if (!cart[id]) return;
-                if (change > 0 && Number(cart[id].stock || 0) > 0 && cart[id].qty >= Number(cart[id].stock)) {
-                    alert('Maximum available stock reached.');
+
+                if (!cart[id]) {
                     return;
                 }
+
+                if (
+                    change > 0 &&
+                    Number(cart[id].stock || 0) > 0 &&
+                    cart[id].qty >= Number(cart[id].stock)
+                ) {
+
+                    alert('Maximum available stock reached.');
+
+                    return;
+                }
+
                 cart[id].qty += change;
-                if (cart[id].qty <= 0) delete cart[id];
+
+                if (cart[id].qty <= 0) {
+                    delete cart[id];
+                }
+
                 persistCart();
+
                 renderCart();
             }
 
+            /* -------------------------------------------------------
+               SYNC PRODUCT QUANTITY BUTTONS
+            ------------------------------------------------------- */
+
             function syncDishControls() {
+
                 dishCards.forEach(function (card) {
-                    const productItems = Object.values(cart).filter(item => item.productId === String(card.dataset.id));
-                    const quantity = productItems.reduce((sum, item) => sum + item.qty, 0);
+
+                    const productItems = Object.values(cart).filter(function (item) {
+                        return item.productId === String(card.dataset.id);
+                    });
+
+                    const quantity = productItems.reduce(
+                        (sum, item) => sum + item.qty,
+                        0
+                    );
+
                     const addButton = card.querySelector('.rd-add');
                     const qtyBox = card.querySelector('.rd-qty');
                     const qtyValue = card.querySelector('.rd-qty-value');
 
+                    if (!addButton || !qtyBox || !qtyValue) {
+                        return;
+                    }
+
                     if (quantity > 0) {
+
                         addButton.style.display = 'none';
+
                         qtyBox.style.display = 'flex';
+
                         qtyValue.textContent = quantity;
+
                     } else {
+
                         addButton.style.display = 'block';
+
                         qtyBox.style.display = 'none';
+
                         const variant = getSelectedVariant(card);
-                        addButton.disabled = card.dataset.available === '0' || !variant?.available;
-                        addButton.textContent = addButton.disabled ? 'Unavailable' : 'Add';
+
+                        addButton.disabled =
+                            card.dataset.available === '0' ||
+                            !variant?.available;
+
+                        addButton.textContent = addButton.disabled
+                            ? 'Unavailable'
+                            : 'Add';
                     }
                 });
             }
 
+            /* -------------------------------------------------------
+               PRODUCT CARD EVENTS
+            ------------------------------------------------------- */
+
             dishCards.forEach(function (card) {
+
                 const id = String(card.dataset.id);
+
                 const variantSelect = card.querySelector('.rd-variant-select');
 
-                variantSelect?.addEventListener('change', function () {
-                    updateCardVariant(card);
-                    syncDishControls();
-                });
+                if (variantSelect) {
 
-                card.querySelector('.rd-add').addEventListener('click', function () {
-                    openAddonModal(card);
-                });
+                    variantSelect.addEventListener('change', function () {
+
+                        updateCardVariant(card);
+
+                        syncDishControls();
+                    });
+                }
+
+                const addButton = card.querySelector('.rd-add');
+
+                if (addButton) {
+
+                    addButton.addEventListener('click', function () {
+                        openAddonModal(card);
+                    });
+                }
 
                 function selectedVariantCartItem() {
+
                     const selected = getSelectedVariant(card);
-                    if (!selected) return null;
+
+                    if (!selected) {
+                        return null;
+                    }
+
                     return Object.values(cart)
-                        .filter(entry => entry.productId === id && String(entry.variantId) === String(selected.id || 'default'))
+                        .filter(function (entry) {
+
+                            return entry.productId === id &&
+                                String(entry.variantId) === String(selected.id || 'default');
+                        })
                         .sort((a, b) => a.id.localeCompare(b.id))[0] || null;
                 }
 
-                card.querySelector('.rd-minus').addEventListener('click', function () {
-                    const item = selectedVariantCartItem();
-                    if (item) changeQty(item.id, -1);
-                });
+                const minusButton = card.querySelector('.rd-minus');
 
-                card.querySelector('.rd-plus').addEventListener('click', function () {
-                    const item = selectedVariantCartItem();
-                    if (!item) return;
-                    const selected = getSelectedVariant(card);
-                    if (selected?.stock > 0 && item.qty >= selected.stock) {
-                        alert('Only ' + selected.stock + ' units are available for this variant.');
+                if (minusButton) {
+
+                    minusButton.addEventListener('click', function () {
+
+                        const item = selectedVariantCartItem();
+
+                        if (item) {
+                            changeQty(item.id, -1);
+                        }
+                    });
+                }
+
+                const plusButton = card.querySelector('.rd-plus');
+
+                if (plusButton) {
+
+                    plusButton.addEventListener('click', function () {
+
+                        const item = selectedVariantCartItem();
+
+                        if (!item) {
+                            return;
+                        }
+
+                        const selected = getSelectedVariant(card);
+
+                        if (selected?.stock > 0 && item.qty >= selected.stock) {
+
+                            alert('Only ' + selected.stock + ' units are available for this variant.');
+
+                            return;
+                        }
+
+                        changeQty(item.id, 1);
+                    });
+                }
+
+                const favButton = card.querySelector('.rd-fav');
+
+                if (favButton) {
+
+                    favButton.addEventListener('click', function () {
+
+                        const active = this.classList.toggle('active');
+
+                        this.textContent = active ? '♥' : '♡';
+                    });
+                }
+            });
+
+            /* -------------------------------------------------------
+               CLEAR CART
+            ------------------------------------------------------- */
+
+            const clearButton = document.getElementById('rd-clear');
+
+            if (clearButton) {
+
+                clearButton.addEventListener('click', function () {
+
+                    cart = {};
+
+                    persistCart();
+
+                    couponApplied = false;
+
+                    renderCart();
+                });
+            }
+
+            /* -------------------------------------------------------
+               COUPON PANEL
+            ------------------------------------------------------- */
+
+            const couponToggle = document.getElementById('rd-coupon-toggle');
+
+            if (couponToggle) {
+
+                couponToggle.addEventListener('click', function () {
+
+                    const panel = document.getElementById('rd-coupon-input');
+
+                    if (!panel) {
                         return;
                     }
-                    changeQty(item.id, 1);
+
+                    panel.style.display =
+                        panel.style.display === 'flex'
+                            ? 'none'
+                            : 'flex';
                 });
+            }
 
-                card.querySelector('.rd-fav').addEventListener('click', function () {
-                    const active = this.classList.toggle('active');
-                    this.textContent = active ? '♥' : '♡';
+            const applyCouponButton = document.getElementById('rd-apply-coupon');
+
+            if (applyCouponButton) {
+
+                applyCouponButton.addEventListener('click', function () {
+
+                    alert(
+                        'Coupon validation is handled on the secure checkout page using active coupon records.'
+                    );
                 });
-            });
+            }
 
-            document.getElementById('rd-clear').addEventListener('click', function () {
-
-                cart = {};
-                persistCart();
-                couponApplied = false;
-                renderCart();
-
-            });
-
-            document.getElementById('rd-coupon-toggle').addEventListener('click', function () {
-
-                const panel = document.getElementById('rd-coupon-input');
-
-                panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
-
-            });
-
-            document.getElementById('rd-apply-coupon').addEventListener('click', function () {
-                alert('Coupon validation is handled on the secure checkout page using active coupon records.');
-            });
+            /* -------------------------------------------------------
+               PAGE TABS
+            ------------------------------------------------------- */
 
             document.querySelectorAll('.rd-tab[data-tab]').forEach(function (tab) {
 
                 tab.addEventListener('click', function () {
 
-                    document.querySelectorAll('.rd-tab[data-tab]').forEach(item => item.classList.remove('active'));
+                    document.querySelectorAll('.rd-tab[data-tab]').forEach(function (item) {
+                        item.classList.remove('active');
+                    });
 
                     this.classList.add('active');
 
@@ -3181,59 +3837,84 @@
                     const isMenu = panelName === 'menu';
 
                     const layout = document.getElementById('rd-layout');
-                    layout.classList.toggle('rd-layout--tab-view', !isMenu);
 
-                    document.getElementById('rd-category-panel').style.display = isMenu ? '' : 'none';
+                    if (layout) {
+                        layout.classList.toggle('rd-layout--tab-view', !isMenu);
+                    }
 
-                    document.getElementById('rd-cart-panel').style.display = isMenu ? '' : 'none';
+                    const categoryPanel = document.getElementById('rd-category-panel');
+                    const cartPanel = document.getElementById('rd-cart-panel');
+                    const menuContent = document.querySelector('.rd-menu-content');
 
-                    document.querySelector('.rd-menu-content').style.display = isMenu ? '' : 'none';
+                    if (categoryPanel) {
+                        categoryPanel.style.display = isMenu ? '' : 'none';
+                    }
+
+                    if (cartPanel) {
+                        cartPanel.style.display = isMenu ? '' : 'none';
+                    }
+
+                    if (menuContent) {
+                        menuContent.style.display = isMenu ? '' : 'none';
+                    }
 
                     document.querySelectorAll('.rd-extra-panel').forEach(function (panel) {
 
-                        panel.style.display = panel.dataset.panel === panelName ? 'block' : 'none';
-
+                        panel.style.display =
+                            panel.dataset.panel === panelName
+                                ? 'block'
+                                : 'none';
                     });
-
-                    if (isMenu) {
-
-                        document.querySelector('.rd-extra-panel[data-panel="about"]').style.display = 'none';
-
-                        document.querySelector('.rd-extra-panel[data-panel="reviews"]').style.display = 'none';
-
-                        document.querySelector('.rd-extra-panel[data-panel="photos"]').style.display = 'none';
-
-                        document.querySelector('.rd-extra-panel[data-panel="offers"]').style.display = 'none';
-
-                    }
-
                 });
-
             });
 
-            document.getElementById('restaurantFavorite').addEventListener('click', function () {
+            /* -------------------------------------------------------
+               RESTAURANT FAVOURITE
+            ------------------------------------------------------- */
 
-                const active = this.dataset.active === '1';
+            const restaurantFavorite = document.getElementById('restaurantFavorite');
 
-                this.dataset.active = active ? '0' : '1';
+            if (restaurantFavorite) {
 
-                this.textContent = active ? '♡' : '♥';
+                restaurantFavorite.addEventListener('click', function () {
 
-                this.style.color = active ? '#fff' : '#ff0718';
+                    const active = this.dataset.active === '1';
 
-            });
+                    this.dataset.active = active ? '0' : '1';
 
-            document.getElementById('rd-checkout').addEventListener('click', function () {
-                alert('The menu cart is saved in this browser. Your Laravel checkout reads database CartItem records, so the add-to-cart API route must be connected before secure checkout can start.');
-            });
+                    this.textContent = active ? '♡' : '♥';
+
+                    this.style.color = active ? '#fff' : '#ff0718';
+                });
+            }
+
+            /* -------------------------------------------------------
+               CHECKOUT
+            ------------------------------------------------------- */
+
+            const checkoutButton = document.getElementById('rd-checkout');
+
+            if (checkoutButton) {
+
+                checkoutButton.addEventListener('click', function () {
+
+                    alert(
+                        'The menu cart is saved in this browser. Your Laravel checkout reads database CartItem records, so the add-to-cart API route must be connected before secure checkout can start.'
+                    );
+                });
+            }
+
+            /* -------------------------------------------------------
+               INITIALIZE PRODUCT VARIANTS AND CART
+            ------------------------------------------------------- */
 
             dishCards.forEach(function (card) {
                 updateCardVariant(card);
             });
+
             renderCart();
 
         });
-
     </script>
 
 @endsection

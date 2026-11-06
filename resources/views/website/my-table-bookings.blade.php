@@ -42,7 +42,7 @@
 
     .tb-number {
         font-weight: 700;
-        color: #76001f;
+        color: #d71313;
     }
 
     .tb-status {

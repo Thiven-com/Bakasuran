@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 
-    <div style="background:linear-gradient(135deg,#76001f,#4f8dfd);padding:35px;border-radius:18px;display:flex;justify-content:space-between;align-items:center;color:#fff;box-shadow:0 10px 30px rgba(13,110,253,.25);margin-top: 100px;
+    <div style="background:linear-gradient(135deg,#d71313,#4f8dfd);padding:35px;border-radius:18px;display:flex;justify-content:space-between;align-items:center;color:#fff;box-shadow:0 10px 30px rgba(13,110,253,.25);margin-top: 100px;
                             margin-left: 270px; margin-bottom:-150px; margin-right: 20px;">
 
         <div>
@@ -78,7 +78,7 @@
 
         /* Left Border */
         .dashboard-card.primary {
-            border-left: 6px solid #76001f;
+            border-left: 6px solid #d71313;
         }
 
         .dashboard-card.success {
@@ -122,7 +122,7 @@
         }
 
         .primary .card-icon {
-            background: #76001f;
+            background: #d71313;
         }
 
         .success .card-icon {

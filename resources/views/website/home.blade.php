@@ -148,10 +148,10 @@
         /* Primary */
 
         .hero-btn-primary {
-            background: #76001f;
+            background: #d71313;
             color: #fff;
 
-            border: 1px solid #76001f;
+            border: 1px solid #d71313;
         }
 
         .hero-btn-primary:hover {
@@ -301,7 +301,7 @@
         }
 
         .hero-dot.active {
-            background: #76001f;
+            background: #d71313;
         }
 
 
@@ -3425,7 +3425,7 @@
         }
 
         .product-title-link:hover {
-            color: #650019;
+            color: #ff0000;
             text-decoration: none !important;
         }
 

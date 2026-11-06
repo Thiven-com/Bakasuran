@@ -67,7 +67,7 @@
         }
 
         .sudheera-breadcrumb a {
-            color: #76001f;
+            color: #d71313;
             text-decoration: none;
             font-weight: 600;
         }
@@ -226,7 +226,7 @@
         }
 
         .sudheera-total {
-            color: #76001f;
+            color: #d71313;
             font-size: 25px;
             font-weight: 800;
             line-height: 1.2;
@@ -299,7 +299,7 @@
         }
 
         .sudheera-summary-total strong:last-child {
-            color: #76001f;
+            color: #d71313;
             font-size: 20px;
         }
 
@@ -376,7 +376,7 @@
         .sudheera-view-btn:hover {
             background: linear-gradient(135deg,
                     #420916,
-                    #76001f,
+                    #d71313,
                     #a85c17);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(66, 9, 22, .20);
@@ -403,7 +403,7 @@
             margin: 0 auto 20px;
             border-radius: 50%;
             background: #faf0e8;
-            color: #76001f;
+            color: #d71313;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -438,7 +438,7 @@
         }
 
         .sudheera-shop-btn:hover {
-            background: #76001f;
+            background: #d71313;
             transform: translateY(-2px);
         }
 

@@ -8,7 +8,7 @@
                                                 ========================================================= */
 
         :root {
-            --sudheera-maroon: #650019;
+            --sudheera-maroon: #ff0000;
             --sudheera-dark: #420014;
             --sudheera-gold: #b58a52;
             --sudheera-cream: #faf8f2;

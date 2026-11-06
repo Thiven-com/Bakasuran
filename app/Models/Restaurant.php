@@ -88,4 +88,14 @@ class Restaurant extends Model
     {
         return $this->hasMany(RestaurantBookingSession::class, 'restaurant_id');
     }
+
+    public function favoritedByUsers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'favorite_restaurants',
+            'restaurant_id',
+            'user_id'
+        )->withTimestamps();
+    }
 }

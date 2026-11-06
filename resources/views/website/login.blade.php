@@ -34,7 +34,7 @@
             height: 75px;
             margin: 0 auto 20px;
             border-radius: 50%;
-            background: #76001f;
+            background: #d71313;
             color: #fff;
             display: flex;
             align-items: center;
@@ -53,7 +53,7 @@
             font-family: "Instrument Serif", serif;
             font-size: 29px;
             font-weight: 600;
-            color: #76001f;
+            color: #d71313;
         }
 
         .sudheera-login-heading p {
@@ -86,7 +86,7 @@
         }
 
         .sudheera-mobile-wrapper:focus-within {
-            border-color: #76001f;
+            border-color: #d71313;
             box-shadow: 0 0 0 3px rgba(165, 106, 22, .08);
         }
 
@@ -142,7 +142,7 @@
         }
 
         .sudheera-otp-input:focus {
-            border-color: #76001f;
+            border-color: #d71313;
             box-shadow: 0 0 0 3px rgba(165, 106, 22, .08);
         }
 
@@ -158,7 +158,7 @@
             border: 0;
             border-radius: 8px;
             padding: 14px 20px;
-            background: #76001f;
+            background: #d71313;
             color: #fff;
             font-size: 13px;
             font-weight: 700;
@@ -168,7 +168,7 @@
         }
 
         .sudheera-login-btn:hover {
-            background: #76001f;
+            background: #d71313;
             transform: translateY(-1px);
         }
 
@@ -189,7 +189,7 @@
         }
 
         .sudheera-resend a {
-            color: #76001f;
+            color: #d71313;
             font-weight: 600;
             text-decoration: none;
         }
@@ -213,7 +213,7 @@
         }
 
         .sudheera-change-number a:hover {
-            color: #76001f;
+            color: #d71313;
         }
 
         /* Message */
@@ -252,7 +252,7 @@
         }
 
         .sudheera-login-terms a {
-            color: #76001f;
+            color: #d71313;
             text-decoration: none;
         }
 

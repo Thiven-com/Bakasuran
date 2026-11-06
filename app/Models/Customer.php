@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Customer extends Authenticatable
 {
@@ -54,5 +55,14 @@ class Customer extends Authenticatable
     public function carts()
     {
         return $this->hasMany(CartItem::class, 'user_id');
+    }
+    public function favoriteRestaurants(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Restaurant::class,
+            'favorite_restaurants',
+            'user_id',
+            'restaurant_id'
+        )->withTimestamps();
     }
 }

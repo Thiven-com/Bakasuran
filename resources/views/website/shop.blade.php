@@ -192,7 +192,7 @@
             height: 35px;
             border: 0;
             border-radius: 8px;
-            background: #650019;
+            background: #ff0000;
             color: #fff;
             font-size: 12px;
             font-weight: 600;
@@ -247,9 +247,9 @@
         }
 
         .category-pill.active {
-            background: #650019;
+            background: #ff0000;
             color: #fff;
-            border-color: #650019;
+            border-color: #ff0000;
         }
 
         .sort-box {
@@ -315,7 +315,7 @@
             position: absolute;
             left: 10px;
             top: 10px;
-            background: #650019;
+            background: #ff0000;
             color: #fff;
             padding: 5px 9px;
             border-radius: 5px;
@@ -340,13 +340,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #650019;
+            color: #ff0000;
             cursor: pointer;
             transition: .25s ease;
         }
 
         .product-wishlist:hover {
-            background: #650019;
+            background: #ff0000;
             color: #fff;
         }
 
@@ -420,8 +420,8 @@
         .add-cart-btn {
             width: 100%;
             height: 40px;
-            border: 1px solid #650019;
-            background: #650019;
+            border: 1px solid #ff0000;
+            background: #ff0000;
             color: #fff;
             border-radius: 8px;
             font-size: 11px;
@@ -431,7 +431,7 @@
 
         .add-cart-btn:hover {
             background: #fff;
-            color: #650019;
+            color: #ff0000;
         }
 
         /* =========================================================
@@ -842,7 +842,7 @@
                                         border: 0;
                                         border-radius: 50%;
                                         background: #f4e9e8;
-                                        color: #650019;
+                                        color: #ff0000;
                                         font-size: 28px;
                                         line-height: 1;
                                         cursor: pointer;
@@ -887,10 +887,10 @@
                                     .filter-reset-btn {
                                         flex: 1;
                                         min-height: 35px;
-                                        border: 1px solid #650019;
+                                        border: 1px solid #ff0000;
                                         border-radius: 8px;
                                         background: #fff;
-                                        color: #650019;
+                                        color: #ff0000;
                                         font-size: 12px;
                                         font-weight: 600;
                                         cursor: pointer;
