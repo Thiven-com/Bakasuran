@@ -11,7 +11,7 @@
                         <div class="login-userset">
                             <div class="final-logo logo-normal">
                                 <a href="{{ url('admin/dashboard') }}" class="logo logo-normal d-flex align-items-center">
-                                    <img src="{{ asset('website') }}/images/thirdeye.png" alt="Logo"
+                                    <img src="{{ asset($site->logo ?? ' ') }}" alt="Logo"
                                       style="width:400px; margin-left: 30px; ">
                                     
                                 </a>
@@ -67,7 +67,7 @@
 
             <div class="col-lg-6 p-0">
                 <div class="login-img">
-                    <img src="{{ asset('website') }}/images/thirdlog.png" alt="img">
+                    <img src="{{ asset('build') }}/img/pro.png" alt="img">
                 </div>
             </div>
         </div>
