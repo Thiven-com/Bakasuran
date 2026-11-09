@@ -46,68 +46,97 @@ class OrderController extends Controller
     }
     public function index(Request $request)
     {
-        // filters
-        $perPage = (int) $request->get('per_page', 1000);
-        $search = trim((string) $request->get('search', ''));
-        $status = $request->get('status'); // e.g. pending, completed, cancelled
-        $paymentStatus = $request->get('payment_status') ?? ''; // paid, pending
-        $customerId = $request->get('customer_id');
-        $from = $request->get('from'); // yyyy-mm-dd
-        $to = $request->get('to');
+        // Filters
+        $perPage = (int) $request->input('per_page', 25);
+        $perPage = max(1, min($perPage, 100));
 
-        // base query
-        $query = Order::where('order_type', 'order')
+        $search = trim((string) $request->input('search', ''));
+        $status = $request->input('status');
+        $paymentStatus = $request->input('payment_status');
+        $customerId = $request->input('customer_id');
+        $from = $request->input('from');
+        $to = $request->input('to');
+
+        // Base query
+        $query = Order::query()
+            ->where('order_type', 'order')
             ->with([
-                // only columns needed for list preview
                 'items' => function ($q) {
-                    $q->select('id', 'order_id', 'product_title', 'quantity', 'unit_price', 'product_variant_id')
-                        ->orderBy('id', 'asc');
+                    $q->select(
+                        'id',
+                        'order_id',
+                        'product_title',
+                        'quantity',
+                        'unit_price',
+                        'product_variant_id'
+                    )->orderBy('id', 'asc');
                 },
-                'user:id,name,email', // assuming order->user relation for customer
+                'user:id,name,email,mobile',
                 'payments:id,order_id,amount,status,method,created_at',
             ])
-            ->select(['orders.*'])
             ->latest('orders.id');
 
-        if ($customerId) {
-            $query->where('user_id', (int) $customerId);
+        // Customer filter
+        if (!empty($customerId)) {
+            $query->where('customer_id', (int) $customerId);
         }
 
+        // Order status filter
         if (!empty($status)) {
             $query->where('status', $status);
         }
 
+        // Payment status filter
         if (!empty($paymentStatus)) {
             $query->where('payment_status', $paymentStatus);
         }
 
+        // From date
         if (!empty($from)) {
             try {
-                $query->whereDate('created_at', '>=', Carbon::parse($from)->toDateString());
+                $fromDate = Carbon::parse($from)->toDateString();
+                $query->whereDate('created_at', '>=', $fromDate);
             } catch (\Throwable $e) {
+                // Ignore invalid date
             }
         }
+
+        // To date
         if (!empty($to)) {
             try {
-                $query->whereDate('created_at', '<=', Carbon::parse($to)->toDateString());
+                $toDate = Carbon::parse($to)->toDateString();
+                $query->whereDate('created_at', '<=', $toDate);
             } catch (\Throwable $e) {
+                // Ignore invalid date
             }
         }
 
+        // Search
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
+
                 $q->where('invoice_id', 'like', "%{$search}%")
-                    ->orWhere('id', (int) $search)
+                    ->orWhere('id', 'like', "%{$search}%")
                     ->orWhere('shipping_address->name', 'like', "%{$search}%")
-                    ->orWhereHas('user', fn($qq) => $qq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")->orWhere('mobile', 'like', "%{$search}%"));
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
             });
         }
-        $data['order_amount'] = (clone $query)->where('payment_status', 'paid')->sum('grand_total');
 
-        // paginate
-        $orders = $query->paginate($perPage)->appends($request->query());
+        // Total paid order amount (independent of listing filters)
+        $data = [];
 
-        // Pass to blade view (admin.sales.index)
+        $data['order_amount'] = Order::where('order_type', 'order')
+            ->where('payment_status', 'paid')
+            ->sum('grand_total');
+
+        // Paginate
+        $orders = $query->paginate($perPage)
+            ->appends($request->query());
+
         return view('admin.orders.orders', compact('orders', 'data'));
     }
 

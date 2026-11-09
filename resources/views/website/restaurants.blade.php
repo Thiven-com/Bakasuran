@@ -866,6 +866,38 @@
             opacity: 0.6;
             cursor: wait;
         }
+
+        .bk-types {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .bk-types::-webkit-scrollbar {
+            display: none;
+        }
+
+        .bk-type {
+            flex-shrink: 0;
+            padding: 10px 14px;
+            border: 1px solid #e8eaf0;
+            border-radius: 10px;
+            background: #f8f9fb;
+            color: #343741;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .18s;
+        }
+
+        .bk-type:hover,
+        .bk-type.active {
+            background: var(--bk-red);
+            border-color: var(--bk-red);
+            color: #fff;
+        }
     </style>
 
     <div class="bk-restaurants">
@@ -901,16 +933,16 @@
             </div>
 
             <div class="bk-filterbar">
-                <div class="bk-cuisines" aria-label="Filter by cuisine">
+                <div class="bk-types" aria-label="Filter by restaurant type">
 
-                    <button type="button" class="bk-cuisine active" data-cuisine="all" aria-pressed="true">
+                    <button type="button" class="bk-type active" data-type="all" aria-pressed="true">
                         All restaurants
                     </button>
 
-                    @foreach ($cuisines as $cuisine)
-                        <button type="button" class="bk-cuisine" data-cuisine="{{ strtolower(trim($cuisine)) }}"
+                    @foreach ($restauranttypes as $type)
+                        <button type="button" class="bk-type" data-type="{{ strtolower(trim($type->name)) }}"
                             aria-pressed="false">
-                            {{ $cuisine }}
+                            {{ $type->name }}
                         </button>
                     @endforeach
 
@@ -927,8 +959,30 @@
 
             <div class="bk-grid" id="bkRestaurantGrid">
                 @forelse ($restaurants as $index => $restaurant)
+                    @php
+                        $typeIds = $restaurant->type ?? [];
+
+                        if (is_string($typeIds)) {
+                            $typeIds = json_decode($typeIds, true) ?? [];
+                        }
+
+                        if (!is_array($typeIds)) {
+                            $typeIds = [];
+                        }
+
+                        $typeNames = $restauranttypes
+                            ->whereIn('id', array_map('intval', $typeIds))
+                            ->pluck('name')
+                            ->implode(', ');
+
+                        $typeNamesLower = $restauranttypes
+                            ->whereIn('id', array_map('intval', $typeIds))
+                            ->pluck('name')
+                            ->map(fn($name) => strtolower(trim($name)))
+                            ->implode('|');
+                    @endphp
                     <article class="bk-card" data-name="{{ strtolower($restaurant->name ?? '') }}"
-                        data-categories="{{ strtolower($restaurant->cuisine_type ?? '') }}"
+                        data-type="{{ $typeNamesLower }}" data-categories="{{ strtolower($restaurant->cuisine_type ?? '') }}"
                         data-rating="{{ (float) ($restaurant->average_rating ?? 0) }}"
                         data-offer="{{ (float) ($restaurant->discount_percentage ?? 0) }}"
                         data-price="{{ (float) ($restaurant->price_for_two ?? 0) }}" data-index="{{ $index }}">
@@ -984,7 +1038,63 @@
                                 </div>
                             </div>
 
-                            <p class="bk-cuisine-text">{{ $restaurant->cuisine_type ?: 'Various cuisines' }}</p>
+                            <div class="bk-cuisine-text">
+                                <div class="bk-cuisine-track">
+                                    @foreach (explode(',', $typeNames ?: 'Restaurant') as $typeName)
+                                        <span>{{ trim($typeName) }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <style>
+                                .bk-cuisine-text {
+                                    width: 100%;
+                                    height: 24px;
+                                    overflow: hidden;
+                                    position: relative;
+                                }
+
+                                .bk-cuisine-track {
+                                    display: flex;
+                                    flex-direction: column;
+                                    will-change: transform;
+                                }
+
+                                .bk-cuisine-track span {
+                                    flex: 0 0 24px;
+                                    height: 24px;
+                                    line-height: 24px;
+                                    color: #e85d04;
+                                    font-family: 'Poppins', sans-serif;
+                                    font-size: 13px;
+                                    font-weight: 600;
+                                    white-space: nowrap;
+                                }
+                            </style>
+
+                            <script>
+document.querySelectorAll('.bk-cuisine-text').forEach(container => {
+    const track = container.querySelector('.bk-cuisine-track');
+    const originalItems = Array.from(track.querySelectorAll('span'));
+
+    if (originalItems.length <= 1) return;
+
+    const itemHeight = 24;
+    const distance = originalItems.length * itemHeight;
+
+    originalItems.forEach(item => {
+        track.appendChild(item.cloneNode(true));
+    });
+
+    track.animate([
+        { transform: 'translateY(0px)' },
+        { transform: `translateY(-${distance}px)` }
+    ], {
+        duration: originalItems.length * 2000,
+        iterations: Infinity,
+        easing: `steps(${originalItems.length}, end)`
+    });
+});
+</script>
 
                             <div class="bk-meta">
                                 <span class="bk-rating"><span>★</span>
@@ -1045,77 +1155,111 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
             const grid = document.getElementById('bkRestaurantGrid');
             if (!grid) return;
 
             const cards = Array.from(grid.querySelectorAll('.bk-card'));
+
             const searchForm = document.getElementById('bkRestaurantSearchForm');
             const searchInput = document.getElementById('bkRestaurantSearch');
-            const sortSelect = document.getElementById('bkRestaurantSort');
-            const cuisineButtons = Array.from(document.querySelectorAll('.bk-cuisine'));
+
+            const typeButtons = Array.from(document.querySelectorAll('.bk-type'));
+
             const emptyMessage = document.getElementById('bkRestaurantEmpty');
             const visibleCount = document.getElementById('bkVisibleCount');
-            let selectedCuisine = 'all';
+
+            let selectedType = 'all';
             let searchTerm = '';
 
             function updateRestaurants() {
-                const visibleCards = [];
-                cards.forEach(function (card) {
-                    const name = (card.dataset.name || '').toLowerCase();
-                    const categories = (card.dataset.categories || '').toLowerCase();
-                    const matchesSearch = !searchTerm || name.includes(searchTerm) || categories.includes(searchTerm);
-                    const matchesCuisine = selectedCuisine === 'all' || categories.includes(selectedCuisine.toLowerCase());
-                    const show = matchesSearch && matchesCuisine;
-                    card.hidden = !show;
-                    if (show) visibleCards.push(card);
-                });
 
-                visibleCards.sort(function (a, b) {
-                    switch (sortSelect.value) {
-                        case 'rating': return Number(b.dataset.rating || 0) - Number(a.dataset.rating || 0);
-                        case 'offer': return Number(b.dataset.offer || 0) - Number(a.dataset.offer || 0);
-                        case 'price-low': return Number(a.dataset.price || 0) - Number(b.dataset.price || 0);
-                        case 'price-high': return Number(b.dataset.price || 0) - Number(a.dataset.price || 0);
-                        case 'name': return (a.dataset.name || '').localeCompare(b.dataset.name || '');
-                        default: return Number(a.dataset.index || 0) - Number(b.dataset.index || 0);
+                const visibleCards = [];
+
+                cards.forEach(function (card) {
+
+                    const name = (card.dataset.name || '').toLowerCase();
+                    const type = (card.dataset.type || '').toLowerCase();
+                    const categories = (card.dataset.categories || '').toLowerCase();
+
+                    // Search restaurant name, type and cuisine
+                    const matchesSearch =
+                        !searchTerm ||
+                        name.includes(searchTerm) ||
+                        type.includes(searchTerm) ||
+                        categories.includes(searchTerm);
+
+                    // Filter by restaurant type
+                    const restaurantTypes = type
+                        ? type.split('|').map(item => item.trim())
+                        : [];
+
+                    const matchesType =
+                        selectedType === 'all' ||
+                        restaurantTypes.includes(selectedType);
+
+                    const show = matchesSearch && matchesType;
+
+                    card.hidden = !show;
+
+                    if (show) {
+                        visibleCards.push(card);
                     }
                 });
-                visibleCards.forEach(function (card) { grid.insertBefore(card, emptyMessage); });
+
+                // Maintain original order
+                visibleCards.sort(function (a, b) {
+                    return Number(a.dataset.index || 0) -
+                        Number(b.dataset.index || 0);
+                });
+
+                visibleCards.forEach(function (card) {
+                    grid.insertBefore(card, emptyMessage);
+                });
+
                 emptyMessage.style.display = visibleCards.length ? 'none' : 'block';
+
                 visibleCount.textContent = visibleCards.length;
             }
 
+            // Search
             searchInput.addEventListener('input', function () {
                 searchTerm = this.value.trim().toLowerCase();
                 updateRestaurants();
             });
+
             searchForm.addEventListener('submit', function (event) {
                 event.preventDefault();
+
                 searchTerm = searchInput.value.trim().toLowerCase();
+
                 updateRestaurants();
-                document.querySelector('.bk-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                document.querySelector('.bk-container').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             });
-            cuisineButtons.forEach(function (button) {
+
+            // Restaurant type filter
+            typeButtons.forEach(function (button) {
+
                 button.addEventListener('click', function () {
-                    cuisineButtons.forEach(function (item) {
+
+                    typeButtons.forEach(function (item) {
                         item.classList.remove('active');
                         item.setAttribute('aria-pressed', 'false');
                     });
+
                     this.classList.add('active');
                     this.setAttribute('aria-pressed', 'true');
-                    selectedCuisine = this.dataset.cuisine;
+
+                    selectedType = this.dataset.type.toLowerCase();
+
                     updateRestaurants();
                 });
             });
-            sortSelect.addEventListener('change', updateRestaurants);
-            grid.querySelectorAll('.bk-favorite').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    const active = this.classList.toggle('active');
-                    this.textContent = active ? '♥' : '♡';
-                    this.setAttribute('aria-pressed', String(active));
-                    this.setAttribute('aria-label', active ? 'Remove from favourites' : 'Add to favourites');
-                });
-            });
+
             updateRestaurants();
         });
     </script>

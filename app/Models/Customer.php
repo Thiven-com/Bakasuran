@@ -65,4 +65,9 @@ class Customer extends Authenticatable
             'restaurant_id'
         )->withTimestamps();
     }
+
+    public function user()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
 }

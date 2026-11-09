@@ -199,6 +199,11 @@
                                                                                         class="ti ti-brand-unity fs-16 me-2"></i><span>Units</span></a>
                                                                 </li>
                                                                 <li
+                                                                        class="{{ Request::is('admin/restaurant-types') ? 'active' : '' }}">
+                                                                        <a href="{{route('admin.restaurant-types.index')}}"><i
+                                                                                        class="ti ti-brand-unity fs-16 me-2"></i><span>Restaurant Type</span></a>
+                                                                </li>
+                                                                <li
                                                                         class="{{ Request::is('admin/attributes') ? 'active' : '' }}">
                                                                         <a href="{{route('admin.attributes.index')}}"><i
                                                                                         class="ti ti-checklist fs-16 me-2"></i><span>Attributes</span></a>

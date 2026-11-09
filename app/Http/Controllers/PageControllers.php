@@ -27,7 +27,7 @@ use App\Models\RestaurantBookingHour;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use App\Models\RestaurantBookingSession;
-
+use App\Models\RestaurantType;
 
 class PageControllers extends Controller
 {
@@ -1054,7 +1054,15 @@ class PageControllers extends Controller
             ->orderBy('cuisine_type')
             ->pluck('cuisine_type');
 
-        return view('website.restaurants', compact('restaurants', 'cuisines'));
+        $types = Restaurant::whereNotNull('type')
+            ->where('type', '!=', '')
+            ->distinct()
+            ->pluck('type');
+        $restauranttypes = RestaurantType::where('status', 1)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return view('website.restaurants', compact('restaurants', 'cuisines', 'types', 'restauranttypes'));
     }
 
 
