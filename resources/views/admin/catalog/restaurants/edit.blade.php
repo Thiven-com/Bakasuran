@@ -3,7 +3,50 @@
 @section('title', 'Edit Restaurant')
 
 @section('content')
+
+@php
+    $selectedTypeIds = old(
+        'restaurant_types',
+        $restaurant->type ?? []
+    );
+
+    if (is_string($selectedTypeIds)) {
+        $selectedTypeIds = json_decode($selectedTypeIds, true) ?? [];
+    }
+
+    $selectedTypeIds = array_map('intval', $selectedTypeIds);
+@endphp
     <style>
+                .restaurant-type-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.restaurant-type-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #fff;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.restaurant-type-checkbox:has(input:checked) {
+    border-color: #ff0000;
+    background: #fff5f5;
+    color: #cc0000;
+}
+
+.restaurant-type-checkbox input {
+    width: auto;
+    margin: 0;
+    accent-color: #ff0000;
+}
         .restaurant-page {
             width: 100%;
             box-sizing: border-box;
@@ -265,20 +308,46 @@
                         <input type="text" id="name" name="name" value="{{ old('name', $restaurant->name) }}" required>
                         @error('name') <small class="field-error">{{ $message }}</small> @enderror
                     </div>
-                   <div class="restaurant-form-group">
-    <label for="cuisine_type">Cuisine Types</label>
+                    <div class="restaurant-form-group">
+                        <label for="cuisine_type">Cuisine Types</label>
 
-    <input
-        type="text"
-        id="cuisine_type"
-        name="cuisine_type"
-        placeholder="e.g. Indian, Chinese, Italian"
-        value="{{ old('cuisine_type', $restaurant->cuisine_type) }}"
-    >
+                        <input type="text" id="cuisine_type" name="cuisine_type" placeholder="e.g. Indian, Chinese, Italian"
+                            value="{{ old('cuisine_type', $restaurant->cuisine_type) }}">
 
-    <small>Enter multiple cuisines separated by commas.</small>
+                        <small>Enter multiple cuisines separated by commas.</small>
 
-    @error('cuisine_type')
+                        @error('cuisine_type')
+                            <small class="field-error">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    {{-- Restaurant Type --}}
+                    {{-- Restaurant Types --}}
+<div class="restaurant-form-group full-width">
+    <label>Restaurant Types *</label>
+
+    <div class="restaurant-type-checkboxes">
+        @foreach ($types as $type)
+            @if ($type->status || in_array($type->id, $selectedTypeIds))
+                <label class="restaurant-type-checkbox">
+                    <input
+                        type="checkbox"
+                        name="restaurant_types[]"
+                        value="{{ $type->id }}"
+                        {{ in_array($type->id, $selectedTypeIds) ? 'checked' : '' }}
+                    >
+
+                    <span>{{ $type->name }}</span>
+                </label>
+            @endif
+        @endforeach
+    </div>
+
+    @error('restaurant_types')
+        <small class="field-error">{{ $message }}</small>
+    @enderror
+
+    @error('restaurant_types.*')
         <small class="field-error">{{ $message }}</small>
     @enderror
 </div>

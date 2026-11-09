@@ -4,9 +4,38 @@
 
 @section('content')
 
-
-
     <style>
+
+        .restaurant-type-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.restaurant-type-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #fff;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.restaurant-type-checkbox:has(input:checked) {
+    border-color: #ff0000;
+    background: #fff5f5;
+    color: #cc0000;
+}
+
+.restaurant-type-checkbox input {
+    width: auto;
+    margin: 0;
+    accent-color: #ff0000;
+}
         /* Restaurant Page Header */
         .restaurant-header {
             display: flex;
@@ -230,16 +259,39 @@
                         <input type="text" id="name" name="name" placeholder="Enter restaurant name" required>
                     </div>
 
-                   <div class="restaurant-form-group">
-    <label for="cuisine_type">Cuisine Types</label>
-    <input
-        type="text"
-        id="cuisine_type"
-        name="cuisine_type"
-        placeholder="e.g. Indian, Chinese, Italian"
-        value="{{ old('cuisine_type') }}"
-    >
-    <small>Enter multiple cuisines separated by commas.</small>
+                    <div class="restaurant-form-group">
+                        <label for="cuisine_type">Cuisine Types</label>
+                        <input type="text" id="cuisine_type" name="cuisine_type" placeholder="e.g. Indian, Chinese, Italian"
+                            value="{{ old('cuisine_type') }}">
+                        <small>Enter multiple cuisines separated by commas.</small>
+                    </div>
+                   <div class="restaurant-form-group full-width">
+    <label>Restaurant Types *</label>
+
+    <div class="restaurant-type-checkboxes">
+        @foreach ($types as $type)
+            @if ($type->status)
+                <label class="restaurant-type-checkbox">
+                    <input
+                        type="checkbox"
+                        name="restaurant_types[]"
+                        value="{{ $type->id }}"
+                        {{ in_array($type->id, old('restaurant_types', [])) ? 'checked' : '' }}
+                    >
+
+                    <span>{{ $type->name }}</span>
+                </label>
+            @endif
+        @endforeach
+    </div>
+
+    @error('restaurant_types')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+
+    @error('restaurant_types.*')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
 </div>
 
                     <div class="restaurant-form-group full-width">

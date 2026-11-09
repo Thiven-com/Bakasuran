@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Models\RestaurantType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -21,7 +22,10 @@ class RestaurantController extends Controller
 
     public function create()
     {
-        return view('admin.catalog.restaurants.create');
+        $types = RestaurantType::where('status', 1)
+            ->orderBy('name')
+            ->get();
+        return view('admin.catalog.restaurants.create', compact('types'));
     }
 
     public function store(Request $request)
@@ -29,6 +33,8 @@ class RestaurantController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'cuisine_type' => 'nullable|string|max:255',
+            'restaurant_types' => 'required|array|min:1',
+            'restaurant_types.*' => 'required|integer|exists:restaurant_types,id',
             'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -103,10 +109,16 @@ class RestaurantController extends Controller
             $validated['cover_image'] = 'uploads/restaurants/covers/' . $filename;
         }
 
-        Restaurant::create($validated);
+        // Store multiple restaurant type IDs in the type column
+        $validated['type'] = json_encode($validated['restaurant_types']);
+
+        unset($validated['restaurant_types']);
+
+        // Create restaurant
+        $restaurant = Restaurant::create($validated);
 
         return redirect()
-            ->route('admin.restaurants.index')
+            ->route('admin.restaurants.index', $restaurant)
             ->with('success', 'Restaurant created successfully!');
     }
 
@@ -119,7 +131,11 @@ class RestaurantController extends Controller
 
     public function edit(Restaurant $restaurant)
     {
-        return view('admin.catalog.restaurants.edit', compact('restaurant'));
+
+        $types = RestaurantType::where('status', 1)
+            ->orderBy('name')
+            ->get();
+        return view('admin.catalog.restaurants.edit', compact('restaurant', 'types'));
     }
 
     public function update(Request $request, Restaurant $restaurant)
@@ -127,6 +143,8 @@ class RestaurantController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'cuisine_type' => 'nullable|string|max:255',
+            'restaurant_types' => 'required|array|min:1',
+            'restaurant_types.*' => 'required|integer|exists:restaurant_types,id',
             'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -210,6 +228,12 @@ class RestaurantController extends Controller
             $validated['cover_image'] = 'uploads/restaurants/covers/' . $filename;
         }
 
+        // Store multiple restaurant type IDs in the type column
+        $validated['type'] = json_encode($validated['restaurant_types']);
+
+        unset($validated['restaurant_types']);
+
+        // Update restaurant details
         $restaurant->update($validated);
 
         // Remove old files only after the database update succeeds.

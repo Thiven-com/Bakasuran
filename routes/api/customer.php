@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerApp\RestaurantController;
 use App\Http\Controllers\CustomerApp\RestaurantFoodOrderController;
 use App\Http\Controllers\CustomerApp\RestaurantReviewController;
 use App\Http\Controllers\CustomerApp\RestaurantTableBookingController;
+use App\Http\Controllers\CustomerApp\SiteSettingController;
 use App\Http\Controllers\CustomerApp\TableBookingController;
 use App\Http\Controllers\CustomerApp\WebhookController;
 use Illuminate\Http\Request;
@@ -59,6 +60,9 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
     //productRating
     Route::post('productRating', 'ProductController@productRating');
     Route::get('ratings', 'ProductController@ratings');
+
+    //Site Settings
+    Route::get('/site-settings', [SiteSettingController::class, 'index']);
 
     //RestaurantTableBooking
 

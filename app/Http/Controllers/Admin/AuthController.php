@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -47,7 +48,7 @@ class AuthController extends Controller
         if (Auth::guard('admin')->attempt($credentials, $remember)) {
 
             if ($remember) {
-                
+
                 Cookie::queue(
                     Cookie::make('admin_email', $request->email, 43200) // 30 days
                 );
@@ -72,168 +73,320 @@ class AuthController extends Controller
 
     public function dashboard()
     {
-        $site = SiteSetting::first();
-
-        // Orders today count
-        $ordersCount = Order::where('order_type', 'order')->where('payment_status', 'paid')->whereDate('created_at', Carbon::today())->count();
-
-        // basic counts
-        $counts = [
-            'customers' => Customer::count(),
-            'suppliers' => 0, // adapt if you have suppliers model
-            'orders' => Order::where('order_type', 'order')->where('payment_status', 'paid')->count(),
-            'categories' => Category::count(),
-            'products' => Product::count(),
-        ];
-
-        // Totals placeholders (replace with your actual calculations)
-        $totals = [
-            'sales' => (float) Order::where('order_type', 'order')->where('payment_status', 'paid')->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->sum('grand_total'),
-            'sales_change_percent' => 22,
-            'sales_return' => 0,
-            'purchase' => 0,
-            'purchase_return' => 0,
-            'profit' => 0,
-            'profit_change_percent' => 12,
-            'invoice_due' => 0,
-            'expense' => 0,
-            'payment_returns' => 0,
-        ];
-
-        // Low stock variants
-        $lowStockThreshold = 10;
-        $lowStockProducts = ProductVariant::with('product')
-            ->where('stock', '<=', $lowStockThreshold)
-            ->orderBy('stock', 'asc')
-            ->take(6)
-            ->get()
-            ->map(function ($v) {
-                return (object) [
-                    'product_id' => $v->product_id,
-                    'title' => $v->product?->title,
-                    'image' => $v->image,
-                    'sku' => $v->sku,
-                    'stock' => $v->stock,
-                    'id' => $v->id,
-                ];
-            });
-
-        $lowStockAlert = $lowStockProducts->first();
-
-        // $topSelling = collect(); 
-        $topSelling = OrderItem::selectRaw('product_variant_id,product_title,unit_price,SUM(quantity) as total_quantity,SUM(subtotal) as total_price')
-            ->groupBy('product_variant_id', 'product_title', 'unit_price')
-            ->orderByDesc('total_quantity')
-            ->take(6)
-            ->get();
-        // Recent sales (last 6 orders)
-        $recentSales = Order::where('order_type', 'order')->where('payment_status', 'paid')->with('user')
-            ->latest()
-            ->take(6)
-            ->get()
-            ->map(function ($o) {
-                return (object) [
-                    'id' => $o->id,
-                    'customer_name' => $o->user?->name ?? 'Guest',
-                    'customer_avatar' => $o->user?->avatar ?? null,
-                    'grand_total' => $o->grand_total,
-                    'status' => $o->status,
-                    'created_at' => $o->created_at,
-                ];
-            });
-
-        // Top categories
-        $topCategories = Category::withCount('products')->orderByDesc('products_count')->take(6)->get();
-
-        // chart summary placeholder
-        $chartSummary = [
-            'purchase_count' => 3000,
-            'sales_count' => 1000,
-        ];
-
-        // customers overview placeholder
-        $customersOverview = [
-            'first_time' => 5500,
-            'first_time_change' => '+25%',
-            'returning' => 3500,
-            'returning_change' => '+21%',
-        ];
-
-        $topCustomers = DB::table('customers')
-            ->select(
-                'customers.id',
-                'customers.name',
-                'customers.email',
-                'customers.profile_pic as avatar',
-                // 'customers.country',
-                DB::raw('(select count(*) from `orders` where `customers`.`id` = `orders`.`customer_id`) as orders_count'),
-                DB::raw('(select sum(`orders`.`grand_total`) from `orders` where `customers`.`id` = `orders`.`customer_id`) as orders_sum_grand_total')
-            )
-            ->whereNull('customers.deleted_at')
-            ->orderByDesc('orders_count')
-            ->limit(5)
-            ->get();
         $today = Carbon::today();
-
-        // Today's Sales
-        $todayOrders = Order::whereDate('created_at', $today)->where('payment_status', 'paid')
-            ->latest()
-            ->take(5)
-            ->get();
-
-        // Today's Transactions
-        $todayTransactions = Payment::whereDate('created_at', $today)->where('status', 'paid')
-            ->latest()
-            ->take(5)
-            ->get();
-
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Helper: Find an existing table
+        |--------------------------------------------------------------------------
+        */
+        $findTable = function (array $tables) {
+            foreach ($tables as $table) {
+                if (Schema::hasTable($table)) {
+                    return $table;
+                }
+            }
 
-        $rawData = Order::where('payment_status', 'paid')->where('payment_status', 'paid')
-            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->selectRaw('DAY(created_at) as day, SUM(grand_total) as total')
-            ->groupBy('day')
-            ->pluck('total', 'day')
-            ->toArray();
+            return null;
+        };
 
+        /*
+        |--------------------------------------------------------------------------
+        | Helper: Find an existing column
+        |--------------------------------------------------------------------------
+        */
+        $findColumn = function ($table, array $columns) {
+            if (!$table) {
+                return null;
+            }
+
+            foreach ($columns as $column) {
+                if (Schema::hasColumn($table, $column)) {
+                    return $column;
+                }
+            }
+
+            return null;
+        };
+
+        /*
+        |--------------------------------------------------------------------------
+        | Main Counts
+        |--------------------------------------------------------------------------
+        */
+        $counts = [
+            'restaurants' => Schema::hasTable('restaurants')
+                ? DB::table('restaurants')->count()
+                : 0,
+
+            'tables' => Schema::hasTable('restaurant_tables')
+                ? DB::table('restaurant_tables')->count()
+                : 0,
+
+            'menu_items' => Schema::hasTable('products')
+                ? DB::table('products')->count()
+                : 0,
+
+            'categories' => Schema::hasTable('categories')
+                ? DB::table('categories')->count()
+                : 0,
+
+            'variants' => Schema::hasTable('product_variants')
+                ? DB::table('product_variants')->count()
+                : 0,
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Restaurant Tables
+        |--------------------------------------------------------------------------
+        */
+        $tableQuery = Schema::hasTable('restaurant_tables')
+            ? DB::table('restaurant_tables')
+            : null;
+
+        $restaurantTables = $tableQuery
+            ? $tableQuery->orderBy('id', 'desc')->take(8)->get()
+            : collect();
+
+        $activeTables = 0;
+        $inactiveTables = 0;
+
+        if (Schema::hasTable('restaurant_tables')) {
+            if (Schema::hasColumn('restaurant_tables', 'status')) {
+                $activeTables = DB::table('restaurant_tables')
+                    ->where('status', 'active')
+                    ->count();
+
+                $inactiveTables = DB::table('restaurant_tables')
+                    ->where('status', '!=', 'active')
+                    ->count();
+            } elseif (Schema::hasColumn('restaurant_tables', 'is_active')) {
+                $activeTables = DB::table('restaurant_tables')
+                    ->where('is_active', 1)
+                    ->count();
+
+                $inactiveTables = DB::table('restaurant_tables')
+                    ->where('is_active', 0)
+                    ->count();
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Booking Table Detection
+        |--------------------------------------------------------------------------
+        */
+        $bookingTable = $findTable([
+            'restaurant_bookings',
+            'table_bookings',
+            'bookings',
+        ]);
+
+        $bookingDateColumn = $findColumn($bookingTable, [
+            'booking_date',
+            'reservation_date',
+            'date',
+            'created_at',
+        ]);
+
+        $bookingStatusColumn = $findColumn($bookingTable, [
+            'status',
+            'booking_status',
+        ]);
+
+        $bookingsToday = 0;
+        $totalBookings = 0;
+        $pendingBookings = 0;
+        $recentBookings = collect();
+
+        if ($bookingTable) {
+            $totalBookings = DB::table($bookingTable)->count();
+
+            if ($bookingDateColumn) {
+                $bookingsToday = DB::table($bookingTable)
+                    ->whereDate($bookingDateColumn, $today)
+                    ->count();
+            }
+
+            if ($bookingStatusColumn) {
+                $pendingBookings = DB::table($bookingTable)
+                    ->whereRaw('LOWER(`' . $bookingStatusColumn . '`) = ?', ['pending'])
+                    ->count();
+            }
+
+            $recentBookings = DB::table($bookingTable)
+                ->orderByDesc(
+                    Schema::hasColumn($bookingTable, 'created_at')
+                    ? 'created_at'
+                    : 'id'
+                )
+                ->take(6)
+                ->get();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Order Table Detection
+        |--------------------------------------------------------------------------
+        */
+        $orderTable = $findTable([
+            'restaurant_orders',
+            'orders',
+        ]);
+
+        $orderDateColumn = $findColumn($orderTable, [
+            'created_at',
+            'order_date',
+        ]);
+
+        $orderAmountColumn = $findColumn($orderTable, [
+            'grand_total',
+            'total_amount',
+            'total',
+            'amount',
+        ]);
+
+        $orderStatusColumn = $findColumn($orderTable, [
+            'status',
+            'order_status',
+        ]);
+
+        $paymentStatusColumn = $findColumn($orderTable, [
+            'payment_status',
+        ]);
+
+        $ordersToday = 0;
+        $totalOrders = 0;
+        $todayRevenue = 0;
+        $monthRevenue = 0;
+        $recentOrders = collect();
+
+        if ($orderTable) {
+            $totalOrders = DB::table($orderTable)->count();
+
+            if ($orderDateColumn) {
+                $ordersToday = DB::table($orderTable)
+                    ->whereDate($orderDateColumn, $today)
+                    ->count();
+
+                $recentOrders = DB::table($orderTable)
+                    ->orderByDesc($orderDateColumn)
+                    ->take(6)
+                    ->get();
+
+                if ($orderAmountColumn) {
+                    $todayRevenue = DB::table($orderTable)
+                        ->whereDate($orderDateColumn, $today)
+                        ->when($paymentStatusColumn, function ($query) use ($paymentStatusColumn) {
+                            $query->where($paymentStatusColumn, 'paid');
+                        })
+                        ->sum($orderAmountColumn);
+
+                    $monthRevenue = DB::table($orderTable)
+                        ->whereBetween($orderDateColumn, [
+                            $startOfMonth,
+                            $endOfMonth,
+                        ])
+                        ->when($paymentStatusColumn, function ($query) use ($paymentStatusColumn) {
+                            $query->where($paymentStatusColumn, 'paid');
+                        })
+                        ->sum($orderAmountColumn);
+                }
+            } else {
+                $recentOrders = DB::table($orderTable)
+                    ->orderByDesc('id')
+                    ->take(6)
+                    ->get();
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Monthly Booking Chart
+        |--------------------------------------------------------------------------
+        */
         $daysInMonth = Carbon::now()->daysInMonth;
 
-        $data['month_dates'] = [];
-        $data['month_values'] = [];
+        $chartDates = [];
+        $chartValues = [];
 
-        for ($i = 1; $i <= $daysInMonth; $i++) {
-            $data['month_dates'][] = (string) $i;
-            $data['month_values'][] = $rawData[$i] ?? 0;
+        $bookingChartData = [];
+
+        if ($bookingTable && $bookingDateColumn) {
+            $bookingChartData = DB::table($bookingTable)
+                ->whereBetween($bookingDateColumn, [
+                    $startOfMonth->toDateString(),
+                    $endOfMonth->toDateString(),
+                ])
+                ->selectRaw(
+                    'DAY(' . $bookingDateColumn . ') as booking_day, COUNT(*) as total'
+                )
+                ->groupByRaw('DAY(' . $bookingDateColumn . ')')
+                ->pluck('total', 'booking_day')
+                ->toArray();
         }
-        $data['month_total'] = array_sum($data['month_values']);
-        $data['today_total'] = $rawData[now()->day] ?? 0;
-        $data['peak_day'] = max($data['month_values']);
 
-        $pendingJobs = DB::table('jobs')->count();
-        // $data['average'] = round($data['month_total'] / count($data['month_values']));
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $chartDates[] = (string) $day;
+            $chartValues[] = (int) ($bookingChartData[$day] ?? 0);
+        }
 
-        // Prepare compact variables for the view
-        return view('admin.auth.dashboard', [
-            'site' => $site,
-            'ordersCount' => $ordersCount,
-            'counts' => $counts,
-            'totals' => $totals,
-            'lowStockProducts' => $lowStockProducts,
-            'lowStockAlert' => $lowStockAlert,
-            'lowStockThreshold' => $lowStockThreshold,
-            'topSelling' => $topSelling,
-            'recentSales' => $recentSales,
-            'topCategories' => $topCategories,
-            'chartSummary' => $chartSummary,
-            'customersOverview' => $customersOverview,
-            'topCustomers' => $topCustomers,
-            'todayOrders' => $todayOrders,
-            'todayTransactions' => $todayTransactions,
-            'data' => $data,
-            'pendingJobs' => $pendingJobs
-        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Restaurant Booking Configuration
+        |--------------------------------------------------------------------------
+        */
+        $bookingSettingsCount = Schema::hasTable('restaurant_booking_settings')
+            ? DB::table('restaurant_booking_settings')
+                ->where('is_booking_enabled', 1)
+                ->count()
+            : 0;
+
+        $bookingSessionsCount = Schema::hasTable('restaurant_booking_sessions')
+            ? DB::table('restaurant_booking_sessions')
+                ->where('is_active', 1)
+                ->count()
+            : 0;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard Data
+        |--------------------------------------------------------------------------
+        */
+        $site = Schema::hasTable('site_settings')
+            ? DB::table('site_settings')->first()
+            : null;
+
+        $data = [
+            'month_total' => $monthRevenue,
+            'today_total' => $todayRevenue,
+            'month_dates' => $chartDates,
+            'month_values' => $chartValues,
+            'peak_day' => max($chartValues ?: [0]),
+        ];
+
+        return view('admin.auth.dashboard', compact(
+            'site',
+            'counts',
+            'restaurantTables',
+            'activeTables',
+            'inactiveTables',
+            'bookingsToday',
+            'totalBookings',
+            'pendingBookings',
+            'recentBookings',
+            'ordersToday',
+            'totalOrders',
+            'todayRevenue',
+            'monthRevenue',
+            'recentOrders',
+            'bookingSettingsCount',
+            'bookingSessionsCount',
+            'data'
+        ));
     }
 
     public function logout()

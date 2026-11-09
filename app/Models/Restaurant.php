@@ -18,6 +18,7 @@ class Restaurant extends Model
         'logo',
         'cover_image',
         'cuisine_type',
+        'type',
         'address',
         'city',
         'state',
@@ -56,6 +57,7 @@ class Restaurant extends Model
             'is_open' => 'boolean',
             'is_featured' => 'boolean',
             'sort_order' => 'integer',
+            'type' => 'array',
         ];
     }
 
@@ -96,6 +98,14 @@ class Restaurant extends Model
             'favorite_restaurants',
             'restaurant_id',
             'user_id'
+        )->withTimestamps();
+    }
+
+    public function restaurantTypes()
+    {
+        return $this->belongsToMany(
+            RestaurantType::class,
+            'restaurant_restaurant_type'
         )->withTimestamps();
     }
 }
