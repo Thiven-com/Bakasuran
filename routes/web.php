@@ -163,6 +163,13 @@ Route::middleware('auth:customer')->group(function () {
         ->name('restaurant.confirm-booking');
 
 
+        // STEP 4: Booking Success Page
+Route::get(
+    '/restaurant/{slug}/booking-success/{bookingNumber}',
+    [PageControllers::class, 'bookingSuccess']
+)->name('restaurant.booking-success');
+
+
     // Restaurant table booking - LOGIN REQUIRED
     // Route::get('/restaurant/{slug}/book-table',
     //     [PageControllers::class, 'table_booking'])

@@ -1798,13 +1798,10 @@ class PageControllers extends Controller
         ]);
 
         // 16. Redirect after successful booking
-        return redirect()
-            ->route('restaurant.table-booking', ['slug' => $slug])
-            ->with(
-                'success',
-                'Your table reservation has been submitted successfully. Booking ID: ' .
-                $booking->booking_number
-            );
+        return redirect()->route('restaurant.booking-success', [
+            'slug' => $slug,
+            'bookingNumber' => $booking->booking_number,
+        ]);
     }
 
 
@@ -1864,6 +1861,29 @@ class PageControllers extends Controller
             ->paginate(10);
 
         return view('website.my-table-bookings', compact('bookings'));
+    }
+
+
+
+    public function bookingSuccess($slug, $bookingNumber)
+    {
+        $restaurant = Restaurant::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $booking = RestaurantTableBooking::with([
+            'restaurant',
+            'restaurantTable'
+        ])
+            ->where('booking_number', $bookingNumber)
+            ->where('restaurant_id', $restaurant->id)
+            ->where('customer_id', Auth::guard('customer')->id())
+            ->firstOrFail();
+
+        return view(
+            'website.table-booking.booking-success',
+            compact('restaurant', 'booking')
+        );
     }
 
 
