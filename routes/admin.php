@@ -126,6 +126,17 @@ Route::group(['middleware' => 'admin'], function () {
         [RestaurantBookingController::class, 'restaurantBookings']
     )->name('admin.restaurant-bookings.restaurant');
 
+    // Check-in
+Route::post(
+    'restaurant-bookings/{restaurant_booking}/check-in',
+    [RestaurantBookingController::class, 'checkIn']
+)->name('admin.restaurant-bookings.check-in');
+
+    Route::post(
+    'restaurant-bookings/{restaurant_booking}/status',
+    [RestaurantBookingController::class, 'quickUpdateStatus']
+)->name('admin.restaurant-bookings.status');
+
     Route::get(
         'restaurant-booking-tables/{restaurantId}',
         [RestaurantBookingController::class, 'getRestaurantTables']

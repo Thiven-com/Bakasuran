@@ -170,6 +170,9 @@ Route::get(
 )->name('restaurant.booking-success');
 
 
+
+
+
     // Restaurant table booking - LOGIN REQUIRED
     // Route::get('/restaurant/{slug}/book-table',
     //     [PageControllers::class, 'table_booking'])

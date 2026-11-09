@@ -24,9 +24,17 @@ class RestaurantTableBooking extends Model
         'occasion',
         'special_requests',
         'status',
+
+
+        // Check-in fields
+        'check_in_status',
+        'checked_in_at',
+
+
         'confirmed_at',
         'cancelled_at',
         'admin_notes',
+        
     ];
 
     protected function casts(): array
@@ -36,6 +44,7 @@ class RestaurantTableBooking extends Model
             'guest_count' => 'integer',
             'confirmed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+             'checked_in_at' => 'datetime',
         ];
     }
 
