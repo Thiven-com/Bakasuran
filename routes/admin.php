@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\RestaurantBookingHourController;
 use App\Http\Controllers\Admin\RestaurantBookingSettingController;
 use App\Http\Controllers\Admin\RestaurantBookingSessionController;
 use App\Http\Controllers\Admin\RestaurantTypeController;
+use App\Http\Controllers\Admin\RestaurantFoodOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,15 +128,15 @@ Route::group(['middleware' => 'admin'], function () {
     )->name('admin.restaurant-bookings.restaurant');
 
     // Check-in
-Route::post(
-    'restaurant-bookings/{restaurant_booking}/check-in',
-    [RestaurantBookingController::class, 'checkIn']
-)->name('admin.restaurant-bookings.check-in');
+    Route::post(
+        'restaurant-bookings/{restaurant_booking}/check-in',
+        [RestaurantBookingController::class, 'checkIn']
+    )->name('admin.restaurant-bookings.check-in');
 
     Route::post(
-    'restaurant-bookings/{restaurant_booking}/status',
-    [RestaurantBookingController::class, 'quickUpdateStatus']
-)->name('admin.restaurant-bookings.status');
+        'restaurant-bookings/{restaurant_booking}/status',
+        [RestaurantBookingController::class, 'quickUpdateStatus']
+    )->name('admin.restaurant-bookings.status');
 
     Route::get(
         'restaurant-booking-tables/{restaurantId}',
@@ -196,6 +197,23 @@ Route::post(
     )->parameters([
                 'booking-settings' => 'booking_setting'
             ])->names('admin.booking-settings');
+
+
+    // Restaurant Dine-In Food Orders
+    Route::get(
+        'restaurant-food-orders',
+        [RestaurantFoodOrderController::class, 'index']
+    )->name('admin.restaurant-food-orders.index');
+
+    Route::get(
+        'restaurant-food-orders/{id}',
+        [RestaurantFoodOrderController::class, 'show']
+    )->name('admin.restaurant-food-orders.show');
+
+    Route::post(
+        'restaurant-food-orders/{id}/status',
+        [RestaurantFoodOrderController::class, 'updateStatus']
+    )->name('admin.restaurant-food-orders.update-status');
 
 
 

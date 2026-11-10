@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cart_items', function (Blueprint $table) {
-            //
+           
             $table->string('type')->nullable()->after('unit_price')->default('order');
         });
     }

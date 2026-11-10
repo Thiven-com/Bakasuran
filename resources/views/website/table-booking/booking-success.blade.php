@@ -294,6 +294,50 @@
                     @endif
                 </div>
 
+
+
+                {{-- DINE-IN ACCESS --}}
+                @if($booking->status === 'confirmed')
+
+                            <div style="
+                        margin-top:25px;
+                        padding:22px;
+                        background:#fbf8f3;
+                        border:1px solid #eadfce;
+                        border-radius:12px;
+                        text-align:left;
+                    ">
+
+                                <h3 style="color:#420916; font-size:19px; margin-bottom:10px;">
+                                    Restaurant Dine-In
+                                </h3>
+
+                                @if($booking->check_in_status === 'checked_in')
+
+                                    <p style="color:#16813b; font-size:14px; margin-bottom:8px;">
+                                        <strong>✓ Restaurant Check-in Completed</strong>
+                                    </p>
+
+                                    <p style="color:#62584f; font-size:13px; margin-bottom:0;">
+                                        Your table is ready! You can now access the restaurant's
+                                        food menu and place your dine-in order.
+                                    </p>
+
+                                @else
+
+                                    <p style="color:#62584f; font-size:13px; margin-bottom:0;">
+                                        Your reservation is confirmed. Please visit the restaurant
+                                        and ask the staff to check you in. The Dine-In Menu will
+                                        become available after check-in.
+                                    </p>
+
+                                @endif
+
+                            </div>
+
+                @endif
+
+
                 <div class="success-actions">
 
                     <a href="{{ route('customer.table-bookings') }}" class="success-btn success-btn-primary">

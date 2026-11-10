@@ -122,6 +122,16 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/my-table-bookings', [PageControllers::class, 'myTableBookings'])
         ->name('customer.table-bookings');
 
+        // CUSTOMER DINE-IN MENU
+Route::get(
+    '/customer/dine-in/{bookingNumber}',
+    [PageControllers::class, 'dineInMenu']
+)->name('customer.dine-in.menu');
+
+Route::post(
+    '/customer/dine-in/{bookingNumber}/place-order',
+    [PageControllers::class, 'placeDineInOrder']
+)->name('customer.dine-in.place-order');
 
     // ==========================================
 // RESTAURANT TABLE BOOKING - LOGIN REQUIRED

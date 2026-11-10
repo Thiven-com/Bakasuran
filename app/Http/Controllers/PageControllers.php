@@ -1895,5 +1895,190 @@ class PageControllers extends Controller
     }
 
 
+    public function dineInMenu($bookingNumber)
+    {
+        // Get the logged-in customer's booking
+        $booking = RestaurantTableBooking::with([
+            'restaurant',
+            'restaurantTable'
+        ])
+            ->where('booking_number', $bookingNumber)
+            ->where('customer_id', Auth::guard('customer')->id())
+            ->firstOrFail();
+
+        // Verify booking confirmation
+        if ($booking->status !== 'confirmed') {
+            return redirect()
+                ->route('customer.table-bookings')
+                ->with('error', 'Your booking is not confirmed.');
+        }
+
+        // Verify restaurant check-in
+        if ($booking->check_in_status !== 'checked_in') {
+            return redirect()
+                ->route('customer.table-bookings')
+                ->with('error', 'Please check in at the restaurant first.');
+        }
+
+        // Load only this booking's restaurant products
+        $restaurant = $booking->restaurant;
+
+        if (!$restaurant) {
+            abort(404, 'Restaurant not found.');
+        }
+
+        $products = Product::with([
+            'category',
+            'variant',
+            'restaurant',
+            'primaryMedia',
+            'media',
+        ])
+            ->where('restaurant_id', $booking->restaurant_id)
+            ->where('status', 'show')
+            ->whereHas('variant')
+            ->latest()
+            ->get();
+
+        // Group products by category
+        $categories = $products
+            ->filter(fn($product) => $product->category)
+            ->groupBy(fn($product) => $product->category->title)
+            ->map(fn($items, $title) => [
+                'name' => $title,
+                'count' => $items->count(),
+            ])
+            ->values();
+
+        return view('website.dine-in.menu', compact(
+            'booking',
+            'restaurant',
+            'products',
+            'categories'
+        ));
+    }
+
+
+public function placeDineInOrder(Request $request, $bookingNumber)
+{
+    $customer = Auth::guard('customer')->user();
+
+    if (!$customer) {
+        return redirect()->route('customer.login');
+    }
+
+    $booking = RestaurantTableBooking::where('booking_number', $bookingNumber)
+        ->where('customer_id', $customer->id)
+        ->firstOrFail();
+
+    if (
+        $booking->status !== 'confirmed' ||
+        $booking->check_in_status !== 'checked_in'
+    ) {
+        return back()->with('error', 'Your booking is not eligible for dine-in ordering.');
+    }
+
+    $validated = $request->validate([
+        'products' => 'required|array|min:1',
+        'products.*.product_variant_id' => 'required|integer|distinct',
+        'products.*.quantity' => 'required|integer|min:1',
+        'special_instructions' => 'nullable|string|max:1000',
+    ]);
+
+    try {
+        $order = \Illuminate\Support\Facades\DB::transaction(
+            function () use ($validated, $booking, $customer) {
+
+                $subtotal = 0;
+                $items = [];
+
+                foreach ($validated['products'] as $product) {
+
+                    $variant = ProductVariant::with('product')
+                        ->where('id', $product['product_variant_id'])
+                        ->whereHas('product', function ($query) use ($booking) {
+                            $query->where(
+                                'restaurant_id',
+                                $booking->restaurant_id
+                            );
+                        })
+                        ->first();
+
+                    if (!$variant || !$variant->product) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'products' => [
+                                'An invalid food item was selected.'
+                            ]
+                        ]);
+                    }
+
+                    $quantity = (int) $product['quantity'];
+                    $price = (float) $variant->price;
+                    $total = $price * $quantity;
+
+                    $subtotal += $total;
+
+                    $items[] = [
+                        'variant' => $variant,
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'total' => $total,
+                    ];
+                }
+
+                $order = \App\Models\RestaurantFoodOrder::create([
+                    'order_number' => 'RFO-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                    'restaurant_id' => $booking->restaurant_id,
+                    'restaurant_table_id' => $booking->restaurant_table_id,
+                    'customer_id' => $customer->id,
+                    'subtotal' => $subtotal,
+                    'tax' => 0,
+                    'grand_total' => $subtotal,
+                    'status' => 'pending',
+                    'special_instructions' => $validated['special_instructions'] ?? null,
+                ]);
+
+                foreach ($items as $item) {
+                    $variant = $item['variant'];
+
+                    \App\Models\RestaurantFoodOrderItem::create([
+                        'restaurant_food_order_id' => $order->id,
+                        'product_variant_id' => $variant->id,
+                        'product_name' => $variant->product->title,
+                        'variant_name' => $variant->name ?? null,
+                        'unit_price' => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'total_price' => $item['total'],
+                    ]);
+                }
+
+                return $order;
+            }
+        );
+
+        return back()->with(
+            'success',
+            'Your dine-in order has been placed. Order Number: ' . $order->order_number
+        );
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        throw $e;
+
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::error(
+            'Website dine-in order failed',
+            [
+                'customer_id' => $customer->id,
+                'booking_number' => $bookingNumber,
+                'error' => $e->getMessage(),
+            ]
+        );
+
+        return back()->with(
+            'error',
+            'Unable to place your food order. Please try again.'
+        );
+    }
+}
 
 }
