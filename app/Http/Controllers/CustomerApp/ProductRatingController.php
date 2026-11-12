@@ -124,6 +124,42 @@ class ProductRatingController extends Controller
         ]);
     }
 
+    public function getRatingsByProduct($productId)
+    {
+        $ratings = ProductRating::with('customer', 'product')
+            ->where('product_id', $productId)
+            ->where('status', 1)
+            ->get();
+
+        if ($ratings->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Product ratings not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product ratings fetched successfully',
+            'product_id' => (int) $productId,
+            'average_rating' => round($ratings->avg('rating'), 1),
+            'total_ratings' => $ratings->count(),
+            'data' => $ratings,
+        ]);
+    }
+
+    public function getAllRatings()
+    {
+        $ratings = ProductRating::where('status', 1)
+            ->select('product_id', 'rating')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $ratings,
+        ]);
+    }
+
     // Update own rating
     public function update(Request $request, $id)
     {

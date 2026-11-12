@@ -358,12 +358,21 @@ class RestaurantFoodOrderController extends Controller
      */
     public function index()
     {
+        $customer = auth()->user();
+
+        if (!$customer) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthenticated. Please login.',
+            ], 401);
+        }
+
         $orders = RestaurantFoodOrder::with([
             'items',
             'table',
             'restaurant',
         ])
-            ->where('customer_id', auth()->id())
+            ->where('customer_id', $customer->id)
             ->latest()
             ->get();
 

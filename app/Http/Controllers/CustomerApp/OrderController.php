@@ -81,6 +81,12 @@ class OrderController extends Controller
     public function show($orderId)
     {
         $user = auth('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthenticated. Please login again.',
+            ], 401);
+        }
 
         $orders = Order::query()
             ->where('customer_id', $user->id)
