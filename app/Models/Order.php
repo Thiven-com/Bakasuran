@@ -61,5 +61,9 @@ class Order extends Model
         'shipment_status',
         'shipment_message',
         'shipment_response',
+        'delivery_partner_id',
+        'picked_up_at',
+        'pickup_otp',
+        'delivered_at',
     ];
 }

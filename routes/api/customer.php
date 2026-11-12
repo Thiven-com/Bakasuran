@@ -123,6 +123,8 @@ Route::group(['middelware' => 'auth:sanctum'], function () {
 
     // Update rating
     Route::put('product-rating/{id}', [ProductRatingController::class, 'update']);
+    Route::get('/product-ratings/{productId}', [ProductRatingController::class, 'getRatingsByProduct']);
+    Route::get('/product-ratings', [ProductRatingController::class, 'getAllRatings']);
 
     // Delete rating
     Route::delete('product-rating/{id}', [ProductRatingController::class, 'destroy']);
