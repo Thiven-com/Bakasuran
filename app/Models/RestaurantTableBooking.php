@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
 class RestaurantTableBooking extends Model
 {
     protected $fillable = [
@@ -74,6 +75,14 @@ public function bookingSession(): BelongsTo
     return $this->belongsTo(
         RestaurantBookingSession::class,
         'booking_session_id'
+    );
+}
+
+public function foodOrders()
+{
+    return $this->hasMany(
+        RestaurantFoodOrder::class,
+        'restaurant_table_booking_id'
     );
 }
 }

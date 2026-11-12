@@ -24,4 +24,12 @@ class RestaurantReview extends Model
     {
         return $this->belongsTo(Restaurant::class, 'restaurant_id');
     }
+
+    public function order()
+{
+    return $this->belongsTo(
+        RestaurantFoodOrder::class,
+        'order_id'
+    );
+}
 }

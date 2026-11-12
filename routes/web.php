@@ -88,11 +88,29 @@ Route::get('/account-settings', [PageControllers::class, 'account_settings'])
 Route::get('/account', [PageControllers::class, 'account'])
     ->name('account');
 
+// Customer Dine-In Bill
+Route::get(
+    '/dine-in-bill/{id}',
+    [PageControllers::class, 'viewDineInBill']
+)->name('customer.dine-in-bill');
+
+Route::post(
+    '/dine-in-bill/{id}/payment-method',
+    [PageControllers::class, 'selectDineInPaymentMethod']
+)->name('customer.dine-in-payment-method');
+
+Route::get('/dine-in-order-history', [PageControllers::class, 'dineInOrderHistory'])
+    ->name('customer.dine-in-order-history');
+
+Route::post('/dine-in-order-history/review', [PageControllers::class, 'storeDineInReview'])
+    ->name('customer.dine-in-order-review');
+
 Route::get('/offers', [PageControllers::class, 'offers'])
     ->name('offers');
 
 Route::get('/checkout', [PageControllers::class, 'checkout'])
     ->name('checkout');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +132,17 @@ Route::middleware('auth:customer')->group(function () {
     Route::post('/payment/success', [OrderController::class, 'paymentSuccess'])
         ->name('customer.payment.success');
 
+    // Dine-In Razorpay payment.
+    Route::get(
+        '/dine-in-payment/{id}',
+        [OrderController::class, 'createDineInPayment']
+    )->name('customer.dine-in-payment');
+
+    Route::post(
+    '/dine-in-payment/{id}/verify',
+    [OrderController::class, 'verifyDineInPayment']
+)->name('customer.dine-in-payment.verify');
+
     // Customer order history.
     Route::get('/my-orders', [OrderController::class, 'orders'])
         ->name('customer.orders');
@@ -122,16 +151,16 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/my-table-bookings', [PageControllers::class, 'myTableBookings'])
         ->name('customer.table-bookings');
 
-        // CUSTOMER DINE-IN MENU
-Route::get(
-    '/customer/dine-in/{bookingNumber}',
-    [PageControllers::class, 'dineInMenu']
-)->name('customer.dine-in.menu');
+    // CUSTOMER DINE-IN MENU
+    Route::get(
+        '/customer/dine-in/{bookingNumber}',
+        [PageControllers::class, 'dineInMenu']
+    )->name('customer.dine-in.menu');
 
-Route::post(
-    '/customer/dine-in/{bookingNumber}/place-order',
-    [PageControllers::class, 'placeDineInOrder']
-)->name('customer.dine-in.place-order');
+    Route::post(
+        '/customer/dine-in/{bookingNumber}/place-order',
+        [PageControllers::class, 'placeDineInOrder']
+    )->name('customer.dine-in.place-order');
 
     // ==========================================
 // RESTAURANT TABLE BOOKING - LOGIN REQUIRED
@@ -173,11 +202,11 @@ Route::post(
         ->name('restaurant.confirm-booking');
 
 
-        // STEP 4: Booking Success Page
-Route::get(
-    '/restaurant/{slug}/booking-success/{bookingNumber}',
-    [PageControllers::class, 'bookingSuccess']
-)->name('restaurant.booking-success');
+    // STEP 4: Booking Success Page
+    Route::get(
+        '/restaurant/{slug}/booking-success/{bookingNumber}',
+        [PageControllers::class, 'bookingSuccess']
+    )->name('restaurant.booking-success');
 
 
 

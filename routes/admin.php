@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\RestaurantBookingSettingController;
 use App\Http\Controllers\Admin\RestaurantBookingSessionController;
 use App\Http\Controllers\Admin\RestaurantTypeController;
 use App\Http\Controllers\Admin\RestaurantFoodOrderController;
+use App\Http\Controllers\Admin\RestaurantReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -214,6 +215,45 @@ Route::group(['middleware' => 'admin'], function () {
         'restaurant-food-orders/{id}/status',
         [RestaurantFoodOrderController::class, 'updateStatus']
     )->name('admin.restaurant-food-orders.update-status');
+
+
+Route::post(
+    'restaurant-food-orders/{id}/complete-all',
+    [RestaurantFoodOrderController::class, 'completeAllOrders']
+)->name('admin.restaurant-food-orders.complete-all');
+
+
+    Route::delete(
+        'restaurant-food-orders/{id}',
+        [RestaurantFoodOrderController::class, 'destroy']
+    )->name('admin.restaurant-food-orders.destroy');
+
+    // Generate Dine-In Bill
+    Route::post(
+        'restaurant-food-orders/{id}/generate-bill',
+        [RestaurantFoodOrderController::class, 'generateBill']
+    )->name('admin.restaurant-food-orders.generate-bill');
+
+    Route::post(
+        'restaurant-food-orders/{id}/confirm-payment',
+        [RestaurantFoodOrderController::class, 'confirmOfflinePayment']
+    )->name('admin.restaurant-food-orders.confirm-payment');
+
+    // Restaurant Reviews
+    Route::get(
+        'restaurant-reviews',
+        [RestaurantReviewController::class, 'index']
+    )->name('admin.restaurant-reviews.index');
+
+    Route::post(
+        'restaurant-reviews/{id}/status',
+        [RestaurantReviewController::class, 'updateStatus']
+    )->name('admin.restaurant-reviews.update-status');
+
+    Route::delete(
+        'restaurant-reviews/{id}',
+        [RestaurantReviewController::class, 'destroy']
+    )->name('admin.restaurant-reviews.destroy');
 
 
 

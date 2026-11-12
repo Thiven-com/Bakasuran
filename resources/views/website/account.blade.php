@@ -4,8 +4,8 @@
 
     <style>
         /* =========================================================
-                                           SUDHEERA SAREES - STATIC ACCOUNT DASHBOARD
-                                        ========================================================= */
+                                                               SUDHEERA SAREES - STATIC ACCOUNT DASHBOARD
+                                                            ========================================================= */
 
         .sudheera-account-page {
             background: #fbf8f3;
@@ -15,8 +15,8 @@
         }
 
         /* =========================================================
-                                           BREADCRUMB
-                                        ========================================================= */
+                                                               BREADCRUMB
+                                                            ========================================================= */
 
         .sudheera-breadcrumb-section {
             padding-bottom: 10px;
@@ -44,16 +44,16 @@
         }
 
         /* =========================================================
-                                           ACCOUNT LAYOUT
-                                        ========================================================= */
+                                                               ACCOUNT LAYOUT
+                                                            ========================================================= */
 
         .sudheera-account-layout {
             padding-top: 35px;
         }
 
         /* =========================================================
-                                           SIDEBAR
-                                        ========================================================= */
+                                                               SIDEBAR
+                                                            ========================================================= */
 
         .sudheera-sidebar {
             background: #fff;
@@ -130,16 +130,16 @@
         }
 
         /* =========================================================
-                                           MAIN CONTENT
-                                        ========================================================= */
+                                                               MAIN CONTENT
+                                                            ========================================================= */
 
         .sudheera-account-content {
             padding-left: 10px;
         }
 
         /* =========================================================
-                                           WELCOME
-                                        ========================================================= */
+                                                               WELCOME
+                                                            ========================================================= */
 
         .sudheera-welcome {
             position: relative;
@@ -208,8 +208,8 @@
         }
 
         /* =========================================================
-                                           DASHBOARD CARDS
-                                        ========================================================= */
+                                                               DASHBOARD CARDS
+                                                            ========================================================= */
 
         .sudheera-dashboard-card {
             background: #fff;
@@ -279,8 +279,8 @@
         }
 
         /* =========================================================
-                                           QUICK INFORMATION
-                                        ========================================================= */
+                                                               QUICK INFORMATION
+                                                            ========================================================= */
 
         .sudheera-info-card {
             background: #fff;
@@ -353,8 +353,8 @@
         }
 
         /* =========================================================
-                                           RESPONSIVE
-                                        ========================================================= */
+                                                               RESPONSIVE
+                                                            ========================================================= */
 
         @media (max-width: 1199px) {
 
@@ -478,14 +478,14 @@
 
 
     <!-- =========================================================
-                                         ACCOUNT PAGE
-                                    ========================================================= -->
+                                                             ACCOUNT PAGE
+                                                        ========================================================= -->
 
     <main class="sudheera-account-page">
 
         <!-- =====================================================
-                         BREADCRUMB
-                    ====================================================== -->
+                                             BREADCRUMB
+                                        ====================================================== -->
 
         <section class="sudheera-breadcrumb-section">
 
@@ -519,8 +519,8 @@
 
 
         <!-- =====================================================
-                         ACCOUNT CONTENT
-                    ====================================================== -->
+                                             ACCOUNT CONTENT
+                                        ====================================================== -->
 
         <section class="sudheera-account-layout">
 
@@ -530,8 +530,8 @@
 
 
                     <!-- =================================================
-                                     SIDEBAR
-                                ================================================== -->
+                                                         SIDEBAR
+                                                    ================================================== -->
 
                     <div class="col-lg-4 col-xl-3">
 
@@ -583,6 +583,16 @@
                                 <i class="icon icon-Box"></i>
                                 <span>My Table Bookings</span>
                                 <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+                            </a>
+
+                            <a href="{{ route('customer.dine-in-order-history') }}" class="sudheera-nav-item">
+
+                                <i class="fa fa-history"></i>
+
+                                <span>Dine-In Order History</span>
+
+                                <i class="icon icon-ArrowCaretRight sudheera-nav-arrow"></i>
+
                             </a>
 
 
@@ -641,8 +651,8 @@
 
 
                     <!-- =================================================
-                                     MAIN CONTENT
-                                ================================================== -->
+                                                         MAIN CONTENT
+                                                    ================================================== -->
 
                     <div class="col-lg-8 col-xl-9">
 
@@ -650,8 +660,8 @@
 
 
                             <!-- =================================================
-                                             WELCOME
-                                        ================================================== -->
+                                                                 WELCOME
+                                                            ================================================== -->
 
                             <div class="sudheera-welcome">
 
@@ -680,8 +690,8 @@
 
 
                             <!-- =================================================
-                                             DASHBOARD CARDS
-                                        ================================================== -->
+                                                                 DASHBOARD CARDS
+                                                            ================================================== -->
 
                             <div class="row g-4">
 
@@ -844,9 +854,180 @@
                             </div>
 
 
+
+                            <!-- DINE-IN ORDERS -->
+                            @if($dineInOrders->isNotEmpty())
+
+                                @php
+                                    $groupedDineInOrders = $dineInOrders->groupBy(function ($item) {
+                                        return $item->restaurant_table_booking_id
+                                            ? 'booking-' . $item->restaurant_table_booking_id
+                                            : 'order-' . $item->id;
+                                    });
+                                @endphp
+
+                                <div class="sudheera-info-card mb-4">
+
+                                    <div class="sudheera-info-title">
+                                        <h5>Dine-In Orders</h5>
+                                        <span class="sudheera-info-badge">
+                                            {{ $groupedDineInOrders->count() }} Bookings
+                                        </span>
+                                    </div>
+
+                                    @foreach($groupedDineInOrders as $bookingOrders)
+
+                                        @php
+                                            $bookingOrders = $bookingOrders->sortBy('created_at');
+
+                                            $firstOrder = $bookingOrders->first();
+
+                                            $totalAmount = $bookingOrders->sum('grand_total');
+
+                                            $totalItems = $bookingOrders->sum(function ($item) {
+                                                return $item->items->sum('quantity');
+                                            });
+
+                                            $allBillsGenerated = $bookingOrders->every(
+                                                fn($item) => !is_null($item->bill_generated_at)
+                                            );
+
+                                            $allPaid = $bookingOrders->every(
+                                                fn($item) => $item->payment_status === 'paid'
+                                            );
+
+                                            $billOrder = $bookingOrders->firstWhere(
+                                                'bill_generated_at',
+                                                '!=',
+                                                null
+                                            );
+                                        @endphp
+
+                                        <div class="border rounded-3 p-3 mb-3">
+
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                <div>
+                                                    <h6 class="mb-1">
+                                                        {{ $firstOrder->restaurant->name ?? 'N/A' }}
+                                                    </h6>
+
+                                                    <small class="text-muted">
+                                                        Table:
+                                                        {{ $firstOrder->table->table_number ?? 'N/A' }}
+                                                    </small>
+                                                </div>
+
+                                                <span class="badge bg-primary">
+                                                    {{ $bookingOrders->count() }} Orders
+                                                </span>
+                                            </div>
+
+                                            <hr>
+
+                                            <strong>Order Numbers</strong>
+
+                                            @foreach($bookingOrders as $bookingOrder)
+                                                <div class="small text-muted mt-2">
+                                                    {{ $bookingOrder->order_number }}
+                                                    <span class="ms-2">
+                                                        ({{ ucfirst(str_replace('_', ' ', $bookingOrder->status)) }})
+                                                    </span>
+                                                </div>
+                                            @endforeach
+
+                                            <hr>
+
+                                            <strong>All Food Items</strong>
+
+                                            <div class="table-responsive mt-2">
+                                                <table class="table table-sm table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Food Item</th>
+                                                            <th>Quantity</th>
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        @foreach($bookingOrders as $bookingOrder)
+                                                            @foreach($bookingOrder->items as $foodItem)
+                                                                <tr>
+                                                                    <td>{{ $foodItem->product_name }}</td>
+                                                                    <td>{{ $foodItem->quantity }}</td>
+                                                                    <td>
+                                                                        ₹{{ number_format($foodItem->total_price, 2) }}
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div class="row g-3 mt-2">
+
+                                                <div class="col-md-6">
+                                                    <small class="text-muted">Total Items</small>
+                                                    <div class="fw-bold">{{ $totalItems }}</div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <small class="text-muted">Combined Total</small>
+                                                    <div class="fw-bold text-success">
+                                                        ₹{{ number_format($totalAmount, 2) }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <small class="text-muted">Bill Status</small>
+                                                    <div class="mt-1">
+                                                        @if($allBillsGenerated)
+                                                            <span class="badge bg-success">Bill Generated</span>
+                                                        @else
+                                                            <span class="badge bg-secondary">Bill Not Generated</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <small class="text-muted">Payment Status</small>
+                                                    <div class="mt-1">
+                                                        @if($allPaid)
+                                                            <span class="badge bg-success">Paid</span>
+                                                        @else
+                                                            <span class="badge bg-warning text-dark">
+                                                                Payment Pending
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                @if($allBillsGenerated && $billOrder)
+                                                    <div class="col-12 mt-3">
+                                                        <a href="{{ route('customer.dine-in-bill', $billOrder->id) }}"
+                                                            class="btn btn-outline-primary btn-sm">
+                                                            <i class="fa fa-file-invoice"></i>
+                                                            View Combined Bill
+                                                        </a>
+                                                    </div>
+                                                @endif
+
+                                            </div>
+
+                                        </div>
+
+                                    @endforeach
+
+                                </div>
+
+                            @endif
+
+
+
                             <!-- =================================================
-                                             QUICK ACCOUNT INFORMATION
-                                        ================================================== -->
+                                                                 QUICK ACCOUNT INFORMATION
+                                                            ================================================== -->
 
                             <div class="sudheera-info-card">
 

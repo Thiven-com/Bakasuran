@@ -244,6 +244,13 @@
                                                                 <span>Restaurant Food Orders</span>
                                                         </a>
                                                 </li>
+
+                                                <li class="{{ Request::is('restaurant-reviews*') ? 'active' : '' }}">
+                                                        <a href="{{ route('admin.restaurant-reviews.index') }}">
+                                                                <i data-feather="star"></i>
+                                                                <span>Restaurant Reviews</span>
+                                                        </a>
+                                                </li>
                                                 @if (isset($admin->role) && $admin->role == 'super_admin')
 
                                                         <li class="{{ Request::is('admin/customers') ? 'active' : '' }}"><a

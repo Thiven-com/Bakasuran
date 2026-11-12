@@ -28,6 +28,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use App\Models\RestaurantBookingSession;
 use App\Models\RestaurantType;
+use App\Models\RestaurantFoodOrder;
+use App\Models\RestaurantReview;
 
 class PageControllers extends Controller
 {
@@ -742,6 +744,7 @@ class PageControllers extends Controller
     public function account()
     {
         $customer = Auth::guard('customer')->user();
+
         if (!$customer) {
             return redirect()->route('login');
         }
@@ -749,7 +752,202 @@ class PageControllers extends Controller
         $address = Address::where('customer_id', $customer->id)
             ->latest()
             ->first();
-        return view('website.account', compact('customer', 'address'));
+
+        // Customer Dine-In Orders
+
+        $dineInOrders = RestaurantFoodOrder::with([
+            'restaurant',
+            'table',
+            'items'
+        ])
+            ->where('customer_id', $customer->id)
+            ->where('status', '!=', 'completed')
+            ->latest()
+            ->get();
+
+
+        return view('website.account', compact(
+            'customer',
+            'address',
+            'dineInOrders'
+        ));
+    }
+
+    // Display Customer Dine-In Bill
+
+public function viewDineInBill($id)
+{
+    $customer = Auth::guard('customer')->user();
+
+    if (!$customer) {
+        return redirect()->route('login');
+    }
+
+    $order = RestaurantFoodOrder::with([
+        'restaurant',
+        'table',
+        'booking.foodOrders.items',
+    ])
+        ->where('id', $id)
+        ->where('customer_id', $customer->id)
+        ->whereNotNull('bill_generated_at')
+        ->firstOrFail();
+
+    // Get all orders from the same table booking
+    $bookingOrders = $order->booking
+        ? $order->booking->foodOrders->sortBy('created_at')->values()
+        : collect([$order]);
+
+    // Calculate combined bill amounts
+    $combinedSubtotal = $bookingOrders->sum('subtotal');
+    $combinedTax = $bookingOrders->sum('tax');
+    $combinedGrandTotal = $bookingOrders->sum('grand_total');
+
+    // Check whether all orders are paid
+    $isPaid = $bookingOrders->every(
+        fn($item) => $item->payment_status === 'paid'
+    );
+
+    return view(
+        'website.dine-in-bill',
+        compact(
+            'customer',
+            'order',
+            'bookingOrders',
+            'combinedSubtotal',
+            'combinedTax',
+            'combinedGrandTotal',
+            'isPaid'
+        )
+    );
+}
+
+
+
+
+   
+
+public function selectDineInPaymentMethod(Request $request, $id)
+{
+    $request->validate([
+        'payment_method' => 'required|in:razorpay',
+    ]);
+
+    $customer = Auth::guard('customer')->user();
+
+    if (!$customer) {
+        return redirect()->route('login');
+    }
+
+    $order = RestaurantFoodOrder::with('booking.foodOrders')
+        ->where('id', $id)
+        ->where('customer_id', $customer->id)
+        ->whereNotNull('bill_generated_at')
+        ->firstOrFail();
+
+    $bookingOrders = $order->booking
+        ? $order->booking->foodOrders
+        : collect([$order]);
+
+    // Prevent payment if any order is already paid
+    if ($bookingOrders->contains(
+        fn($item) => $item->payment_status === 'paid'
+    )) {
+        return back()->with(
+            'error',
+            'Payment has already been confirmed for this booking.'
+        );
+    }
+
+    // All orders must have generated bills
+    if ($bookingOrders->contains(
+        fn($item) => !$item->bill_generated_at
+    )) {
+        return back()->with(
+            'error',
+            'Combined bill is not generated for all orders.'
+        );
+    }
+
+    // Customer can select Razorpay only
+    foreach ($bookingOrders as $bookingOrder) {
+        $bookingOrder->update([
+            'payment_method' => 'razorpay',
+        ]);
+    }
+
+    return redirect()->route(
+        'customer.dine-in-payment',
+        $order->id
+    );
+}
+
+
+
+
+
+    public function dineInOrderHistory()
+    {
+        $customer = Auth::guard('customer')->user();
+
+        if (!$customer) {
+            return redirect()->route('login');
+        }
+
+        $dineInOrders = RestaurantFoodOrder::with([
+            'restaurant',
+            'table',
+            'items'
+        ])
+            ->where('customer_id', $customer->id)
+            ->whereIn('status', ['completed'])
+            ->latest()
+            ->get();
+
+        return view('website.dine-in-order-history', compact(
+            'customer',
+            'dineInOrders'
+        ));
+    }
+
+
+
+    public function storeDineInReview(Request $request)
+    {
+        $customer = Auth::guard('customer')->user();
+
+        if (!$customer) {
+            return redirect()->route('login');
+        }
+
+        $validated = $request->validate([
+            'order_id' => 'required|integer',
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'nullable|string|max:1000',
+        ]);
+
+        $order = RestaurantFoodOrder::where('id', $validated['order_id'])
+            ->where('customer_id', $customer->id)
+            ->where('status', 'completed')
+            ->firstOrFail();
+
+        $existingReview = RestaurantReview::where('order_id', $order->id)
+            ->first();
+
+        if ($existingReview) {
+            return back()->with('error', 'You have already reviewed this order.');
+        }
+
+        RestaurantReview::create([
+            'customer_id' => $customer->id,
+            'restaurant_id' => $order->restaurant_id,
+            'order_id' => $order->id,
+            'rating' => $validated['rating'],
+            'review' => $validated['review'] ?? null,
+            'status' => 1,
+        ]);
+
+        return back()->with('success', 'Thank you! Your review has been submitted.');
     }
 
 
@@ -1959,126 +2157,127 @@ class PageControllers extends Controller
     }
 
 
-public function placeDineInOrder(Request $request, $bookingNumber)
-{
-    $customer = Auth::guard('customer')->user();
+    public function placeDineInOrder(Request $request, $bookingNumber)
+    {
+        $customer = Auth::guard('customer')->user();
 
-    if (!$customer) {
-        return redirect()->route('customer.login');
-    }
+        if (!$customer) {
+            return redirect()->route('customer.login');
+        }
 
-    $booking = RestaurantTableBooking::where('booking_number', $bookingNumber)
-        ->where('customer_id', $customer->id)
-        ->firstOrFail();
+        $booking = RestaurantTableBooking::where('booking_number', $bookingNumber)
+            ->where('customer_id', $customer->id)
+            ->firstOrFail();
 
-    if (
-        $booking->status !== 'confirmed' ||
-        $booking->check_in_status !== 'checked_in'
-    ) {
-        return back()->with('error', 'Your booking is not eligible for dine-in ordering.');
-    }
+        if (
+            $booking->status !== 'confirmed' ||
+            $booking->check_in_status !== 'checked_in'
+        ) {
+            return back()->with('error', 'Your booking is not eligible for dine-in ordering.');
+        }
 
-    $validated = $request->validate([
-        'products' => 'required|array|min:1',
-        'products.*.product_variant_id' => 'required|integer|distinct',
-        'products.*.quantity' => 'required|integer|min:1',
-        'special_instructions' => 'nullable|string|max:1000',
-    ]);
+        $validated = $request->validate([
+            'products' => 'required|array|min:1',
+            'products.*.product_variant_id' => 'required|integer|distinct',
+            'products.*.quantity' => 'required|integer|min:1',
+            'special_instructions' => 'nullable|string|max:1000',
+        ]);
 
-    try {
-        $order = \Illuminate\Support\Facades\DB::transaction(
-            function () use ($validated, $booking, $customer) {
+        try {
+            $order = \Illuminate\Support\Facades\DB::transaction(
+                function () use ($validated, $booking, $customer) {
 
-                $subtotal = 0;
-                $items = [];
+                    $subtotal = 0;
+                    $items = [];
 
-                foreach ($validated['products'] as $product) {
+                    foreach ($validated['products'] as $product) {
 
-                    $variant = ProductVariant::with('product')
-                        ->where('id', $product['product_variant_id'])
-                        ->whereHas('product', function ($query) use ($booking) {
-                            $query->where(
-                                'restaurant_id',
-                                $booking->restaurant_id
-                            );
-                        })
-                        ->first();
+                        $variant = ProductVariant::with('product')
+                            ->where('id', $product['product_variant_id'])
+                            ->whereHas('product', function ($query) use ($booking) {
+                                $query->where(
+                                    'restaurant_id',
+                                    $booking->restaurant_id
+                                );
+                            })
+                            ->first();
 
-                    if (!$variant || !$variant->product) {
-                        throw \Illuminate\Validation\ValidationException::withMessages([
-                            'products' => [
-                                'An invalid food item was selected.'
-                            ]
+                        if (!$variant || !$variant->product) {
+                            throw \Illuminate\Validation\ValidationException::withMessages([
+                                'products' => [
+                                    'An invalid food item was selected.'
+                                ]
+                            ]);
+                        }
+
+                        $quantity = (int) $product['quantity'];
+                        $price = (float) $variant->price;
+                        $total = $price * $quantity;
+
+                        $subtotal += $total;
+
+                        $items[] = [
+                            'variant' => $variant,
+                            'quantity' => $quantity,
+                            'price' => $price,
+                            'total' => $total,
+                        ];
+                    }
+
+                    $order = \App\Models\RestaurantFoodOrder::create([
+                        'order_number' => 'RFO-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'restaurant_id' => $booking->restaurant_id,
+                        'restaurant_table_id' => $booking->restaurant_table_id,
+                        'restaurant_table_booking_id' => $booking->id,
+                        'customer_id' => $customer->id,
+                        'subtotal' => $subtotal,
+                        'tax' => 0,
+                        'grand_total' => $subtotal,
+                        'status' => 'pending',
+                        'special_instructions' => $validated['special_instructions'] ?? null,
+                    ]);
+
+                    foreach ($items as $item) {
+                        $variant = $item['variant'];
+
+                        \App\Models\RestaurantFoodOrderItem::create([
+                            'restaurant_food_order_id' => $order->id,
+                            'product_variant_id' => $variant->id,
+                            'product_name' => $variant->product->title,
+                            'variant_name' => $variant->name ?? null,
+                            'unit_price' => $item['price'],
+                            'quantity' => $item['quantity'],
+                            'total_price' => $item['total'],
                         ]);
                     }
 
-                    $quantity = (int) $product['quantity'];
-                    $price = (float) $variant->price;
-                    $total = $price * $quantity;
-
-                    $subtotal += $total;
-
-                    $items[] = [
-                        'variant' => $variant,
-                        'quantity' => $quantity,
-                        'price' => $price,
-                        'total' => $total,
-                    ];
+                    return $order;
                 }
+            );
 
-                $order = \App\Models\RestaurantFoodOrder::create([
-                    'order_number' => 'RFO-' . strtoupper(\Illuminate\Support\Str::random(10)),
-                    'restaurant_id' => $booking->restaurant_id,
-                    'restaurant_table_id' => $booking->restaurant_table_id,
+            return back()->with(
+                'success',
+                'Your dine-in order has been placed. Order Number: ' . $order->order_number
+            );
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error(
+                'Website dine-in order failed',
+                [
                     'customer_id' => $customer->id,
-                    'subtotal' => $subtotal,
-                    'tax' => 0,
-                    'grand_total' => $subtotal,
-                    'status' => 'pending',
-                    'special_instructions' => $validated['special_instructions'] ?? null,
-                ]);
+                    'booking_number' => $bookingNumber,
+                    'error' => $e->getMessage(),
+                ]
+            );
 
-                foreach ($items as $item) {
-                    $variant = $item['variant'];
-
-                    \App\Models\RestaurantFoodOrderItem::create([
-                        'restaurant_food_order_id' => $order->id,
-                        'product_variant_id' => $variant->id,
-                        'product_name' => $variant->product->title,
-                        'variant_name' => $variant->name ?? null,
-                        'unit_price' => $item['price'],
-                        'quantity' => $item['quantity'],
-                        'total_price' => $item['total'],
-                    ]);
-                }
-
-                return $order;
-            }
-        );
-
-        return back()->with(
-            'success',
-            'Your dine-in order has been placed. Order Number: ' . $order->order_number
-        );
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        throw $e;
-
-    } catch (\Throwable $e) {
-        \Illuminate\Support\Facades\Log::error(
-            'Website dine-in order failed',
-            [
-                'customer_id' => $customer->id,
-                'booking_number' => $bookingNumber,
-                'error' => $e->getMessage(),
-            ]
-        );
-
-        return back()->with(
-            'error',
-            'Unable to place your food order. Please try again.'
-        );
+            return back()->with(
+                'error',
+                'Unable to place your food order. Please try again.'
+            );
+        }
     }
-}
 
 }
