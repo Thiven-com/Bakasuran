@@ -23,6 +23,8 @@ use App\Http\Controllers\Admin\RestaurantBookingHourController;
 use App\Http\Controllers\Admin\RestaurantBookingSettingController;
 use App\Http\Controllers\Admin\RestaurantBookingSessionController;
 use App\Http\Controllers\Admin\RestaurantTypeController;
+use App\Http\Controllers\Admin\RestaurantFoodOrderController;
+use App\Http\Controllers\Admin\RestaurantReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +128,17 @@ Route::group(['middleware' => 'admin'], function () {
         [RestaurantBookingController::class, 'restaurantBookings']
     )->name('admin.restaurant-bookings.restaurant');
 
+    // Check-in
+    Route::post(
+        'restaurant-bookings/{restaurant_booking}/check-in',
+        [RestaurantBookingController::class, 'checkIn']
+    )->name('admin.restaurant-bookings.check-in');
+
+    Route::post(
+        'restaurant-bookings/{restaurant_booking}/status',
+        [RestaurantBookingController::class, 'quickUpdateStatus']
+    )->name('admin.restaurant-bookings.status');
+
     Route::get(
         'restaurant-booking-tables/{restaurantId}',
         [RestaurantBookingController::class, 'getRestaurantTables']
@@ -185,6 +198,62 @@ Route::group(['middleware' => 'admin'], function () {
     )->parameters([
                 'booking-settings' => 'booking_setting'
             ])->names('admin.booking-settings');
+
+
+    // Restaurant Dine-In Food Orders
+    Route::get(
+        'restaurant-food-orders',
+        [RestaurantFoodOrderController::class, 'index']
+    )->name('admin.restaurant-food-orders.index');
+
+    Route::get(
+        'restaurant-food-orders/{id}',
+        [RestaurantFoodOrderController::class, 'show']
+    )->name('admin.restaurant-food-orders.show');
+
+    Route::post(
+        'restaurant-food-orders/{id}/status',
+        [RestaurantFoodOrderController::class, 'updateStatus']
+    )->name('admin.restaurant-food-orders.update-status');
+
+
+Route::post(
+    'restaurant-food-orders/{id}/complete-all',
+    [RestaurantFoodOrderController::class, 'completeAllOrders']
+)->name('admin.restaurant-food-orders.complete-all');
+
+
+    Route::delete(
+        'restaurant-food-orders/{id}',
+        [RestaurantFoodOrderController::class, 'destroy']
+    )->name('admin.restaurant-food-orders.destroy');
+
+    // Generate Dine-In Bill
+    Route::post(
+        'restaurant-food-orders/{id}/generate-bill',
+        [RestaurantFoodOrderController::class, 'generateBill']
+    )->name('admin.restaurant-food-orders.generate-bill');
+
+    Route::post(
+        'restaurant-food-orders/{id}/confirm-payment',
+        [RestaurantFoodOrderController::class, 'confirmOfflinePayment']
+    )->name('admin.restaurant-food-orders.confirm-payment');
+
+    // Restaurant Reviews
+    Route::get(
+        'restaurant-reviews',
+        [RestaurantReviewController::class, 'index']
+    )->name('admin.restaurant-reviews.index');
+
+    Route::post(
+        'restaurant-reviews/{id}/status',
+        [RestaurantReviewController::class, 'updateStatus']
+    )->name('admin.restaurant-reviews.update-status');
+
+    Route::delete(
+        'restaurant-reviews/{id}',
+        [RestaurantReviewController::class, 'destroy']
+    )->name('admin.restaurant-reviews.destroy');
 
 
 

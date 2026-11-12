@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
 class RestaurantTableBooking extends Model
 {
     protected $fillable = [
@@ -24,9 +25,17 @@ class RestaurantTableBooking extends Model
         'occasion',
         'special_requests',
         'status',
+
+
+        // Check-in fields
+        'check_in_status',
+        'checked_in_at',
+
+
         'confirmed_at',
         'cancelled_at',
         'admin_notes',
+        
     ];
 
     protected function casts(): array
@@ -36,6 +45,7 @@ class RestaurantTableBooking extends Model
             'guest_count' => 'integer',
             'confirmed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+             'checked_in_at' => 'datetime',
         ];
     }
 
@@ -65,6 +75,14 @@ public function bookingSession(): BelongsTo
     return $this->belongsTo(
         RestaurantBookingSession::class,
         'booking_session_id'
+    );
+}
+
+public function foodOrders()
+{
+    return $this->hasMany(
+        RestaurantFoodOrder::class,
+        'restaurant_table_booking_id'
     );
 }
 }

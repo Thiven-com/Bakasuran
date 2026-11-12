@@ -274,6 +274,112 @@ class RestaurantBookingController extends Controller
             ->with('success', 'Restaurant booking updated successfully.');
     }
 
+
+    public function quickUpdateStatus(
+        Request $request,
+        RestaurantTableBooking $restaurant_booking
+    ) {
+        $validated = $request->validate([
+            'status' => [
+                'required',
+                Rule::in(['confirmed', 'cancelled']),
+            ],
+        ]);
+
+        $newStatus = $validated['status'];
+
+        // Only pending bookings can use quick actions.
+        if ($restaurant_booking->status !== 'pending') {
+            return back()->with(
+                'error',
+                'Only pending bookings can be confirmed or cancelled.'
+            );
+        }
+
+        // Recheck availability before confirming.
+        if ($newStatus === 'confirmed') {
+            $this->validateBookingAvailability([
+                'restaurant_id' => $restaurant_booking->restaurant_id,
+                'restaurant_table_id' => $restaurant_booking->restaurant_table_id,
+                'booking_date' => $restaurant_booking->booking_date,
+                'booking_time' => Carbon::parse(
+                    $restaurant_booking->booking_time
+                )->format('H:i'),
+                'end_time' => Carbon::parse(
+                    $restaurant_booking->end_time
+                )->format('H:i'),
+                'guest_count' => $restaurant_booking->guest_count,
+                'status' => 'confirmed',
+            ], $restaurant_booking->id);
+        }
+
+        $restaurant_booking->status = $newStatus;
+
+        if ($newStatus === 'confirmed') {
+            $restaurant_booking->confirmed_at = now();
+            $restaurant_booking->cancelled_at = null;
+        }
+
+        if ($newStatus === 'cancelled') {
+            $restaurant_booking->cancelled_at = now();
+            $restaurant_booking->confirmed_at = null;
+        }
+
+        $restaurant_booking->save();
+
+        return redirect()
+            ->route(
+                'admin.restaurant-bookings.restaurant',
+                $restaurant_booking->restaurant_id
+            )
+            ->with(
+                'success',
+                'Booking ' . $newStatus . ' successfully.'
+            );
+    }
+
+
+    /**
+     * Check in a customer when they arrive at the restaurant.
+     */
+    public function checkIn(RestaurantTableBooking $restaurant_booking)
+    {
+        // Only confirmed bookings can be checked in.
+        if ($restaurant_booking->status !== 'confirmed') {
+            return back()->with(
+                'error',
+                'Only confirmed bookings can be checked in.'
+            );
+        }
+
+        // Prevent duplicate check-in.
+        if ($restaurant_booking->check_in_status === 'checked_in') {
+            return back()->with(
+                'error',
+                'This customer has already been checked in.'
+            );
+        }
+
+        // Check-in is allowed only on the reservation date.
+        if (!Carbon::parse($restaurant_booking->booking_date)->isToday()) {
+            return back()->with(
+                'error',
+                'Customer check-in is allowed only on the booking date.'
+            );
+        }
+
+        // Update check-in details.
+        $restaurant_booking->check_in_status = 'checked_in';
+        $restaurant_booking->checked_in_at = now();
+
+        $restaurant_booking->save();
+
+        return back()->with(
+            'success',
+            'Customer checked in successfully.'
+        );
+    }
+
     /**
      * Delete a booking.
      */

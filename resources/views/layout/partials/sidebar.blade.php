@@ -200,8 +200,10 @@
                                                                 </li>
                                                                 <li
                                                                         class="{{ Request::is('admin/restaurant-types') ? 'active' : '' }}">
-                                                                        <a href="{{route('admin.restaurant-types.index')}}"><i
-                                                                                        class="ti ti-brand-unity fs-16 me-2"></i><span>Restaurant Type</span></a>
+                                                                        <a
+                                                                                href="{{route('admin.restaurant-types.index')}}"><i
+                                                                                        class="ti ti-brand-unity fs-16 me-2"></i><span>Restaurant
+                                                                                        Type</span></a>
                                                                 </li>
                                                                 <li
                                                                         class="{{ Request::is('admin/attributes') ? 'active' : '' }}">
@@ -232,6 +234,21 @@
                                                         <a href="{{ route('admin.restaurants.index') }}">
                                                                 <i data-feather="coffee"></i>
                                                                 <span>Restaurants</span>
+                                                        </a>
+                                                </li>
+
+                                                <li
+                                                        class="{{ Request::is('restaurant-food-orders*') ? 'active' : '' }}">
+                                                        <a href="{{ route('admin.restaurant-food-orders.index') }}">
+                                                                <i data-feather="clipboard"></i>
+                                                                <span>Restaurant Food Orders</span>
+                                                        </a>
+                                                </li>
+
+                                                <li class="{{ Request::is('restaurant-reviews*') ? 'active' : '' }}">
+                                                        <a href="{{ route('admin.restaurant-reviews.index') }}">
+                                                                <i data-feather="star"></i>
+                                                                <span>Restaurant Reviews</span>
                                                         </a>
                                                 </li>
                                                 @if (isset($admin->role) && $admin->role == 'super_admin')
