@@ -6,10 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class WishlistItem extends Model
 {
+    protected $fillable = [
+        'user_id',
+        'product_variant_id',
+    ];
 
     public function variant()
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id')
-            ->with(['product:id,title,slug,short_description,description,category_id','product.category:id,title,slug']);
+            ->with([
+                'product:id,title,slug,short_description,description,category_id',
+                'product.category:id,title,slug'
+            ]);
     }
 }
+

@@ -234,7 +234,7 @@ class PageControllers extends Controller
         |--------------------------------------------------------------------------
         */
 
-        switch ($request->get('sort')) {
+       switch ($request->input('sort')) {
 
             case 'best-selling':
 
@@ -775,112 +775,117 @@ class PageControllers extends Controller
 
     // Display Customer Dine-In Bill
 
-public function viewDineInBill($id)
-{
-    $customer = Auth::guard('customer')->user();
+    public function viewDineInBill($id)
+    {
+        $customer = Auth::guard('customer')->user();
 
-    if (!$customer) {
-        return redirect()->route('login');
-    }
+        if (!$customer) {
+            return redirect()->route('login');
+        }
 
-    $order = RestaurantFoodOrder::with([
-        'restaurant',
-        'table',
-        'booking.foodOrders.items',
-    ])
-        ->where('id', $id)
-        ->where('customer_id', $customer->id)
-        ->whereNotNull('bill_generated_at')
-        ->firstOrFail();
+        $order = RestaurantFoodOrder::with([
+            'restaurant',
+            'table',
+            'booking.foodOrders.items',
+        ])
+            ->where('id', $id)
+            ->where('customer_id', $customer->id)
+            ->whereNotNull('bill_generated_at')
+            ->firstOrFail();
 
-    // Get all orders from the same table booking
-    $bookingOrders = $order->booking
-        ? $order->booking->foodOrders->sortBy('created_at')->values()
-        : collect([$order]);
+        // Get all orders from the same table booking
+        $bookingOrders = $order->booking
+            ? $order->booking->foodOrders->sortBy('created_at')->values()
+            : collect([$order]);
 
-    // Calculate combined bill amounts
-    $combinedSubtotal = $bookingOrders->sum('subtotal');
-    $combinedTax = $bookingOrders->sum('tax');
-    $combinedGrandTotal = $bookingOrders->sum('grand_total');
+        // Calculate combined bill amounts
+        $combinedSubtotal = $bookingOrders->sum('subtotal');
+        $combinedTax = $bookingOrders->sum('tax');
+        $combinedGrandTotal = $bookingOrders->sum('grand_total');
 
-    // Check whether all orders are paid
-    $isPaid = $bookingOrders->every(
-        fn($item) => $item->payment_status === 'paid'
-    );
+        // Check whether all orders are paid
+        $isPaid = $bookingOrders->every(
+            fn($item) => $item->payment_status === 'paid'
+        );
 
-    return view(
-        'website.dine-in-bill',
-        compact(
-            'customer',
-            'order',
-            'bookingOrders',
-            'combinedSubtotal',
-            'combinedTax',
-            'combinedGrandTotal',
-            'isPaid'
-        )
-    );
-}
-
-
-
-
-   
-
-public function selectDineInPaymentMethod(Request $request, $id)
-{
-    $request->validate([
-        'payment_method' => 'required|in:razorpay',
-    ]);
-
-    $customer = Auth::guard('customer')->user();
-
-    if (!$customer) {
-        return redirect()->route('login');
-    }
-
-    $order = RestaurantFoodOrder::with('booking.foodOrders')
-        ->where('id', $id)
-        ->where('customer_id', $customer->id)
-        ->whereNotNull('bill_generated_at')
-        ->firstOrFail();
-
-    $bookingOrders = $order->booking
-        ? $order->booking->foodOrders
-        : collect([$order]);
-
-    // Prevent payment if any order is already paid
-    if ($bookingOrders->contains(
-        fn($item) => $item->payment_status === 'paid'
-    )) {
-        return back()->with(
-            'error',
-            'Payment has already been confirmed for this booking.'
+        return view(
+            'website.dine-in-bill',
+            compact(
+                'customer',
+                'order',
+                'bookingOrders',
+                'combinedSubtotal',
+                'combinedTax',
+                'combinedGrandTotal',
+                'isPaid'
+            )
         );
     }
 
-    // All orders must have generated bills
-    if ($bookingOrders->contains(
-        fn($item) => !$item->bill_generated_at
-    )) {
-        return back()->with(
-            'error',
-            'Combined bill is not generated for all orders.'
-        );
-    }
 
-    // Customer can select Razorpay only
-    foreach ($bookingOrders as $bookingOrder) {
-        $bookingOrder->update([
+
+
+
+
+    public function selectDineInPaymentMethod(Request $request, $id)
+    {
+        $request->validate([
+            'payment_method' => 'required|in:razorpay',
+        ]);
+
+        $customer = Auth::guard('customer')->user();
+
+        if (!$customer) {
+            return redirect()->route('login');
+        }
+
+        $order = RestaurantFoodOrder::with('booking.foodOrders')
+            ->where('id', $id)
+            ->where('customer_id', $customer->id)
+            ->whereNotNull('bill_generated_at')
+            ->firstOrFail();
+
+        $bookingOrders = $order->booking
+            ? $order->booking->foodOrders
+            : collect([$order]);
+
+        // Prevent payment if any order is already paid
+        if (
+            $bookingOrders->contains(
+                fn($item) => $item->payment_status === 'paid'
+            )
+        ) {
+            return back()->with(
+                'error',
+                'Payment has already been confirmed for this booking.'
+            );
+        }
+
+        // All orders must have generated bills
+        if (
+            $bookingOrders->contains(
+                fn($item) => !$item->bill_generated_at
+            )
+        ) {
+            return back()->with(
+                'error',
+                'Combined bill is not generated for all orders.'
+            );
+        }
+
+        // Customer can select Razorpay only
+        foreach ($bookingOrders as $bookingOrder) {
+    RestaurantFoodOrder::where('id', $bookingOrder->id)
+        ->update([
             'payment_method' => 'razorpay',
         ]);
-    }
-
-    return redirect()->route(
-        'customer.dine-in-payment',
-        $order->id
-    );
 }
+
+        return redirect()->route(
+            'customer.dine-in-payment',
+            $order->id
+        );
+    }
 
 
 
@@ -1266,6 +1271,7 @@ public function selectDineInPaymentMethod(Request $request, $id)
 
 
 
+
     public function restaurant_details($slug)
     {
         $restaurant = Restaurant::where('slug', $slug)
@@ -1275,9 +1281,11 @@ public function selectDineInPaymentMethod(Request $request, $id)
         $products = Product::with([
             'category',
             'variant',
+            'variants',
             'restaurant',
             'primaryMedia',
             'media',
+            'addonGroups.options',
         ])
             ->where('restaurant_id', $restaurant->id)
             ->where('status', 'show')
@@ -1295,12 +1303,31 @@ public function selectDineInPaymentMethod(Request $request, $id)
             ])
             ->values();
 
+        // Load Wishlist variants for the logged-in customer.
+        $wishlistVariantIds = [];
+
+        if (Auth::guard('customer')->check()) {
+            $wishlistVariantIds = WishlistItem::where(
+                'user_id',
+                Auth::guard('customer')->id()
+            )
+                ->whereIn(
+                    'product_variant_id',
+                    $products->flatMap(fn($product) => $product->variants->pluck('id'))
+                        ->unique()
+                )
+                ->pluck('product_variant_id')
+                ->toArray();
+        }
+
         return view('website.restaurant-details', compact(
             'restaurant',
             'products',
-            'categories'
+            'categories',
+            'wishlistVariantIds'
         ));
     }
+
 
 
 

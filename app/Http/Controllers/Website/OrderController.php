@@ -26,83 +26,83 @@ class OrderController extends Controller
      * and redirect directly to checkout.
      */
 
-public function buyNow(Request $request)
-{
-    $validated = $request->validate([
-        'product_variant_id' => [
-            'required',
-            'integer',
-            'exists:product_variants,id',
-        ],
-        'quantity' => ['required', 'integer', 'min:1'],
-    ]);
+    public function buyNow(Request $request)
+    {
+        $validated = $request->validate([
+            'product_variant_id' => [
+                'required',
+                'integer',
+                'exists:product_variants,id',
+            ],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
 
-    if (!Auth::guard('customer')->check()) {
-        return redirect()->route('login');
-    }
+        if (!Auth::guard('customer')->check()) {
+            return redirect()->route('login');
+        }
 
-    $variant = ProductVariant::with('product')
-        ->findOrFail($validated['product_variant_id']);
+        $variant = ProductVariant::with('product')
+            ->findOrFail($validated['product_variant_id']);
 
-    $quantity = (int) $validated['quantity'];
+        $quantity = (int) $validated['quantity'];
 
-    \Log::info('Buy Now variant check', [
-        'variant_id' => $variant->id,
-        'variant_status' => $variant->status,
-        'stock' => $variant->stock,
-        'quantity' => $quantity,
-        'has_product' => $variant->product !== null,
-    ]);
-
-    if (!$variant->product || $variant->status !== 'show') {
-    return back()->with(
-        'error',
-        'This product is not available.'
-    );
-}
-
-    if ($quantity > (int) $variant->stock) {
-        return back()->with(
-            'error',
-            'Requested quantity is unavailable.'
-        );
-    }
-
-    if (
-        $variant->product_min_order &&
-        $quantity < (int) $variant->product_min_order
-    ) {
-        return back()->with(
-            'error',
-            'Minimum order quantity is ' . $variant->product_min_order
-        );
-    }
-
-    if (
-        $variant->product_max_order &&
-        $quantity > (int) $variant->product_max_order
-    ) {
-        return back()->with(
-            'error',
-            'Maximum order quantity is ' . $variant->product_max_order
-        );
-    }
-
-    session([
-        'buy_now' => [
-            'product_variant_id' => $variant->id,
+        \Log::info('Buy Now variant check', [
+            'variant_id' => $variant->id,
+            'variant_status' => $variant->status,
+            'stock' => $variant->stock,
             'quantity' => $quantity,
-        ],
-    ]);
+            'has_product' => $variant->product !== null,
+        ]);
 
-    \Log::info('Buy Now session saved', [
-        'buy_now' => session('buy_now'),
-    ]);
+        if (!$variant->product || $variant->status !== 'show') {
+            return back()->with(
+                'error',
+                'This product is not available.'
+            );
+        }
 
-    return redirect()->route('checkout', [
-        'mode' => 'buy_now',
-    ]);
-}
+        if ($quantity > (int) $variant->stock) {
+            return back()->with(
+                'error',
+                'Requested quantity is unavailable.'
+            );
+        }
+
+        if (
+            $variant->product_min_order &&
+            $quantity < (int) $variant->product_min_order
+        ) {
+            return back()->with(
+                'error',
+                'Minimum order quantity is ' . $variant->product_min_order
+            );
+        }
+
+        if (
+            $variant->product_max_order &&
+            $quantity > (int) $variant->product_max_order
+        ) {
+            return back()->with(
+                'error',
+                'Maximum order quantity is ' . $variant->product_max_order
+            );
+        }
+
+        session([
+            'buy_now' => [
+                'product_variant_id' => $variant->id,
+                'quantity' => $quantity,
+            ],
+        ]);
+
+        \Log::info('Buy Now session saved', [
+            'buy_now' => session('buy_now'),
+        ]);
+
+        return redirect()->route('checkout', [
+            'mode' => 'buy_now',
+        ]);
+    }
 
 
     /**
@@ -169,13 +169,7 @@ public function buyNow(Request $request)
         ];
 
         try {
-            $result = DB::transaction(function () use (
-                $request,
-                $user,
-                $shippingAddress,
-                $isBuyNow,
-                $buyNow
-            ) {
+            $result = DB::transaction(function () use ($request, $user, $shippingAddress, $isBuyNow, $buyNow) {
                 $items = collect();
 
                 if ($isBuyNow) {
@@ -232,7 +226,13 @@ public function buyNow(Request $request)
                     $variant = $item->variant;
                     $quantity = (int) $item->quantity;
 
-                    if ($variant->status !== 'active') {
+                    // if ($variant->status !== 'active') {
+                    //     throw new \RuntimeException(
+                    //         $variant->product->title . ' is not available.'
+                    //     );
+                    // }
+
+                    if ($variant->status !== 'show') {
                         throw new \RuntimeException(
                             $variant->product->title . ' is not available.'
                         );
@@ -421,8 +421,8 @@ public function buyNow(Request $request)
 
             Alert::toast(
                 $e instanceof \RuntimeException
-                    ? $e->getMessage()
-                    : 'Unable to place your order. Please try again.',
+                ? $e->getMessage()
+                : 'Unable to place your order. Please try again.',
                 'error'
             );
 
@@ -434,129 +434,14 @@ public function buyNow(Request $request)
 
 
 
-public function createDineInPayment($id)
-{
-    $customerId = Auth::guard('customer')->id();
+    public function createDineInPayment($id)
+    {
+        $customerId = Auth::guard('customer')->id();
 
-    if (!$customerId) {
-        return redirect()->route('login');
-    }
-
-    $order = RestaurantFoodOrder::with('booking.foodOrders')
-        ->where('id', $id)
-        ->where('customer_id', $customerId)
-        ->whereNotNull('bill_generated_at')
-        ->firstOrFail();
-
-    $bookingOrders = $order->booking
-        ? $order->booking->foodOrders
-        : collect([$order]);
-
-    // Check that all bills are generated
-    if ($bookingOrders->contains(fn($item) => !$item->bill_generated_at)) {
-        return back()->with(
-            'error',
-            'Combined bill is not generated for all orders.'
-        );
-    }
-
-    // Check payment status
-    if ($bookingOrders->contains(fn($item) => $item->payment_status !== 'pending')) {
-        return back()->with(
-            'error',
-            'One or more orders are already paid or cannot be paid.'
-        );
-    }
-
-    // Check payment method
-    if ($bookingOrders->contains(fn($item) => $item->payment_method !== 'razorpay')) {
-        return back()->with(
-            'error',
-            'Razorpay is not selected for all orders.'
-        );
-    }
-
-    // Calculate combined amount
-    $combinedGrandTotal = $bookingOrders->sum('grand_total');
-
-    if ($combinedGrandTotal <= 0) {
-        return back()->with('error', 'Invalid combined bill amount.');
-    }
-
-    $gateway = PaymentGateway::where('code', 'razorpay')
-        ->where('is_online', 1)
-        ->where('status', 1)
-        ->first();
-
-    if (!$gateway) {
-        return back()->with('error', 'Razorpay is not configured.');
-    }
-
-    $config = is_array($gateway->config)
-        ? $gateway->config
-        : json_decode($gateway->config ?? '{}', true);
-
-    $key = $config['key_id'] ?? null;
-    $secret = $config['secret'] ?? null;
-
-    if (!$key || !$secret) {
-        return back()->with('error', 'Razorpay keys are missing.');
-    }
-
-    try {
-        $api = new Api($key, $secret);
-
-        $razorpayOrder = $api->order->create([
-            'receipt' => $order->order_number,
-            'amount' => (int) round($combinedGrandTotal * 100),
-            'currency' => 'INR',
-        ]);
-
-        // Save the same Razorpay order ID against every booking order
-        foreach ($bookingOrders as $bookingOrder) {
-            $bookingOrder->update([
-                'payment_gateway_order_id' => $razorpayOrder['id'],
-            ]);
+        if (!$customerId) {
+            return redirect()->route('login');
         }
 
-        return view('website.razorpay-dine-in', [
-            'order' => $order,
-            'razorpayOrder' => $razorpayOrder,
-            'razorpayKey' => $key,
-        ]);
-
-    } catch (\Throwable $e) {
-        Log::error('Dine-In Razorpay order creation failed', [
-            'order_id' => $order->id,
-            'error' => $e->getMessage(),
-        ]);
-
-        return back()->with(
-            'error',
-            'Unable to start online payment.'
-        );
-    }
-}
-
-
-
-
-
-public function verifyDineInPayment(Request $request, $id)
-{
-    $request->validate([
-        'razorpay_payment_id' => ['required', 'string'],
-        'razorpay_order_id' => ['required', 'string'],
-        'razorpay_signature' => ['required', 'string'],
-    ]);
-
-    $customerId = Auth::guard('customer')->id();
-
-    if (!$customerId) {
-        return redirect()->route('login');
-    }
-
-    try {
         $order = RestaurantFoodOrder::with('booking.foodOrders')
             ->where('id', $id)
             ->where('customer_id', $customerId)
@@ -567,31 +452,45 @@ public function verifyDineInPayment(Request $request, $id)
             ? $order->booking->foodOrders
             : collect([$order]);
 
-        // Check that all orders are awaiting Razorpay payment
-        if ($bookingOrders->contains(function ($item) {
-            return !$item->bill_generated_at
-                || $item->payment_status !== 'pending'
-                || $item->payment_method !== 'razorpay';
-        })) {
-            throw new \RuntimeException(
-                'One or more orders are not eligible for payment.'
+        // Check that all bills are generated
+        if ($bookingOrders->contains(fn($item) => !$item->bill_generated_at)) {
+            return back()->with(
+                'error',
+                'Combined bill is not generated for all orders.'
             );
         }
 
-        // Verify the same Razorpay order ID is stored for all orders
-        if ($bookingOrders->contains(function ($item) use ($request) {
-            return $item->payment_gateway_order_id !== $request->razorpay_order_id;
-        })) {
-            throw new \RuntimeException('Razorpay order ID mismatch.');
+        // Check payment status
+        if ($bookingOrders->contains(fn($item) => $item->payment_status !== 'pending')) {
+            return back()->with(
+                'error',
+                'One or more orders are already paid or cannot be paid.'
+            );
         }
 
+        // Check payment method
+        if ($bookingOrders->contains(fn($item) => $item->payment_method !== 'razorpay')) {
+            return back()->with(
+                'error',
+                'Razorpay is not selected for all orders.'
+            );
+        }
+
+        // Calculate combined amount
         $combinedGrandTotal = $bookingOrders->sum('grand_total');
-        $expectedAmount = (int) round($combinedGrandTotal * 100);
+
+        if ($combinedGrandTotal <= 0) {
+            return back()->with('error', 'Invalid combined bill amount.');
+        }
 
         $gateway = PaymentGateway::where('code', 'razorpay')
             ->where('is_online', 1)
             ->where('status', 1)
-            ->firstOrFail();
+            ->first();
+
+        if (!$gateway) {
+            return back()->with('error', 'Razorpay is not configured.');
+        }
 
         $config = is_array($gateway->config)
             ? $gateway->config
@@ -601,105 +500,208 @@ public function verifyDineInPayment(Request $request, $id)
         $secret = $config['secret'] ?? null;
 
         if (!$key || !$secret) {
-            throw new \RuntimeException('Razorpay credentials are missing.');
+            return back()->with('error', 'Razorpay keys are missing.');
         }
 
-        $api = new Api($key, $secret);
+        try {
+            $api = new Api($key, $secret);
 
-        // Verify Razorpay signature
-        $api->utility->verifyPaymentSignature([
-            'razorpay_order_id' => $request->razorpay_order_id,
-            'razorpay_payment_id' => $request->razorpay_payment_id,
-            'razorpay_signature' => $request->razorpay_signature,
-        ]);
+            $razorpayOrder = $api->order->create([
+                'receipt' => $order->order_number,
+                'amount' => (int) round($combinedGrandTotal * 100),
+                'currency' => 'INR',
+            ]);
 
-        // Verify captured payment and combined amount
-        $razorpayPayment = $api->payment->fetch(
-            $request->razorpay_payment_id
-        );
-
-        if (
-            $razorpayPayment['order_id'] !== $request->razorpay_order_id ||
-            $razorpayPayment['status'] !== 'captured' ||
-            (int) $razorpayPayment['amount'] !== $expectedAmount
-        ) {
-            throw new \RuntimeException(
-                'Payment is not successfully captured or amount does not match.'
-            );
-        }
-
-        // Mark every order under this booking as paid
-        DB::transaction(function () use (
-            $order,
-            $request,
-            $expectedAmount
-        ) {
-            $bookingOrders = RestaurantFoodOrder::where(
-                'restaurant_table_booking_id',
-                $order->restaurant_table_booking_id
-            )
-                ->lockForUpdate()
-                ->get();
-
-            // Handle orders without a booking ID
-            if (!$order->restaurant_table_booking_id) {
-                $bookingOrders = RestaurantFoodOrder::whereKey($order->id)
-                    ->lockForUpdate()
-                    ->get();
-            }
-
-            if ($bookingOrders->contains(function ($item) use ($request) {
-                return $item->payment_status !== 'pending'
-                    || $item->payment_method !== 'razorpay'
-                    || $item->payment_gateway_order_id !== $request->razorpay_order_id
-                    || !$item->bill_generated_at;
-            })) {
-                throw new \RuntimeException(
-                    'Payment has already been processed or booking orders changed.'
-                );
-            }
-
-            $currentTotal = (int) round(
-                $bookingOrders->sum('grand_total') * 100
-            );
-
-            if ($currentTotal !== $expectedAmount) {
-                throw new \RuntimeException(
-                    'Combined bill amount changed during payment verification.'
-                );
-            }
-
+            // Save the same Razorpay order ID against every booking order
             foreach ($bookingOrders as $bookingOrder) {
                 $bookingOrder->update([
-                    'payment_transaction_id' => $request->razorpay_payment_id,
-                    'payment_status' => 'paid',
-                    'paid_at' => now(),
+                    'payment_gateway_order_id' => $razorpayOrder['id'],
                 ]);
             }
-        });
 
-        return redirect()
-            ->route('customer.dine-in-bill', $order->id)
-            ->with(
-                'success',
-                'Combined dine-in payment completed successfully.'
+            return view('website.razorpay-dine-in', [
+                'order' => $order,
+                'razorpayOrder' => $razorpayOrder,
+                'razorpayKey' => $key,
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Dine-In Razorpay order creation failed', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with(
+                'error',
+                'Unable to start online payment.'
             );
+        }
+    }
 
-    } catch (\Throwable $e) {
-        Log::error('Dine-In Razorpay verification failed', [
-            'order_id' => $id,
-            'customer_id' => $customerId,
-            'error' => $e->getMessage(),
+
+
+
+
+    public function verifyDineInPayment(Request $request, $id)
+    {
+        $request->validate([
+            'razorpay_payment_id' => ['required', 'string'],
+            'razorpay_order_id' => ['required', 'string'],
+            'razorpay_signature' => ['required', 'string'],
         ]);
 
-        return redirect()
-            ->route('customer.dine-in-bill', $id)
-            ->with(
-                'error',
-                'Payment verification failed. Please contact support if money was deducted.'
+        $customerId = Auth::guard('customer')->id();
+
+        if (!$customerId) {
+            return redirect()->route('login');
+        }
+
+        try {
+            $order = RestaurantFoodOrder::with('booking.foodOrders')
+                ->where('id', $id)
+                ->where('customer_id', $customerId)
+                ->whereNotNull('bill_generated_at')
+                ->firstOrFail();
+
+            $bookingOrders = $order->booking
+                ? $order->booking->foodOrders
+                : collect([$order]);
+
+            // Check that all orders are awaiting Razorpay payment
+            if (
+                $bookingOrders->contains(function ($item) {
+                    return !$item->bill_generated_at
+                        || $item->payment_status !== 'pending'
+                        || $item->payment_method !== 'razorpay';
+                })
+            ) {
+                throw new \RuntimeException(
+                    'One or more orders are not eligible for payment.'
+                );
+            }
+
+            // Verify the same Razorpay order ID is stored for all orders
+            if (
+                $bookingOrders->contains(function ($item) use ($request) {
+                    return $item->payment_gateway_order_id !== $request->razorpay_order_id;
+                })
+            ) {
+                throw new \RuntimeException('Razorpay order ID mismatch.');
+            }
+
+            $combinedGrandTotal = $bookingOrders->sum('grand_total');
+            $expectedAmount = (int) round($combinedGrandTotal * 100);
+
+            $gateway = PaymentGateway::where('code', 'razorpay')
+                ->where('is_online', 1)
+                ->where('status', 1)
+                ->firstOrFail();
+
+            $config = is_array($gateway->config)
+                ? $gateway->config
+                : json_decode($gateway->config ?? '{}', true);
+
+            $key = $config['key_id'] ?? null;
+            $secret = $config['secret'] ?? null;
+
+            if (!$key || !$secret) {
+                throw new \RuntimeException('Razorpay credentials are missing.');
+            }
+
+            $api = new Api($key, $secret);
+
+            // Verify Razorpay signature
+            $api->utility->verifyPaymentSignature([
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_signature' => $request->razorpay_signature,
+            ]);
+
+            // Verify captured payment and combined amount
+            $razorpayPayment = $api->payment->fetch(
+                $request->razorpay_payment_id
             );
+
+            if (
+                $razorpayPayment['order_id'] !== $request->razorpay_order_id ||
+                $razorpayPayment['status'] !== 'captured' ||
+                (int) $razorpayPayment['amount'] !== $expectedAmount
+            ) {
+                throw new \RuntimeException(
+                    'Payment is not successfully captured or amount does not match.'
+                );
+            }
+
+            // Mark every order under this booking as paid
+            DB::transaction(function () use ($order, $request, $expectedAmount) {
+                $bookingOrders = RestaurantFoodOrder::where(
+                    'restaurant_table_booking_id',
+                    $order->restaurant_table_booking_id
+                )
+                    ->lockForUpdate()
+                    ->get();
+
+                // Handle orders without a booking ID
+                if (!$order->restaurant_table_booking_id) {
+                    $bookingOrders = RestaurantFoodOrder::whereKey($order->id)
+                        ->lockForUpdate()
+                        ->get();
+                }
+
+                if (
+                    $bookingOrders->contains(function ($item) use ($request) {
+                        return $item->payment_status !== 'pending'
+                            || $item->payment_method !== 'razorpay'
+                            || $item->payment_gateway_order_id !== $request->razorpay_order_id
+                            || !$item->bill_generated_at;
+                    })
+                ) {
+                    throw new \RuntimeException(
+                        'Payment has already been processed or booking orders changed.'
+                    );
+                }
+
+                $currentTotal = (int) round(
+                    $bookingOrders->sum('grand_total') * 100
+                );
+
+                if ($currentTotal !== $expectedAmount) {
+                    throw new \RuntimeException(
+                        'Combined bill amount changed during payment verification.'
+                    );
+                }
+
+                foreach ($bookingOrders as $bookingOrder) {
+                    $bookingOrder->update([
+                        'payment_transaction_id' => $request->razorpay_payment_id,
+                        'payment_status' => 'paid',
+                        'paid_at' => now(),
+                    ]);
+                }
+            });
+
+            return redirect()
+                ->route('customer.dine-in-bill', $order->id)
+                ->with(
+                    'success',
+                    'Combined dine-in payment completed successfully.'
+                );
+
+        } catch (\Throwable $e) {
+            Log::error('Dine-In Razorpay verification failed', [
+                'order_id' => $id,
+                'customer_id' => $customerId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()
+                ->route('customer.dine-in-bill', $id)
+                ->with(
+                    'error',
+                    'Payment verification failed. Please contact support if money was deducted.'
+                );
+        }
     }
-}
 
 
 
@@ -744,6 +746,7 @@ public function verifyDineInPayment(Request $request, $id)
      */
     public function paymentSuccess(Request $request)
     {
+        $isBuyNow = session()->has('buy_now');
         $request->validate([
             'razorpay_payment_id' => ['required', 'string'],
             'razorpay_order_id' => ['required', 'string'],
@@ -793,7 +796,7 @@ public function verifyDineInPayment(Request $request, $id)
                 'razorpay_signature' => $request->razorpay_signature,
             ]);
 
-            DB::transaction(function () use ($payment, $request) {
+            DB::transaction(function () use ($payment, $request, $isBuyNow) {
                 $lockedPayment = Payment::whereKey($payment->id)
                     ->lockForUpdate()
                     ->firstOrFail();
@@ -859,20 +862,27 @@ public function verifyDineInPayment(Request $request, $id)
 
                 // Clear cart only if it was a cart checkout.
                 // Direct orders must preserve the existing cart.
-                if (!session()->has('buy_now')) {
-                    CartItem::where('user_id', $lockedPayment->user_id)
-                        ->delete();
-                }
+                // Clear database cart only for normal cart checkout.
+if (!$isBuyNow) {
+    CartItem::where('user_id', $lockedPayment->user_id)
+        ->delete();
+}
             });
 
-            session()->forget('buy_now');
+           session()->forget('buy_now');
 
-            Alert::success(
-                'Payment Successful',
-                'Your order has been placed.'
-            );
+Alert::success(
+    'Payment Successful',
+    'Your order has been placed.'
+);
 
-            return redirect()->route('customer.orders');
+if (!$isBuyNow) {
+    return redirect()
+        ->route('customer.orders')
+        ->with('clear_restaurant_cart', true);
+}
+
+return redirect()->route('customer.orders');
         } catch (\Throwable $e) {
             Log::error('Razorpay payment verification failed', [
                 'customer_id' => $customerId,

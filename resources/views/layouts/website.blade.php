@@ -3139,6 +3139,8 @@
         </header>
     </div>
 
+    
+
     @yield('content')
     {{-- @include('sweetalert::alert') --}}
 
@@ -5181,7 +5183,19 @@
     </script>
 
 
+    </script>
+
+    @if (session('clear_restaurant_cart'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Object.keys(localStorage).forEach(function (key) {
+                    if (key.startsWith('bakasuran_cart_restaurant_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            });
+        </script>
+    @endif
+
 </body>
-
-
 </html>
