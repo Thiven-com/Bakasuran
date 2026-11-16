@@ -33,4 +33,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/profile', [AuthController::class, 'profile']);
 
+    Route::post('/profile/update', [AuthController::class, 'updateProfile']);
+
+    Route::post('/vehicle-details/update', [AuthController::class, 'updateVehicleDetails']);
+
+    Route::post('/bank-details/update', [AuthController::class, 'updateBankDetails']);
+
+    Route::post('/documents/upload', [AuthController::class, 'uploadDocuments']);
 });

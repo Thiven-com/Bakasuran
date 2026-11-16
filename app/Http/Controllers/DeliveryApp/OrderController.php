@@ -110,13 +110,96 @@ class OrderController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    // public function acceptOrder(Request $request, $id)
+    // {
+    //     $partner = $request->user();
+
+    //     try {
+
+    //         $order = DB::transaction(function () use ($id, $partner) {
+
+    //             $order = Order::where('id', $id)
+    //                 ->lockForUpdate()
+    //                 ->first();
+
+    //             if (!$order) {
+    //                 abort(404, 'Order not found.');
+    //             }
+
+    //             if ($order->delivery_partner_id !== null) {
+    //                 abort(409, 'This order has already been assigned.');
+    //             }
+
+    //             if (in_array($order->status, ['cancelled', 'delivered'])) {
+    //                 abort(409, 'This order is no longer available.');
+    //             }
+
+
+    //             $order->delivery_partner_id = $partner->id;
+    //             $order->pickup_otp = (string) random_int(1000, 9999);
+    //             $order->delivery_earning = $order->subtotal;
+    //             $order->delivered_at = now();
+    //             $order->status = 'delivered';
+    //             $order->save();
+
+    //             return $order;
+    //         });
+
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Order accepted successfully.',
+    //             'data' => [
+    //                 'order_id' => $order->id,
+    //                 'booking_number' => $order->invoice_id ?? $order->order_id,
+    //                 'delivery_partner_id' => $partner->id,
+    //             ],
+    //         ]);
+
+    //     } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => $e->getMessage(),
+    //         ], $e->getStatusCode());
+
+    //     } catch (\Throwable $e) {
+
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Unable to accept order.',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function acceptOrder(Request $request, $id)
     {
         $partner = $request->user();
 
         try {
-
             $order = DB::transaction(function () use ($id, $partner) {
+
+                // Lock partner row to prevent simultaneous assignments
+                $lockedPartner = \App\Models\DeliveryPartner::where('id', $partner->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$lockedPartner || $lockedPartner->status !== 'active') {
+                    abort(403, 'Your delivery account is not active.');
+                }
+
+                if (
+                    !$lockedPartner->is_verified ||
+                    $lockedPartner->verification_status !== 'approved'
+                ) {
+                    abort(403, 'Your account is not approved.');
+                }
+
+                // Do not allow new orders until pending COD cash is submitted
+                if ($lockedPartner->pending_hand_cash >= $lockedPartner->hand_cash_limit) {
+                    abort(403, 'Please submit your pending hand cash to the restaurant.');
+                }
 
                 $order = Order::where('id', $id)
                     ->lockForUpdate()
@@ -134,12 +217,10 @@ class OrderController extends Controller
                     abort(409, 'This order is no longer available.');
                 }
 
-
-                $order->delivery_partner_id = $partner->id;
+                // Assign order only. Do not mark it delivered here.
+                $order->delivery_partner_id = $lockedPartner->id;
                 $order->pickup_otp = (string) random_int(1000, 9999);
-                $order->delivery_earning = $order->subtotal;
-                $order->delivered_at = now();
-                $order->status = 'delivered';
+
                 $order->save();
 
                 return $order;
@@ -152,18 +233,17 @@ class OrderController extends Controller
                     'order_id' => $order->id,
                     'booking_number' => $order->invoice_id ?? $order->order_id,
                     'delivery_partner_id' => $partner->id,
+                    'status' => $order->status,
                 ],
             ]);
 
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
             ], $e->getStatusCode());
 
         } catch (\Throwable $e) {
-
             return response()->json([
                 'status' => false,
                 'message' => 'Unable to accept order.',
@@ -171,6 +251,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
 
 
     public function orderDetails(Request $request, $id)

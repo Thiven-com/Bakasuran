@@ -75,6 +75,15 @@ class DeliveryPartner extends Model
         'device_token',
 
         'notes',
+
+        'total_earnings',
+        'pending_earnings',
+        'settled_earnings',
+        'earnings_settlement_limit',
+        'total_hand_cash',
+        'pending_hand_cash',
+        'submitted_hand_cash',
+        'hand_cash_limit',
     ];
 
     protected $hidden = [
