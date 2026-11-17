@@ -51,6 +51,11 @@ return [
             'driver' => 'session',
             'provider' => 'customers',
         ],
+
+        'restaurant' => [
+            'driver' => 'session',
+            'provider' => 'restaurantpanel',
+        ],
     ],
 
     /*
@@ -84,6 +89,11 @@ return [
         'customers' => [
             'driver' => 'eloquent',
             'model' => App\Models\Customer::class,
+        ],
+
+        'restaurantpanel' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\RestaurantPanel::class,
         ],
 
         // 'users' => [

@@ -23,6 +23,8 @@ class RouteServiceProvider extends ServiceProvider
     protected $delivery_namespace = 'App\Http\Controllers\DeliveryApp';
     protected $admin_namespace = 'App\Http\Controllers\Admin';
 
+    protected $restaurant_namespace = 'App\Http\Controllers\RestaurantPanel';
+
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
@@ -40,6 +42,10 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')->namespace($this->admin_namespace)
                 ->prefix('admin')
                 ->group(base_path('routes/admin.php'));
+            Route::middleware('web')
+                ->namespace($this->restaurant_namespace)
+                ->prefix('restaurantpanel')
+                ->group(base_path('routes/restaurantpanel.php'));
             Route::middleware('api')->namespace($this->app_namespace)
                 ->prefix('api/customer')
                 ->group(base_path('routes/api/customer.php'));
