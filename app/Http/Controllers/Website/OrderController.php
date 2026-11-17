@@ -863,26 +863,26 @@ class OrderController extends Controller
                 // Clear cart only if it was a cart checkout.
                 // Direct orders must preserve the existing cart.
                 // Clear database cart only for normal cart checkout.
-if (!$isBuyNow) {
-    CartItem::where('user_id', $lockedPayment->user_id)
-        ->delete();
-}
+                if (!$isBuyNow) {
+                    CartItem::where('user_id', $lockedPayment->user_id)
+                        ->delete();
+                }
             });
 
-           session()->forget('buy_now');
+            session()->forget('buy_now');
 
-Alert::success(
-    'Payment Successful',
-    'Your order has been placed.'
-);
+            Alert::success(
+                'Payment Successful',
+                'Your order has been placed.'
+            );
 
-if (!$isBuyNow) {
-    return redirect()
-        ->route('customer.orders')
-        ->with('clear_restaurant_cart', true);
-}
+            if (!$isBuyNow) {
+                return redirect()
+                    ->route('customer.orders')
+                    ->with('clear_restaurant_cart', true);
+            }
 
-return redirect()->route('customer.orders');
+            return redirect()->route('customer.orders');
         } catch (\Throwable $e) {
             Log::error('Razorpay payment verification failed', [
                 'customer_id' => $customerId,
