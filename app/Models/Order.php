@@ -41,7 +41,7 @@ class Order extends Model
     {
         return $this->hasMany(OrderStatusHistory::class);
     }
-    
+
 
     protected $fillable = [
         'customer_id',
@@ -64,6 +64,18 @@ class Order extends Model
         'delivery_partner_id',
         'picked_up_at',
         'pickup_otp',
+        'delivery_otp',
+        'delivery_otp_sent_at',
+        'delivery_otp_expires_at',
+        'delivery_earning',
         'delivered_at',
     ];
+
+    public function deliveryPartner()
+    {
+        return $this->belongsTo(
+            DeliveryPartner::class,
+            'delivery_partner_id'
+        );
+    }
 }

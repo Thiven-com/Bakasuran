@@ -4,6 +4,7 @@ namespace App\Http\Controllers\DeliveryApp;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -400,7 +401,10 @@ class OrderController extends Controller
                         abort(409, 'Pickup OTP has not been generated.');
                     }
 
-                    if ($order->pickup_otp !== $request->pickup_otp) {
+                    $storedOtp = trim((string) $order->pickup_otp);
+                    $enteredOtp = trim((string) $request->pickup_otp);
+
+                    if ($storedOtp !== $enteredOtp) {
                         abort(422, 'Invalid pickup OTP.');
                     }
 
@@ -446,7 +450,6 @@ class OrderController extends Controller
     {
         $partner = $request->user();
 
-        // Current date
         $today = Carbon::today();
 
         // This week (Monday to Sunday)
@@ -471,8 +474,8 @@ class OrderController extends Controller
             ])
             ->get();
 
-        // Today's earnings = subtotal
-        $todayEarnings = $todayOrders->sum('subtotal');
+        // Today's earnings
+        $todayEarnings = $todayOrders->sum('delivery_earning');
 
         // Today's completed orders count
         $todayOrderCount = $todayOrders->count();
@@ -484,7 +487,7 @@ class OrderController extends Controller
                 $thisWeekStart,
                 $thisWeekEnd
             ])
-            ->sum('subtotal');
+            ->sum('delivery_earning');
 
         // Last week's earnings
         $lastWeekEarnings = Order::where('delivery_partner_id', $partner->id)
@@ -493,7 +496,7 @@ class OrderController extends Controller
                 $lastWeekStart,
                 $lastWeekEnd
             ])
-            ->sum('subtotal');
+            ->sum('delivery_earning');
 
         return response()->json([
             'status' => true,
@@ -522,7 +525,6 @@ class OrderController extends Controller
             ],
         ]);
     }
-
 
     public function earningHistory(Request $request)
     {
@@ -566,7 +568,7 @@ class OrderController extends Controller
             ->whereBetween('delivered_at', [$startDate, $endDate]);
 
         // Calculate total earnings and order count
-        $totalEarnings = (clone $query)->sum('subtotal');
+        $totalEarnings = (clone $query)->sum('delivery_earning');
         $totalOrders = (clone $query)->count();
 
         // Individual earning history
@@ -604,6 +606,210 @@ class OrderController extends Controller
                 ],
             ],
         ]);
+    }
+
+
+    public function sendDeliveryOtp(Request $request, $id)
+    {
+        $partner = $request->user();
+
+        try {
+            $order = DB::transaction(function () use ($id, $partner) {
+
+                $order = Order::with('user')
+                    ->where('id', $id)
+                    ->where('delivery_partner_id', $partner->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$order) {
+                    abort(404, 'Order not found.');
+                }
+
+                if ($order->status !== 'picked_up') {
+                    abort(409, 'You can request delivery OTP only after pickup.');
+                }
+
+                if ($order->delivered_at !== null) {
+                    abort(409, 'Order is already delivered.');
+                }
+
+                if (empty(optional($order->user)->mobile)) {
+                    abort(422, 'Customer mobile number not found.');
+                }
+
+                $order->delivery_otp = (string) random_int(1000, 9999);
+                $order->delivery_otp_sent_at = now();
+                $order->delivery_otp_expires_at = now()->addMinutes(5);
+                $order->save();
+
+                return $order;
+            });
+
+            /*
+             * Send the OTP to the customer's registered mobile number
+             * using your existing SMS gateway/service here.
+             *
+             * Customer mobile: $order->user->mobile
+             * OTP: $order->delivery_otp
+             */
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Delivery OTP generated successfully. Send it to the customer.',
+                'data' => [
+                    'order_id' => $order->id,
+                    'booking_number' => $order->invoice_id ?? $order->order_id,
+                    'customer_mobile' => $order->user->mobile,
+                    'otp_expires_at' => $order->delivery_otp_expires_at,
+                ],
+            ]);
+
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to send delivery OTP.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+    public function verifyDeliveryOtp(Request $request, $id)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make(
+            $request->all(),
+            [
+                'delivery_otp' => 'required|digits:4',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $partner = $request->user();
+
+        try {
+
+            $order = DB::transaction(function () use ($id, $partner, $request) {
+
+                $order = Order::where('id', $id)
+                    ->where('delivery_partner_id', $partner->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$order) {
+                    abort(404, 'Order not found.');
+                }
+
+                if ($order->status === 'delivered') {
+                    abort(409, 'Order is already delivered.');
+                }
+
+                if ($order->status !== 'picked_up') {
+                    abort(409, 'Order must be picked up before delivery.');
+                }
+
+                if (empty($order->delivery_otp)) {
+                    abort(409, 'Please generate the delivery OTP first.');
+                }
+
+                if (
+                    !$order->delivery_otp_expires_at ||
+                    now()->greaterThan($order->delivery_otp_expires_at)
+                ) {
+                    abort(422, 'Delivery OTP has expired. Please request a new OTP.');
+                }
+
+                // Verify delivery OTP
+                $storedOtp = trim((string) $order->delivery_otp);
+                $enteredOtp = trim((string) $request->delivery_otp);
+
+                if ($storedOtp !== $enteredOtp) {
+                    abort(422, 'Invalid delivery OTP.');
+                }
+
+                // Fetch delivery partner earning from settings
+                $earningSetting = Setting::where(
+                    'key',
+                    'delivery_partner_earning'
+                )->first();
+
+                if (!$earningSetting) {
+                    abort(500, 'Delivery partner earning setting record not found.');
+                }
+
+                // Setting status: 1 = Show, 0 = Hide
+                if ($earningSetting->status !== 'show') {
+                    abort(500, 'Delivery partner earning setting is hidden.');
+                }
+
+                // Validate earning amount
+                if (
+                    $earningSetting->value === null ||
+                    !is_numeric($earningSetting->value)
+                ) {
+                    abort(500, 'Delivery partner earning value is invalid.');
+                }
+
+                $deliveryEarning = (float) $earningSetting->value;
+
+                // Complete delivery after successful OTP verification
+                $order->status = 'delivered';
+                $order->delivered_at = now();
+
+                // Save delivery partner earning
+                $order->delivery_earning = $deliveryEarning;
+
+                // Clear delivery OTP after successful verification
+                $order->delivery_otp = null;
+                $order->delivery_otp_sent_at = null;
+                $order->delivery_otp_expires_at = null;
+
+                $order->save();
+
+                return $order;
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Order delivered successfully.',
+                'data' => [
+                    'order_id' => $order->id,
+                    'booking_number' => $order->invoice_id ?? $order->order_id,
+                    'status' => $order->status,
+                    'delivery_earning' => $order->delivery_earning,
+                    'delivered_at' => $order->delivered_at,
+                ],
+            ]);
+
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to verify delivery OTP.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 

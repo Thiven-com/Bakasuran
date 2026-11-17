@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\TestimonialController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AddonGroupController;
 use App\Http\Controllers\Admin\AddonOptionController;
+use App\Http\Controllers\Admin\DeliveryPartnerController;
 use App\Http\Controllers\Admin\RestaurantTableController;
 use App\Http\Controllers\Admin\RestaurantBookingController;
 use App\Http\Controllers\Admin\RestaurantBookingHourController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Admin\RestaurantBookingSessionController;
 use App\Http\Controllers\Admin\RestaurantTypeController;
 use App\Http\Controllers\Admin\RestaurantFoodOrderController;
 use App\Http\Controllers\Admin\RestaurantReviewController;
+use App\Http\Controllers\Admin\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +69,55 @@ Route::group(['middleware' => 'admin'], function () {
     Route::resource('brands', BrandController::class)->names('admin.brands');
     Route::resource('banners', BannerController::class)->names('admin.banners');
     Route::resource('products', ProductController::class)->names('admin.products');
+
+    Route::get(
+        'delivery-partners/{id}/settlements',
+        [DeliveryPartnerController::class, 'settlements']
+    )->name('admin.delivery-partners.settlements.show');
+
+    Route::post(
+        'delivery-partners/{id}/settlements',
+        [DeliveryPartnerController::class, 'storeSettlement']
+    )->name('admin.delivery-partners.settlements.store');
+
+    Route::get('/delivery-partners', [
+        DeliveryPartnerController::class,
+        'index'
+    ])->name('admin.delivery-partners.index');
+
+    Route::post('/delivery-partners/{id}/approve', [
+        DeliveryPartnerController::class,
+        'approve'
+    ])->name('admin.delivery-partners.approve');
+
+    Route::post('/delivery-partners/{id}/reject', [
+        DeliveryPartnerController::class,
+        'reject'
+    ])->name('admin.delivery-partners.reject');
+
+    Route::put('/delivery-partners/{id}/verification', [
+        DeliveryPartnerController::class,
+        'updateVerification'
+    ])->name('admin.delivery-partners.update-verification');
+
+    Route::get('/delivery-partners/{id}', [DeliveryPartnerController::class, 'show'])
+        ->name('admin.delivery-partners.show');
+
+    Route::get('/earnings', [OrderController::class, 'earnings'])
+        ->name('admin.earnings.index');
+
+
+    Route::get('/setting', [SettingController::class, 'index'])
+        ->name('admin.setting.index');
+
+    Route::post('/setting/store', [SettingController::class, 'store'])
+        ->name('admin.setting.store');
+
+    Route::put('/setting/update/{id}', [SettingController::class, 'update'])
+        ->name('admin.setting.update');
+
+    Route::delete('/setting/delete/{id}', [SettingController::class, 'destroy'])
+        ->name('admin.setting.destroy');
 
 
     Route::get('/restaurant-types', [RestaurantTypeController::class, 'index'])
@@ -217,10 +268,10 @@ Route::group(['middleware' => 'admin'], function () {
     )->name('admin.restaurant-food-orders.update-status');
 
 
-Route::post(
-    'restaurant-food-orders/{id}/complete-all',
-    [RestaurantFoodOrderController::class, 'completeAllOrders']
-)->name('admin.restaurant-food-orders.complete-all');
+    Route::post(
+        'restaurant-food-orders/{id}/complete-all',
+        [RestaurantFoodOrderController::class, 'completeAllOrders']
+    )->name('admin.restaurant-food-orders.complete-all');
 
 
     Route::delete(

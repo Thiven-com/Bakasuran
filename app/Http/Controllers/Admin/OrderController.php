@@ -2224,4 +2224,42 @@ class OrderController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+
+    public function earnings(Request $request)
+    {
+        $query = Order::with('deliveryPartner');
+
+        // Order ID Filter
+        if ($request->filled('order_id')) {
+            $query->where(
+                'invoice_id',
+                'like',
+                '%' . $request->order_id . '%'
+            );
+        }
+
+        // Mobile Number Filter
+        if ($request->filled('mobile')) {
+            $query->whereHas('deliveryPartner', function ($q) use ($request) {
+                $q->where('mobile', 'like', '%' . $request->mobile . '%');
+            });
+        }
+
+        // Order Status Filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->latest('delivered_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        $totalDeliveryEarnings = Order::where('status', 'delivered')
+            ->sum('delivery_earning');
+
+        return view('admin.earnings.index', compact(
+            'orders',
+            'totalDeliveryEarnings'
+        ));
+    }
 }
