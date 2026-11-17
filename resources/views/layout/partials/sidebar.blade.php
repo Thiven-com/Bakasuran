@@ -277,6 +277,10 @@
                                                                 <i class="ti ti-cards fs-16 me-2"></i><span>Flash
                                                                         Sales</span></a>
                                                 </li> --}}
+                                                <li class="{{ Request::is('admin/earnings') ? 'active' : '' }}"><a
+                                                                href="{{route('admin.earnings.index')}}"><i
+                                                                        class="ti ti-wallet fs-16 me-2"></i><span>Earnings</span></a>
+                                                </li>
 
                                         </ul>
                                 </li>
@@ -305,9 +309,19 @@
                                                                         </li>
                                                                 </ul>
                                                         </li>
+                                                        <li
+                                                                class="{{ Request::is('admin/delivery-partners') ? 'active' : '' }}">
+                                                                <a href="{{route('admin.delivery-partners.index')}}"><i
+                                                                                class="ti ti-truck-delivery fs-16 me-2"></i><span>Delivery
+                                                                                Partners</span></a>
+                                                        </li>
                                                         <li class="{{ Request::is('admin/faqs') ? 'active' : '' }}"><a
                                                                         href="{{route('admin.faqs.index')}}"><i
                                                                                 class="ti ti-folder fs-16 me-2"></i><span>Faq's</span></a>
+                                                        </li>
+                                                        <li class="{{ Request::is('admin/setting') ? 'active' : '' }}"><a
+                                                                        href="{{route('admin.setting.index')}}"><i
+                                                                                class="ti ti-settings fs-16 me-2"></i><span>Settings</span></a>
                                                         </li>
                                                 </ul>
                                         </li>

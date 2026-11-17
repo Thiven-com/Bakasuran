@@ -40,4 +40,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bank-details/update', [AuthController::class, 'updateBankDetails']);
 
     Route::post('/documents/upload', [AuthController::class, 'uploadDocuments']);
+
+    Route::post('/orders/{id}/send-delivery-otp', [
+        OrderController::class,
+        'sendDeliveryOtp'
+    ]);
+
+    Route::post('/orders/{id}/verify-delivery-otp', [
+        OrderController::class,
+        'verifyDeliveryOtp'
+    ]);
 });

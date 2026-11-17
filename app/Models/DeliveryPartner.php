@@ -106,4 +106,13 @@ class DeliveryPartner extends Model
             'longitude' => 'decimal:7',
         ];
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'delivery_partner_id');
+    }
+    public function settlements()
+    {
+        return $this->hasMany(Settlement::class);
+    }
 }
