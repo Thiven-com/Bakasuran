@@ -16,7 +16,7 @@
         "actual_price": "299",
         "product_id": 13,
         "product_variant_id": 13,
-        "stock": "49",
+        "stock": "47",
         "sku": "BAK-BIR-001-F"
     },
     {
@@ -26,7 +26,7 @@
         "actual_price": "399",
         "product_id": 1,
         "product_variant_id": 14,
-        "stock": "28",
+        "stock": "24",
         "sku": "1234"
     },
     {
@@ -36,7 +36,7 @@
         "actual_price": "179",
         "product_id": 2,
         "product_variant_id": 15,
-        "stock": "38",
+        "stock": "32",
         "sku": "1235"
     },
     {
@@ -46,7 +46,7 @@
         "actual_price": "199",
         "product_id": 3,
         "product_variant_id": 16,
-        "stock": "40",
+        "stock": "39",
         "sku": "1236"
     },
     {
@@ -86,7 +86,7 @@
         "actual_price": "149",
         "product_id": 11,
         "product_variant_id": 20,
-        "stock": "33",
+        "stock": "10",
         "sku": "2314"
     },
     {
@@ -106,7 +106,7 @@
         "actual_price": "159",
         "product_id": 8,
         "product_variant_id": 22,
-        "stock": "26",
+        "stock": "14",
         "sku": "1231"
     },
     {
@@ -116,7 +116,7 @@
         "actual_price": "229",
         "product_id": 9,
         "product_variant_id": 23,
-        "stock": "27",
+        "stock": "26",
         "sku": "1232"
     },
     {
@@ -126,7 +126,7 @@
         "actual_price": "219",
         "product_id": 12,
         "product_variant_id": 24,
-        "stock": "28",
+        "stock": "27",
         "sku": "2315"
     },
     {
@@ -146,7 +146,7 @@
         "actual_price": "179",
         "product_id": 14,
         "product_variant_id": 26,
-        "stock": "28",
+        "stock": "18",
         "sku": "BAK-PIZ-001-REG"
     },
     {
@@ -166,7 +166,7 @@
         "actual_price": "150",
         "product_id": 15,
         "product_variant_id": 28,
-        "stock": "50",
+        "stock": "46",
         "sku": "BAK-DES-001"
     },
     {
