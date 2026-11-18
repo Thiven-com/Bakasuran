@@ -54,8 +54,13 @@ return [
 
         'restaurant' => [
             'driver' => 'session',
-            'provider' => 'restaurantpanel',
+            'provider' => 'restaurants',
         ],
+
+        // 'restaurant' => [
+        //     'driver' => 'session',
+        //     'provider' => 'restaurantpanel',
+        // ],
     ],
 
     /*
@@ -91,10 +96,16 @@ return [
             'model' => App\Models\Customer::class,
         ],
 
-        'restaurantpanel' => [
+        // Restaurant Panel Provider
+        'restaurants' => [
             'driver' => 'eloquent',
-            'model' => App\Models\RestaurantPanel::class,
+            'model' => App\Models\Restaurant::class,
         ],
+
+        // 'restaurantpanel' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\RestaurantPanel::class,
+        // ],
 
         // 'users' => [
         //     'driver' => 'database',

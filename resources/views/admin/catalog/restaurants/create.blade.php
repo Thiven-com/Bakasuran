@@ -4,6 +4,53 @@
 
 @section('content')
 
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css"
+/>
+
+
+<style>
+    .restaurant-map-section {
+    margin: 25px 0;
+}
+
+.restaurant-map-section h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+#restaurantMap {
+    width: 100%;
+    height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    z-index: 1;
+}
+
+.map-instructions {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 12px;
+}
+
+.leaflet-control-geocoder {
+    max-width: 320px;
+}
+
+@media (max-width: 600px) {
+    #restaurantMap {
+        height: 320px;
+    }
+}
+</style>
+
     <style>
 
         .restaurant-type-checkboxes {
@@ -337,14 +384,42 @@
                     </div>
 
                     <div class="restaurant-form-group">
-                        <label for="latitude">Latitude</label>
-                        <input type="number" step="any" id="latitude" name="latitude" placeholder="Optional">
-                    </div>
+    <label for="latitude">Latitude</label>
+    <input
+        type="number"
+        step="any"
+        id="latitude"
+        name="latitude"
+        value="{{ old('latitude') }}"
+        placeholder="Enter latitude manually"
+    >
+</div>
 
-                    <div class="restaurant-form-group">
-                        <label for="longitude">Longitude</label>
-                        <input type="number" step="any" id="longitude" name="longitude" placeholder="Optional">
-                    </div>
+<div class="restaurant-form-group">
+    <label for="longitude">Longitude</label>
+    <input
+        type="number"
+        step="any"
+        id="longitude"
+        name="longitude"
+        value="{{ old('longitude') }}"
+        placeholder="Enter longitude manually"
+    >
+</div>
+
+                </div>
+
+                <!-- Restaurant Location Map -->
+                <div class="restaurant-map-section">
+
+                    <h3>Restaurant Location</h3>
+
+                    <p class="map-instructions">
+                        Search for your restaurant address and select the correct location.
+                        You can also drag the marker to adjust the position.
+                    </p>
+
+                    <div id="restaurantMap"></div>
 
                 </div>
 
@@ -626,6 +701,332 @@
 
         });
     </script>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* =====================================
+       1. GET FORM ELEMENTS
+    ===================================== */
+
+    const latitudeInput = document.getElementById('latitude');
+    const longitudeInput = document.getElementById('longitude');
+
+    const addressInput = document.getElementById('address');
+    const cityInput = document.getElementById('city');
+    const stateInput = document.getElementById('state');
+    const pincodeInput = document.getElementById('pincode');
+
+    const mapElement = document.getElementById('restaurantMap');
+
+    if (!mapElement || !latitudeInput || !longitudeInput) {
+        return;
+    }
+
+    if (typeof L === 'undefined' || !L.Control.Geocoder) {
+        console.error('Leaflet or Leaflet Geocoder is not loaded.');
+        return;
+    }
+
+
+    /* =====================================
+       2. DEFAULT MAP LOCATION
+    ===================================== */
+
+    // Default location: Bengaluru
+const defaultLat = 12.9716;
+const defaultLng = 77.5946;
+
+    const initialLat = parseFloat(latitudeInput.value);
+    const initialLng = parseFloat(longitudeInput.value);
+
+    function isValidCoordinates(lat, lng) {
+        return Number.isFinite(lat) &&
+            Number.isFinite(lng) &&
+            lat >= -90 && lat <= 90 &&
+            lng >= -180 && lng <= 180;
+    }
+
+    const hasInitialLocation = isValidCoordinates(
+        initialLat,
+        initialLng
+    );
+
+    const startLat = hasInitialLocation ? initialLat : defaultLat;
+    const startLng = hasInitialLocation ? initialLng : defaultLng;
+
+
+    /* =====================================
+       3. INITIALIZE LEAFLET MAP
+    ===================================== */
+
+   const map = L.map('restaurantMap').setView(
+    [startLat, startLng],
+    hasInitialLocation ? 16 : 12
+);
+
+// Bengaluru map boundaries
+const bangaloreBounds = L.latLngBounds(
+    [12.75, 77.35],
+    [13.20, 77.85]
+);
+
+map.setMaxBounds(bangaloreBounds);
+map.options.maxBoundsViscosity = 1.0;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+
+    /* =====================================
+       4. CREATE DRAGGABLE MARKER
+    ===================================== */
+
+    const marker = L.marker(
+        [startLat, startLng],
+        { draggable: true }
+    ).addTo(map);
+
+    if (hasInitialLocation) {
+        marker.bindPopup('Restaurant Location');
+    }
+
+
+    /* =====================================
+       5. UPDATE COORDINATE INPUTS
+    ===================================== */
+
+    function updateCoordinates(lat, lng) {
+
+        latitudeInput.value = Number(lat).toFixed(7);
+        longitudeInput.value = Number(lng).toFixed(7);
+    }
+
+
+    /* =====================================
+       6. UPDATE ADDRESS INFORMATION
+    ===================================== */
+
+    function updateAddressFields(data) {
+
+        if (!data) return;
+
+        const location = data.address || {};
+
+        if (addressInput && data.display_name) {
+            addressInput.value = data.display_name;
+        }
+
+        if (cityInput) {
+            cityInput.value =
+                location.city ||
+                location.town ||
+                location.village ||
+                location.municipality ||
+                location.county ||
+                '';
+        }
+
+        if (stateInput) {
+            stateInput.value = location.state || '';
+        }
+
+        if (pincodeInput) {
+            pincodeInput.value = location.postcode || '';
+        }
+    }
+
+
+    /* =====================================
+       7. ADDRESS SEARCH
+    ===================================== */
+
+    
+const geocoder = L.Control.geocoder({
+
+    defaultMarkGeocode: false,
+
+    placeholder: 'Search Bengaluru areas, streets, locations...',
+
+    position: 'topleft',
+
+    geocoder: L.Control.Geocoder.nominatim({
+
+        geocodingQueryParams: {
+
+            // India only
+            countrycodes: 'in',
+
+            // Bengaluru approximate geographic boundary
+            viewbox: '77.35,13.20,77.85,12.75',
+
+            // Restrict results to the specified viewbox
+            bounded: 1,
+
+            // Return complete address information
+            addressdetails: 1,
+
+            // Maximum search results
+            limit: 10
+
+        }
+
+    })
+
+}).addTo(map);
+
+
+    // When admin selects a search result
+
+    geocoder.on('markgeocode', function (event) {
+
+        const result = event.geocode;
+
+        const lat = result.center.lat;
+        const lng = result.center.lng;
+
+        map.setView([lat, lng], 17);
+
+        marker.setLatLng([lat, lng]);
+
+        updateCoordinates(lat, lng);
+
+        updateAddressFields({
+            display_name: result.name,
+            address: result.properties.address
+        });
+
+        marker.bindPopup('Selected Restaurant Location')
+            .openPopup();
+
+    });
+
+
+    /* =====================================
+       8. REVERSE GEOCODING
+    ===================================== */
+
+    async function reverseGeocode(lat, lng) {
+
+        try {
+
+            const url =
+                `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`;
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error('Unable to fetch address');
+            }
+
+            const data = await response.json();
+
+            updateAddressFields(data);
+
+        } catch (error) {
+
+            console.error('Reverse geocoding error:', error);
+
+        }
+    }
+
+
+    /* =====================================
+       9. SELECT LOCATION BY MAP CLICK
+    ===================================== */
+
+    map.on('click', function (event) {
+
+        const lat = event.latlng.lat;
+        const lng = event.latlng.lng;
+
+        marker.setLatLng([lat, lng]);
+
+        updateCoordinates(lat, lng);
+
+        reverseGeocode(lat, lng);
+
+        marker.bindPopup('Selected Restaurant Location')
+            .openPopup();
+
+    });
+
+
+    /* =====================================
+       10. DRAG MARKER TO SELECT LOCATION
+    ===================================== */
+
+    marker.on('dragend', function (event) {
+
+        const position = event.target.getLatLng();
+
+        updateCoordinates(position.lat, position.lng);
+
+        reverseGeocode(position.lat, position.lng);
+
+        marker.bindPopup('Selected Restaurant Location')
+            .openPopup();
+
+    });
+
+
+    /* =====================================
+       11. MANUAL LATITUDE & LONGITUDE
+    ===================================== */
+
+    function updateMapFromInputs() {
+
+        const lat = parseFloat(latitudeInput.value);
+        const lng = parseFloat(longitudeInput.value);
+
+        // Wait until both coordinates are valid
+        if (!isValidCoordinates(lat, lng)) {
+            return;
+        }
+
+        const newPosition = [lat, lng];
+
+        // Move marker
+        marker.setLatLng(newPosition);
+
+        // Move map
+        map.setView(newPosition, 17);
+
+        marker.bindPopup('Manually Entered Location')
+            .openPopup();
+
+    }
+
+
+    // Update map when latitude or longitude is entered
+
+    latitudeInput.addEventListener('input', updateMapFromInputs);
+
+    longitudeInput.addEventListener('input', updateMapFromInputs);
+
+
+    /* =====================================
+       12. MAP RESIZE FIX
+    ===================================== */
+
+    setTimeout(function () {
+
+        map.invalidateSize();
+
+    }, 300);
+
+
+});
+
+</script>
 
 
 @endsection

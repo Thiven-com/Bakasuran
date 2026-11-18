@@ -4,6 +4,9 @@
 
 @section('content')
 
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css"/>
 @php
     $selectedTypeIds = old(
         'restaurant_types',
@@ -267,6 +270,32 @@
         }
     </style>
 
+    <style>
+        .restaurant-map-section {
+    margin: 25px 0 30px;
+}
+
+.restaurant-map-section h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.map-instructions {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 12px;
+}
+
+#restaurantMap {
+    width: 100%;
+    height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    z-index: 1;
+}
+    </style>
+
     <div class="restaurant-page">
         <div class="restaurant-header">
             <div>
@@ -415,6 +444,16 @@
                             value="{{ old('longitude', $restaurant->longitude) }}">
                         @error('longitude') <small class="field-error">{{ $message }}</small> @enderror
                     </div>
+                </div>
+
+                <!-- Restaurant Location Map -->
+                <div class="restaurant-map-section">
+                    <h3>Restaurant Location</h3>
+                    <p class="map-instructions">
+                        Search for your restaurant in Bengaluru and select the correct location.
+                        You can also drag the marker to adjust the position.
+                    </p>
+                    <div id="restaurantMap"></div>
                 </div>
 
                 <h3 class="form-section-title">Contact Information</h3>
@@ -626,4 +665,207 @@
             });
         });
     </script>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const latitudeInput = document.getElementById('latitude');
+    const longitudeInput = document.getElementById('longitude');
+    const addressInput = document.getElementById('address');
+    const cityInput = document.getElementById('city');
+    const stateInput = document.getElementById('state');
+    const pincodeInput = document.getElementById('pincode');
+
+    if (!document.getElementById('restaurantMap') || !window.L) {
+        return;
+    }
+
+    // Bengaluru default location
+    const defaultLat = 12.9716;
+    const defaultLng = 77.5946;
+
+    // Existing restaurant coordinates
+    const savedLat = parseFloat(latitudeInput.value);
+    const savedLng = parseFloat(longitudeInput.value);
+
+    const hasSavedCoordinates =
+        Number.isFinite(savedLat) &&
+        Number.isFinite(savedLng) &&
+        savedLat >= -90 && savedLat <= 90 &&
+        savedLng >= -180 && savedLng <= 180;
+
+    const initialLat = hasSavedCoordinates ? savedLat : defaultLat;
+    const initialLng = hasSavedCoordinates ? savedLng : defaultLng;
+
+    // Initialize map
+    const map = L.map('restaurantMap').setView(
+        [initialLat, initialLng],
+        hasSavedCoordinates ? 16 : 12
+    );
+
+    // Restrict map navigation to Bengaluru
+    const bangaloreBounds = L.latLngBounds(
+        [12.75, 77.35],
+        [13.20, 77.85]
+    );
+
+    map.setMaxBounds(bangaloreBounds);
+    map.options.maxBoundsViscosity = 1.0;
+
+    // OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Restaurant marker
+    const marker = L.marker(
+        [initialLat, initialLng],
+        { draggable: true }
+    ).addTo(map);
+
+    // Update latitude and longitude
+    function updateCoordinates(lat, lng) {
+        latitudeInput.value = lat.toFixed(7);
+        longitudeInput.value = lng.toFixed(7);
+    }
+
+    // Update address fields
+    function updateAddressFields(data) {
+        if (!data) return;
+
+        const address = data.address || {};
+
+        addressInput.value = data.display_name || addressInput.value;
+
+        cityInput.value =
+            address.city ||
+            address.town ||
+            address.village ||
+            address.municipality ||
+            address.county ||
+            cityInput.value;
+
+        stateInput.value = address.state || stateInput.value;
+        pincodeInput.value = address.postcode || pincodeInput.value;
+    }
+
+    // Reverse geocoding
+    async function reverseGeocode(lat, lng) {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`
+            );
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            updateAddressFields(data);
+
+        } catch (error) {
+            console.error('Reverse geocoding failed:', error);
+        }
+    }
+
+    // Bengaluru-specific address search
+    const geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        placeholder: 'Search Bengaluru areas, streets, locations...',
+        position: 'topleft',
+        geocoder: L.Control.Geocoder.nominatim({
+            geocodingQueryParams: {
+                countrycodes: 'in',
+                viewbox: '77.35,13.20,77.85,12.75',
+                bounded: 1,
+                addressdetails: 1,
+                limit: 10
+            }
+        })
+    }).addTo(map);
+
+    // When a search result is selected
+    geocoder.on('markgeocode', function (event) {
+
+        const location = event.geocode.center;
+
+        if (!bangaloreBounds.contains(location)) {
+            alert('Please select a location within Bengaluru.');
+            return;
+        }
+
+        map.setView(location, 16);
+        marker.setLatLng(location);
+
+        updateCoordinates(location.lat, location.lng);
+        updateAddressFields(event.geocode.properties);
+    });
+
+    // When map is clicked
+    map.on('click', function (event) {
+
+        const location = event.latlng;
+
+        if (!bangaloreBounds.contains(location)) {
+            alert('Please select a location within Bengaluru.');
+            return;
+        }
+
+        marker.setLatLng(location);
+        updateCoordinates(location.lat, location.lng);
+
+        reverseGeocode(location.lat, location.lng);
+    });
+
+    // When marker is dragged
+    marker.on('dragend', function () {
+
+        const location = marker.getLatLng();
+
+        if (!bangaloreBounds.contains(location)) {
+            alert('Please select a location within Bengaluru.');
+            marker.setLatLng([initialLat, initialLng]);
+            return;
+        }
+
+        updateCoordinates(location.lat, location.lng);
+        reverseGeocode(location.lat, location.lng);
+    });
+
+    // Manual latitude and longitude changes
+    function updateMapFromInputs() {
+
+        const lat = parseFloat(latitudeInput.value);
+        const lng = parseFloat(longitudeInput.value);
+
+        if (
+            Number.isFinite(lat) &&
+            Number.isFinite(lng) &&
+            lat >= -90 && lat <= 90 &&
+            lng >= -180 && lng <= 180
+        ) {
+            const location = L.latLng(lat, lng);
+
+            if (!bangaloreBounds.contains(location)) {
+                return;
+            }
+
+            marker.setLatLng(location);
+            map.setView(location, 16);
+        }
+    }
+
+    latitudeInput.addEventListener('change', updateMapFromInputs);
+    longitudeInput.addEventListener('change', updateMapFromInputs);
+
+    // Fix map display after page layout loads
+    setTimeout(function () {
+        map.invalidateSize();
+    }, 300);
+
+});
+</script>
 @endsection

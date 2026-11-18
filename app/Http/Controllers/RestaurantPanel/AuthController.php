@@ -3,130 +3,118 @@
 namespace App\Http\Controllers\RestaurantPanel;
 
 use App\Http\Controllers\Controller;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Crypt;
-use App\Models\RestaurantPanel;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
-    /**
-     * Display restaurant login page.
-     */
+    // Display restaurant login page
     public function showLoginForm()
     {
-        $email = Cookie::get('restaurant_email');
+        $email = Cookie::get('restaurant_email', '');
 
-        $password = Cookie::get('restaurant_password')
-            ? Crypt::decryptString(Cookie::get('restaurant_password'))
-            : '';
-
-        return view('restaurantpanel.auth.login', compact(
-            'email',
-            'password'
-        ));
+        return view('restaurantpanel.auth.login', compact('email'));
     }
 
-    /**
-     * Handle restaurant login.
-     */
+    // Restaurant login
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+        
 
-        $remember = $request->has('remember');
+        $remember = $request->boolean('remember');
+        $credentials['is_active'] = true;
+
+        $restaurant = Restaurant::where('email', $request->email)->first();
+
+        
 
         if (Auth::guard('restaurant')->attempt($credentials, $remember)) {
 
-            if ($remember) {
-
-                Cookie::queue(
-                    Cookie::make(
-                        'restaurant_email',
-                        $request->email,
-                        43200
-                    )
-                );
-
-                Cookie::queue(
-                    Cookie::make(
-                        'restaurant_password',
-                        Crypt::encryptString($request->password),
-                        43200
-                    )
-                );
-
-            } else {
-
-                Cookie::queue(Cookie::forget('restaurant_email'));
-
-                Cookie::queue(Cookie::forget('restaurant_password'));
-            }
-
             $request->session()->regenerate();
+
+            if ($remember) {
+                Cookie::queue(
+                    Cookie::make('restaurant_email', $request->email, 43200)
+                );
+            } else {
+                Cookie::queue(Cookie::forget('restaurant_email'));
+            }
 
             return redirect()->route('restaurant.dashboard');
         }
 
-        return redirect()->back()
-            ->withErrors(['Invalid Credentials'])
-            ->withInput($request->only('email'));
+        return back()
+            ->withErrors([
+                'email' => 'Invalid credentials or inactive restaurant account.',
+            ])
+            ->onlyInput('email');
     }
 
-    /**
-     * Restaurant logout.
-     */
+    // Restaurant logout
     public function logout(Request $request)
     {
         Auth::guard('restaurant')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         Cookie::queue(Cookie::forget('restaurant_email'));
 
-        Cookie::queue(Cookie::forget('restaurant_password'));
-
         return redirect()->route('restaurant.login');
     }
 
+    // Display forgot password page
     public function showForgotForm()
     {
         return view('restaurantpanel.auth.forgot-password');
     }
 
+    // Send OTP to restaurant email
     public function sendOtp(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:restaurantpanel,email',
+            'email' => 'required|email|exists:restaurants,email',
         ]);
 
-        $restaurant = RestaurantPanel::where('email', $request->email)->first();
+        $restaurant = Restaurant::where('email', $request->email)->firstOrFail();
 
-        $otp = rand(100000, 999999);
+        $otp = (string) random_int(100000, 999999);
 
+        // Store OTP as plain text (for development)
         $restaurant->otp = $otp;
         $restaurant->save();
 
-        Mail::raw(
-            "Your BAKASURAN Restaurant Panel password reset OTP is: {$otp}",
-            function ($message) use ($request) {
-                $message->to($request->email)
-                    ->subject('Restaurant Panel Password Reset OTP');
-            }
-        );
+        // Send OTP email
+        try {
+            Mail::raw(
+                "Your BAKASURAN Restaurant Panel password reset OTP is: {$otp}",
+                function ($message) use ($request) {
+                    $message->to($request->email)
+                        ->subject('Restaurant Panel Password Reset OTP');
+                }
+            );
+        } catch (\Exception $e) {
+            Log::info('Restaurant OTP email error: ' . $e->getMessage());
+        }
 
         session(['email' => $request->email]);
 
         return redirect()
             ->route('restaurant.password.verifyForm')
-            ->with('success', 'OTP sent successfully to your email.');
+            ->with('success', 'OTP generated. Please check your email.');
     }
 
+    // Display OTP verification page
     public function showVerifyForm()
     {
         if (!session()->has('email')) {
@@ -136,7 +124,7 @@ class AuthController extends Controller
         return view('restaurantpanel.auth.verify-otp');
     }
 
-
+    // Verify OTP
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -144,38 +132,61 @@ class AuthController extends Controller
             'otp' => 'required|digits:6',
         ]);
 
-        $restaurant = RestaurantPanel::where('email', $request->email)
-            ->where('otp', $request->otp)
-            ->first();
+        $restaurant = Restaurant::where('email', $request->email)->first();
 
-        if (!$restaurant) {
+        if (
+            !$restaurant ||
+            !$restaurant->otp ||
+            $request->otp !== $restaurant->otp
+        ) {
             return back()->withErrors([
                 'otp' => 'Invalid OTP. Please try again.',
             ]);
         }
 
-        session(['email' => $restaurant->email]);
+        // Mark OTP verification in session
+        session([
+            'email' => $restaurant->email,
+            'restaurant_otp_verified' => true,
+        ]);
 
         return view('restaurantpanel.auth.reset-password', [
             'email' => $restaurant->email,
         ]);
     }
 
-
+    // Reset restaurant password
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:restaurantpanel,email',
+            'email' => 'required|email|exists:restaurants,email',
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $restaurant = RestaurantPanel::where('email', $request->email)->first();
+        $restaurant = Restaurant::where('email', $request->email)->firstOrFail();
 
-        $restaurant->password = Hash::make($request->password);
+        if (
+            !session()->has('email') ||
+            session('email') !== $restaurant->email ||
+            !session('restaurant_otp_verified') ||
+            !$restaurant->otp
+        ) {
+            return redirect()
+                ->route('restaurant.password.request')
+                ->withErrors([
+                    'email' => 'Please verify your OTP first.',
+                ]);
+        }
+
+        // Password is automatically hashed by the Restaurant model cast
+        $restaurant->password = $request->password;
         $restaurant->otp = null;
         $restaurant->save();
 
-        session()->forget('email');
+        session()->forget([
+            'email',
+            'restaurant_otp_verified',
+        ]);
 
         return redirect()
             ->route('restaurant.login')
