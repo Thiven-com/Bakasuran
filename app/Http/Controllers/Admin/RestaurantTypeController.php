@@ -9,12 +9,29 @@ use Illuminate\Validation\Rule;
 
 class RestaurantTypeController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        $types = RestaurantType::get();
+        $query = RestaurantType::query();
+
+        // Search by restaurant type name
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by status
+        if (
+            $request->input('status') !== null &&
+            $request->input('status') !== ''
+        ) {
+            $query->where('status', $request->status);
+        }
+
+        $types = $query->latest()->get();
 
         return view('admin.restaurant-types.index', compact('types'));
     }
+
 
     public function store(Request $request)
     {

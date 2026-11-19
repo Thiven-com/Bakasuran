@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="booking-settings-create-page">
+    <div class="booking-settings-create-page mt-3">
 
         <style>
             .booking-settings-create-page {
@@ -148,7 +148,7 @@
         </style>
 
         {{-- Header --}}
-        <div class="settings-header">
+        <div class="settings-header mt-5">
             <div>
                 <h4>Add Booking Settings</h4>
                 <p>Configure reservation rules for a restaurant.</p>

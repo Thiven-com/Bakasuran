@@ -226,73 +226,89 @@
     </script>
 
     <!-- Image Script -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
+   <!-- COMPLETE IMAGE SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-            const preview = document.getElementById("imagePreview");
-            const removeBtn = document.getElementById("removeImage");
-            let inputFile = document.getElementById("imageInput");
-            const removeInput = document.getElementById("remove_image");
+    const preview = document.getElementById("imagePreview");
+    const removeBtn = document.getElementById("removeImage");
+    const removeInput = document.getElementById("remove_image");
+    let inputFile = document.getElementById("imageInput");
 
-            let isSelectingFile = false;
+    // Check required elements
+    if (!preview || !removeBtn || !removeInput || !inputFile) {
+        console.error("Image upload elements not found.");
+        return;
+    }
 
-            function isImagePresent() {
-                const bg = window.getComputedStyle(preview).backgroundImage;
-                return bg && bg !== "none";
+    // Open file picker when clicking image preview
+    preview.addEventListener("click", function () {
+        inputFile.click();
+    });
+
+    // Bind file input change event
+    function bindFileChange() {
+
+        inputFile.addEventListener("change", function (event) {
+
+            const file = event.target.files[0];
+
+            if (!file) {
+                return;
             }
 
-            function bindFileChange() {
-                inputFile.addEventListener("change", function (e) {
-
-                    const file = e.target.files[0];
-                    if (!file) {
-                        isSelectingFile = false;
-                        return;
-                    }
-
-                    const reader = new FileReader();
-                    reader.onload = function (event) {
-
-                        preview.style.backgroundImage = "url('" + event.target.result + "')";
-                        preview.innerHTML = "";
-                        preview.classList.add("has-image");
-
-                        setTimeout(() => {
-                            isSelectingFile = false;
-                        }, 200);
-                    };
-
-                    reader.readAsDataURL(file);
-                    removeInput.value = 0;
-                });
+            // Validate image type
+            if (!file.type.startsWith("image/")) {
+                alert("Please select a valid image.");
+                inputFile.value = "";
+                return;
             }
 
-            bindFileChange();
+            // Preview selected image
+            const reader = new FileReader();
 
-            removeBtn.addEventListener("click", function (e) {
-                e.preventDefault();
+            reader.onload = function (e) {
 
-                preview.style.backgroundImage = "none";
-                preview.innerHTML = 'Select Image';
-                preview.classList.remove("has-image");
+                preview.style.backgroundImage =
+                    "url('" + e.target.result + "')";
 
-                const newInput = inputFile.cloneNode(true);
-                inputFile.parentNode.replaceChild(newInput, inputFile);
-                inputFile = newInput;
+                preview.style.backgroundSize = "cover";
+                preview.style.backgroundPosition = "center";
 
-                bindFileChange();
-                removeInput.value = 1;
-            });
+                preview.innerHTML = "";
+                preview.classList.add("has-image");
 
-            preview.addEventListener("click", function () {
-                if (isSelectingFile) return;
-                if (isImagePresent()) return;
+            };
 
-                isSelectingFile = true;
-                inputFile.click();
-            });
+            reader.readAsDataURL(file);
+
+            // New image selected, don't remove image
+            removeInput.value = 0;
 
         });
-    </script>
+    }
+
+    bindFileChange();
+
+    // Remove image button
+    removeBtn.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        // Clear image preview
+        preview.style.backgroundImage = "none";
+        preview.innerHTML = "Select Image";
+        preview.classList.remove("has-image");
+
+        // Clear selected file
+        inputFile.value = "";
+
+        // Tell Laravel to remove existing image
+        removeInput.value = 1;
+
+    });
+
+});
+</script>
 
 @endsection

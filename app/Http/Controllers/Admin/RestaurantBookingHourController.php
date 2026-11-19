@@ -22,12 +22,45 @@ class RestaurantBookingHourController extends Controller
     ];
 
     // INDEX
-    public function index()
+
+    public function index(Request $request)
     {
-        $restaurants = Restaurant::whereHas('bookingHours')
+        $query = Restaurant::whereHas('bookingHours')
             ->with('bookingHours')
-            ->orderBy('name')
-            ->paginate(10);
+            ->withCount('bookingHours');
+
+        // Search by restaurant name or ID
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('id', $search);
+            });
+        }
+
+        // Opening status filter
+        if ($request->status === 'open') {
+            $query->whereHas('bookingHours', function ($q) {
+                $q->where('is_closed', false);
+            });
+        } elseif ($request->status === 'closed') {
+            $query->whereDoesntHave('bookingHours', function ($q) {
+                $q->where('is_closed', false);
+            });
+        }
+
+        // Schedule completeness filter
+        if ($request->schedule === 'complete') {
+            $query->has('bookingHours', '=', 7);
+        } elseif ($request->schedule === 'incomplete') {
+            $query->has('bookingHours', '<', 7);
+        }
+
+        // Use the same filtered query
+        $restaurants = $query->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
 
         return view(
             'admin.catalog.booking-hours.index',
@@ -35,37 +68,38 @@ class RestaurantBookingHourController extends Controller
         );
     }
 
+
     // CREATE
- public function create(Request $request)
-{
-    $selectedRestaurantId = $request->query('restaurant_id');
+    public function create(Request $request)
+    {
+        $selectedRestaurantId = $request->query('restaurant_id');
 
-    // Check whether the selected restaurant already has booking hours
-    if ($selectedRestaurantId) {
+        // Check whether the selected restaurant already has booking hours
+        if ($selectedRestaurantId) {
 
-        $restaurant = Restaurant::findOrFail($selectedRestaurantId);
+            $restaurant = Restaurant::findOrFail($selectedRestaurantId);
 
-        if ($restaurant->bookingHours()->exists()) {
-            return redirect()
-                ->route('admin.booking-hours.edit', $restaurant->id)
-                ->with('info', 'Booking hours are already configured for this restaurant.');
+            if ($restaurant->bookingHours()->exists()) {
+                return redirect()
+                    ->route('admin.booking-hours.edit', $restaurant->id)
+                    ->with('info', 'Booking hours are already configured for this restaurant.');
+            }
         }
+
+        // Get restaurants without existing booking hours
+        $restaurants = Restaurant::whereDoesntHave('bookingHours')
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'admin.catalog.booking-hours.create',
+            [
+                'restaurants' => $restaurants,
+                'days' => $this->days,
+                'selectedRestaurantId' => $selectedRestaurantId,
+            ]
+        );
     }
-
-    // Get restaurants without existing booking hours
-    $restaurants = Restaurant::whereDoesntHave('bookingHours')
-        ->orderBy('name')
-        ->get();
-
-    return view(
-        'admin.catalog.booking-hours.create',
-        [
-            'restaurants' => $restaurants,
-            'days' => $this->days,
-            'selectedRestaurantId' => $selectedRestaurantId,
-        ]
-    );
-}
 
     // STORE
     public function store(Request $request)
@@ -90,9 +124,9 @@ class RestaurantBookingHourController extends Controller
             }
         });
 
-       return redirect()
-    ->route('admin.booking-hours.edit', $validated['restaurant_id'])
-    ->with('success', 'Booking hours created successfully.');
+        return redirect()
+            ->route('admin.booking-hours.index', $validated['restaurant_id'])
+            ->with('success', 'Booking hours created successfully.');
     }
 
     // EDIT
@@ -147,23 +181,23 @@ class RestaurantBookingHourController extends Controller
             }
         });
 
-       return redirect()
-    ->route('admin.booking-hours.edit', $restaurant->id)
-    ->with('success', 'Booking hours updated successfully.');
+        return redirect()
+            ->route('admin.booking-hours.index', $restaurant->id)
+            ->with('success', 'Booking hours updated successfully.');
     }
 
     // DELETE
     public function destroy(Restaurant $restaurant)
-{
-    RestaurantBookingHour::where(
-        'restaurant_id',
-        $restaurant->id
-    )->delete();
+    {
+        RestaurantBookingHour::where(
+            'restaurant_id',
+            $restaurant->id
+        )->delete();
 
-    return redirect()
-        ->route('admin.booking-hours.index')
-        ->with('success', 'Booking hours deleted successfully.');
-}
+        return redirect()
+            ->route('admin.booking-hours.index')
+            ->with('success', 'Booking hours deleted successfully.');
+    }
 
     // VALIDATION
     private function validateSchedule(Request $request, bool $requireRestaurant = true)

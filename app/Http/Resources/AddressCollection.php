@@ -35,6 +35,8 @@ class AddressCollection extends ResourceCollection
                     "state" => $data->state,
                     "state_id" => $data->state_id,
                     "default" => $data->default,
+                    "latitude" => $data->latitude,
+                    "longitude" => $data->longitude,
                     "created_at" => Carbon::parse($data->created_at)->format('d-M, Y'),
                     "updated_at" => Carbon::parse($data->updated_at)->format('d-M, Y'),
 

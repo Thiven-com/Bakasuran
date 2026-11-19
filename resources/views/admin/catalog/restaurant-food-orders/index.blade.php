@@ -24,6 +24,105 @@
 
             <!-- ORDERS TABLE -->
             <div class="card">
+                {{-- ORDER FILTERS --}}
+<div class="card-body border-bottom">
+    <form action="{{ route('admin.restaurant-food-orders.index') }}" method="GET">
+
+        <div class="row">
+
+            {{-- Order Number --}}
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Order Number</label>
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search order number"
+                    value="{{ request('search') }}"
+                >
+            </div>
+
+            {{-- Restaurant --}}
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Restaurant</label>
+                <select name="restaurant_id" class="form-select">
+                    <option value="">All Restaurants</option>
+
+                    @foreach($restaurants as $restaurant)
+                        <option value="{{ $restaurant->id }}"
+                            {{ request('restaurant_id') == $restaurant->id ? 'selected' : '' }}>
+                            {{ $restaurant->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Table Number --}}
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Table Number</label>
+                <input
+                    type="text"
+                    name="table_number"
+                    class="form-control"
+                    placeholder="Table number"
+                    value="{{ request('table_number') }}"
+                >
+            </div>
+
+            {{-- Seating Type --}}
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Seating Type</label>
+                <select name="seating_type" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="indoor" {{ request('seating_type') == 'indoor' ? 'selected' : '' }}>
+                        Indoor
+                    </option>
+                    <option value="outdoor" {{ request('seating_type') == 'outdoor' ? 'selected' : '' }}>
+                        Outdoor
+                    </option>
+                </select>
+            </div>
+
+            {{-- Status --}}
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                    <option value="preparing" {{ request('status') == 'preparing' ? 'selected' : '' }}>Preparing</option>
+                    <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Ready</option>
+                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                </select>
+            </div>
+
+            {{-- Order Date --}}
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Order Date</label>
+                <input
+                    type="date"
+                    name="order_date"
+                    class="form-control"
+                    value="{{ request('order_date') }}"
+                >
+            </div>
+
+            {{-- Buttons --}}
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="ti ti-search me-1"></i> Filter
+                </button>
+
+                <a href="{{ route('admin.restaurant-food-orders.index') }}"
+                   class="btn btn-secondary">
+                    Reset
+                </a>
+            </div>
+
+        </div>
+    </form>
+</div>
                 <div class="card-body table-responsive">
 
                     <table class="table table-bordered table-hover">

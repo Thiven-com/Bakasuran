@@ -1,324 +1,358 @@
-
 @extends('layout.mainlayout')
 
 @section('content')
 
 
-<style>
-    .pagination-wrapper {
-    padding: 18px 20px;
-    border-top: 1px solid #eee;
-    background: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-}
+    <style>
+        .pagination-wrapper {
+            padding: 18px 20px;
+            border-top: 1px solid #eee;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
 
-.pagination-info {
-    font-size: 13px;
-    color: #777;
-}
+        .pagination-info {
+            font-size: 13px;
+            color: #777;
+        }
 
-.pagination-info strong {
-    color: #222;
-    font-weight: 700;
-}
+        .pagination-info strong {
+            color: #222;
+            font-weight: 700;
+        }
 
-.pagination-links .pagination {
-    margin: 0;
-    gap: 5px;
-}
+        .pagination-links .pagination {
+            margin: 0;
+            gap: 5px;
+        }
 
-.pagination-links .page-link {
-    border: 1px solid #e5e5e5;
-    color: #333;
-    background: #fff;
-    border-radius: 7px !important;
-    padding: 8px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    box-shadow: none;
-}
+        .pagination-links .page-link {
+            border: 1px solid #e5e5e5;
+            color: #333;
+            background: #fff;
+            border-radius: 7px !important;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: none;
+        }
 
-.pagination-links .page-link:hover {
-    background: #fff0f0;
-    border-color: #ff0000;
-    color: #ff0000;
-}
+        .pagination-links .page-link:hover {
+            background: #fff0f0;
+            border-color: #ff0000;
+            color: #ff0000;
+        }
 
-.pagination-links .page-item.active .page-link {
-    background: #ff0000;
-    border-color: #ff0000;
-    color: #fff;
-}
+        .pagination-links .page-item.active .page-link {
+            background: #ff0000;
+            border-color: #ff0000;
+            color: #fff;
+        }
 
-.pagination-links .page-item.disabled .page-link {
-    background: #f8f8f8;
-    border-color: #eee;
-    color: #aaa;
-}
+        .pagination-links .page-item.disabled .page-link {
+            background: #f8f8f8;
+            border-color: #eee;
+            color: #aaa;
+        }
 
-@media(max-width:650px) {
-    .pagination-wrapper {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+        @media(max-width:650px) {
+            .pagination-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-    .pagination-links {
-        width: 100%;
-        overflow-x: auto;
-    }
-}
-</style>
+            .pagination-links {
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+    </style>
 
-<div class="booking-hours-page" style="margin-top:70px;">
-    <div class="container-fluid py-4">
+    <div class="booking-hours-page" style="margin-top:70px;">
+        <div class="container-fluid py-4">
 
-        {{-- PAGE HEADER --}}
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-            <div>
-                <h3 class="mb-1">Booking Hours</h3>
-                <p class="text-muted mb-0">
-                    Manage restaurant reservation timings for each day.
-                </p>
+            {{-- PAGE HEADER --}}
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                <div>
+                    <h3 class="mb-1">Booking Hours</h3>
+                    <p class="text-muted mb-0">
+                        Manage restaurant reservation timings for each day.
+                    </p>
+                </div>
+
+                <a href="{{ route('admin.booking-hours.create') }}" class="btn btn-danger px-4">
+                    <i class="fas fa-plus me-1"></i> Add Booking Hours
+                </a>
             </div>
 
-            <a href="{{ route('admin.booking-hours.create') }}"
-               class="btn btn-danger px-4">
-                <i class="fas fa-plus me-1"></i> Add Booking Hours
-            </a>
-        </div>
+            {{-- SUCCESS MESSAGE --}}
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
 
-        {{-- SUCCESS MESSAGE --}}
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+            {{-- STATISTICS --}}
+            <div class="row g-3 mb-4">
 
-        {{-- STATISTICS --}}
-        <div class="row g-3 mb-4">
-
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted mb-1">Restaurants With Schedules</p>
-                                <h3 class="mb-0">{{ $restaurants->total() }}</h3>
-                            </div>
-                            <div class="bg-light rounded-circle p-3">
-                                <i class="fas fa-utensils text-danger fs-4"></i>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="text-muted mb-1">Restaurants With Schedules</p>
+                                    <h3 class="mb-0">{{ $restaurants->total() }}</h3>
+                                </div>
+                                <div class="bg-light rounded-circle p-3">
+                                    <i class="fas fa-utensils text-danger fs-4"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-3">
-                    <div class="card-body">
-                        <p class="text-muted mb-1">Schedule Days</p>
-                        <h3 class="mb-0">7</h3>
-                        <small class="text-muted">Sunday to Saturday</small>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Schedule Days</p>
+                            <h3 class="mb-0">7</h3>
+                            <small class="text-muted">Sunday to Saturday</small>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-3">
-                    <div class="card-body">
-                        <p class="text-muted mb-1">Schedule Type</p>
-                        <h5 class="mb-0">Weekly Schedule</h5>
-                        <small class="text-muted">Restaurant-wise timings</small>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Schedule Type</p>
+                            <h5 class="mb-0">Weekly Schedule</h5>
+                            <small class="text-muted">Restaurant-wise timings</small>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
-        </div>
+            {{-- RESTAURANT SCHEDULE TABLE --}}
+            <div class="card border-0 shadow-sm rounded-3">
 
-        {{-- RESTAURANT SCHEDULE TABLE --}}
-        <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Restaurant Booking Schedules</h5>
+                </div>
+                {{-- BOOKING HOURS FILTERS --}}
 
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0">Restaurant Booking Schedules</h5>
-            </div>
 
-            <div class="card-body">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('admin.booking-hours.index') }}" class="mb-4">
 
-                <div class="table-responsive">
-                    <table class="table align-middle table-hover">
+                        <div class="d-flex gap-2 flex-nowrap align-items-center">
 
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Restaurant</th>
-                                <th>Schedule Days</th>
-                                <th>Opening Days</th>
-                                <th>Closed Days</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search restaurant name or ID..." value="{{ request('search') }}"
+                                style="min-width:220px;">
 
-                        <tbody>
+                            <select name="status" class="form-select" style="min-width:170px;">
+                                <option value="">All Opening Status</option>
+                                <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>
+                                    Has Open Days
+                                </option>
+                                <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>
+                                    All Days Closed
+                                </option>
+                            </select>
 
-                            @forelse($restaurants as $restaurant)
+                            <select name="schedule" class="form-select" style="min-width:180px;">
+                                <option value="">All Schedules</option>
+                                <option value="complete" {{ request('schedule') == 'complete' ? 'selected' : '' }}>
+                                    Complete (7 Days)
+                                </option>
+                                <option value="incomplete" {{ request('schedule') == 'incomplete' ? 'selected' : '' }}>
+                                    Incomplete
+                                </option>
+                            </select>
 
-                                @php
-                                    $hours = $restaurant->bookingHours;
-                                    $openDays = $hours->where('is_closed', false)->count();
-                                    $closedDays = $hours->where('is_closed', true)->count();
-                                @endphp
+                            <button type="submit" class="btn btn-dark text-nowrap">
+                                <i class="ti ti-search"></i> Search
+                            </button>
 
+                            <a href="{{ route('admin.booking-hours.index') }}" class="btn btn-light text-nowrap">
+                                Reset
+                            </a>
+
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle table-hover">
+
+                            <thead class="table-light">
                                 <tr>
-                                    <td>
-                                        {{ $loop->iteration + ($restaurants->currentPage() - 1) * $restaurants->perPage() }}
-                                    </td>
+                                    <th>#</th>
+                                    <th>Restaurant</th>
+                                    <th>Schedule Days</th>
+                                    <th>Opening Days</th>
+                                    <th>Closed Days</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
 
-                                    <td>
-                                        <div class="fw-semibold">
-                                            {{ $restaurant->name }}
-                                        </div>
-                                        <small class="text-muted">
-                                            Restaurant ID: {{ $restaurant->id }}
-                                        </small>
-                                    </td>
+                            <tbody>
 
-                                    <td>
-                                        <span class="badge bg-light text-dark border">
-                                            {{ $hours->count() }} / 7 Days
-                                        </span>
-                                    </td>
+                                @forelse($restaurants as $restaurant)
 
-                                    <td>
-                                        <span class="badge bg-success-subtle text-success">
-                                            {{ $openDays }} Open
-                                        </span>
-                                    </td>
+                                    @php
+                                        $hours = $restaurant->bookingHours;
+                                        $openDays = $hours->where('is_closed', false)->count();
+                                        $closedDays = $hours->where('is_closed', true)->count();
+                                    @endphp
 
-                                    <td>
-                                        <span class="badge bg-danger-subtle text-danger">
-                                            {{ $closedDays }} Closed
-                                        </span>
-                                    </td>
+                                    <tr>
+                                        <td>
+                                            {{ $loop->iteration + ($restaurants->currentPage() - 1) * $restaurants->perPage() }}
+                                        </td>
 
-                                    <td class="text-end">
+                                        <td>
+                                            <div class="fw-semibold">
+                                                {{ $restaurant->name }}
+                                            </div>
+                                            <small class="text-muted">
+                                                Restaurant ID: {{ $restaurant->id }}
+                                            </small>
+                                        </td>
 
-                                        <a href="{{ route('admin.booking-hours.edit', $restaurant->id) }}"
-                                           class="btn btn-sm btn-outline-primary"
-                                           title="Edit Schedule">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">
+                                                {{ $hours->count() }} / 7 Days
+                                            </span>
+                                        </td>
 
-                                        <form action="{{ route('admin.booking-hours.destroy', $restaurant->id) }}"
-                                              method="POST"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Are you sure you want to delete this restaurant booking schedule?');">
-                                            @csrf
-                                            @method('DELETE')
+                                        <td>
+                                            <span class="badge bg-success-subtle text-success">
+                                                {{ $openDays }} Open
+                                            </span>
+                                        </td>
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger"
+                                        <td>
+                                            <span class="badge bg-danger-subtle text-danger">
+                                                {{ $closedDays }} Closed
+                                            </span>
+                                        </td>
+
+                                        <td class="text-end">
+
+                                            <a href="{{ route('admin.booking-hours.edit', $restaurant->id) }}"
+                                                class="btn btn-sm btn-outline-primary" title="Edit Schedule">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <form action="{{ route('admin.booking-hours.destroy', $restaurant->id) }}"
+                                                method="POST" class="d-inline"
+                                                onsubmit="return confirm('Are you sure you want to delete this restaurant booking schedule?');">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
                                                     title="Delete Schedule">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
 
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
 
-                            @empty
+                                @empty
 
-                                <tr>
-                                    <td colspan="6" class="text-center py-5">
-                                        <i class="fas fa-clock fs-1 text-muted mb-3"></i>
-                                        <h5>No Booking Hours Found</h5>
-                                        <p class="text-muted">
-                                            Create a weekly schedule for your restaurant.
-                                        </p>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="fas fa-clock fs-1 text-muted mb-3"></i>
+                                            <h5>No Booking Hours Found</h5>
+                                            <p class="text-muted">
+                                                Create a weekly schedule for your restaurant.
+                                            </p>
 
-                                        <a href="{{ route('admin.booking-hours.create') }}"
-                                           class="btn btn-danger">
-                                            <i class="fas fa-plus me-1"></i>
-                                            Add Booking Hours
-                                        </a>
-                                    </td>
-                                </tr>
+                                            <a href="{{ route('admin.booking-hours.create') }}" class="btn btn-danger">
+                                                <i class="fas fa-plus me-1"></i>
+                                                Add Booking Hours
+                                            </a>
+                                        </td>
+                                    </tr>
 
-                            @endforelse
+                                @endforelse
 
-                        </tbody>
+                            </tbody>
 
-                    </table>
+                        </table>
+                    </div>
+
+                    @if($restaurants->hasPages())
+                        <div class="pagination-wrapper">
+
+                            <div class="pagination-info">
+                                Showing
+                                <strong>{{ $restaurants->firstItem() }}</strong>
+                                to
+                                <strong>{{ $restaurants->lastItem() }}</strong>
+                                of
+                                <strong>{{ $restaurants->total() }}</strong>
+                                restaurants
+                            </div>
+
+                            <div class="pagination-links">
+                                {{ $restaurants->onEachSide(1)->links('pagination::bootstrap-5') }}
+                            </div>
+
+                        </div>
+                    @endif
+
                 </div>
-
-                @if($restaurants->hasPages())
-    <div class="pagination-wrapper">
-
-        <div class="pagination-info">
-            Showing
-            <strong>{{ $restaurants->firstItem() }}</strong>
-            to
-            <strong>{{ $restaurants->lastItem() }}</strong>
-            of
-            <strong>{{ $restaurants->total() }}</strong>
-            restaurants
-        </div>
-
-        <div class="pagination-links">
-            {{ $restaurants->onEachSide(1)->links('pagination::bootstrap-5') }}
-        </div>
-
-    </div>
-@endif
-
             </div>
+
         </div>
-
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
-    function syncBookingHoursLayout() {
-        const sidebar = document.getElementById('sidebar');
-        const page = document.querySelector('.booking-hours-page');
+            function syncBookingHoursLayout() {
+                const sidebar = document.getElementById('sidebar');
+                const page = document.querySelector('.booking-hours-page');
 
-        if (!sidebar || !page) return;
+                if (!sidebar || !page) return;
 
-        if (window.innerWidth <= 991) {
-            page.style.marginLeft = '0';
-            page.style.width = '100%';
-        } else {
-            const sidebarWidth = sidebar.getBoundingClientRect().width;
+                if (window.innerWidth <= 991) {
+                    page.style.marginLeft = '0';
+                    page.style.width = '100%';
+                } else {
+                    const sidebarWidth = sidebar.getBoundingClientRect().width;
 
-            page.style.marginLeft = sidebarWidth + 'px';
-            page.style.width = 'calc(100% - ' + sidebarWidth + 'px)';
-        }
-    }
+                    page.style.marginLeft = sidebarWidth + 'px';
+                    page.style.width = 'calc(100% - ' + sidebarWidth + 'px)';
+                }
+            }
 
-    syncBookingHoursLayout();
+            syncBookingHoursLayout();
 
-    window.addEventListener('load', syncBookingHoursLayout);
-    window.addEventListener('resize', syncBookingHoursLayout);
+            window.addEventListener('load', syncBookingHoursLayout);
+            window.addEventListener('resize', syncBookingHoursLayout);
 
-    document.addEventListener('click', function () {
-        setTimeout(syncBookingHoursLayout, 100);
-        setTimeout(syncBookingHoursLayout, 300);
-    });
+            document.addEventListener('click', function () {
+                setTimeout(syncBookingHoursLayout, 100);
+                setTimeout(syncBookingHoursLayout, 300);
+            });
 
-    const sidebar = document.getElementById('sidebar');
+            const sidebar = document.getElementById('sidebar');
 
-    if (sidebar && typeof ResizeObserver !== 'undefined') {
-        const observer = new ResizeObserver(syncBookingHoursLayout);
-        observer.observe(sidebar);
-    }
+            if (sidebar && typeof ResizeObserver !== 'undefined') {
+                const observer = new ResizeObserver(syncBookingHoursLayout);
+                observer.observe(sidebar);
+            }
 
-});
-</script>
+        });
+    </script>
 
 @endsection

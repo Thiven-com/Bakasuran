@@ -2,10 +2,43 @@
 
 @section('content')
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #addAddressMap {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            border: 1px solid #dfd3c3;
+            z-index: 1;
+        }
+
+        .location-map-section {
+            margin-top: 20px;
+        }
+
+        .location-map-section label {
+            display: block;
+            margin-bottom: 10px;
+            color: #420916;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .get-current-location {
+            background: #420916;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 15px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+    </style>
     <style>
         /* =========================================================
-                                                   SUDHEERA SAREES - ADDRESS PAGE
-                                                ========================================================= */
+                                                                                                   SUDHEERA SAREES - ADDRESS PAGE
+                                                                                                ========================================================= */
 
         .sudheera-address-page {
             background: #fbf8f3;
@@ -517,8 +550,8 @@
 
 
         /* =========================================================
-               EDIT ADDRESS FORM
-            ========================================================= */
+                                                               EDIT ADDRESS FORM
+                                                            ========================================================= */
 
         #editAddressForm {
             width: 100%;
@@ -650,7 +683,7 @@
         }
 
         /* HIDE THE INLINE BUTTON INSIDE FORM
-               We use the modal footer button instead */
+                                                               We use the modal footer button instead */
         #editAddressForm>.sudheera-save-btn {
             display: none;
         }
@@ -760,8 +793,8 @@
     </style>
 
     <!-- =========================================================
-                                                 ADDRESS PAGE
-                                            ========================================================= -->
+                                                                                                 ADDRESS PAGE
+                                                                                            ========================================================= -->
 
     <main class="sudheera-address-page">
 
@@ -820,8 +853,8 @@
 
 
             <!-- =====================================================
-                                                     ADDRESS CARDS
-                                                ====================================================== -->
+                                                                                                     ADDRESS CARDS
+                                                                                                ====================================================== -->
 
 
             <div class="sudheera-address-grid">
@@ -863,10 +896,10 @@
                                     data-email="{{ $address->email }}" data-address="{{ $address->address }}"
                                     data-address2="{{ $address->address_2 }}" data-city="{{ $address->city }}"
                                     data-state-id="{{ $address->state_id }}" data-pincode="{{ $address->pincode }}"
+                                    data-latitude="{{ $address->latitude }}" data-longitude="{{ $address->longitude }}"
                                     title="Edit">
 
                                     <i class="fa fa-edit"></i>
-
                                 </button>
 
 
@@ -1019,8 +1052,8 @@
     </main>
 
     <!-- =========================================================
-                                                 ADD ADDRESS MODAL
-                                            ========================================================= -->
+                                                                                                 ADD ADDRESS MODAL
+                                                                                            ========================================================= -->
 
     <div class="modal fade" id="modalAddAddress" tabindex="-1" aria-hidden="true">
 
@@ -1241,6 +1274,29 @@
                                     placeholder="Apartment, Area, Additional Address"></textarea>
 
                             </div>
+                            <div class="col-12 location-map-section">
+
+                                <label>
+                                    <i class="fa fa-map-marker"></i>
+                                    Select Delivery Location *
+                                </label>
+
+                                <button type="button" class="get-current-location" id="getCurrentLocation">
+                                    <i class="fa fa-location-arrow"></i>
+                                    Use My Current Location
+                                </button>
+
+                                <div id="addAddressMap"></div>
+
+                                <small class="text-muted d-block mt-2">
+                                    Click on the map to select your delivery location.
+                                </small>
+
+                            </div>
+
+                            <input type="hidden" name="latitude" id="latitude">
+
+                            <input type="hidden" name="longitude" id="longitude">
 
                         </div>
 
@@ -1276,8 +1332,8 @@
     </div>
 
     <!-- =========================================================
-                                                 EDIT ADDRESS MODAL
-                                            ========================================================= -->
+                                                                                                 EDIT ADDRESS MODAL
+                                                                                            ========================================================= -->
 
     <div class="modal fade" id="modalEditAddress" tabindex="-1" aria-hidden="true">
 
@@ -1297,43 +1353,116 @@
                 </div>
 
 
-                <div class="modal-body">
+                <style>
+                    #editAddressMap {
+                        width: 100%;
+                        height: 350px;
+                        border-radius: 12px;
+                        border: 1px solid #dfd3c3;
+                        z-index: 1;
+                    }
+                </style>
 
+                <div class="modal-body">
 
                     <form id="editAddressForm" method="POST">
 
                         @csrf
                         @method('PUT')
 
-                        <input type="text" id="editName" name="name" required>
+                        <div class="row g-3">
 
-                        <input type="text" id="editMobile" name="mobile" required>
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" id="editName" name="name" class="form-control"
+                                    placeholder="Enter full name" required>
+                            </div>
 
-                        <input type="email" id="editEmail" name="email">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="text" id="editMobile" name="mobile" class="form-control"
+                                    placeholder="Enter phone number" required>
+                            </div>
 
-                        <input type="text" id="editPincode" name="pincode" required>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="editEmail" name="email" class="form-control"
+                                    placeholder="Enter email">
+                            </div>
 
-                        <input type="text" id="editCity" name="city" required>
+                            <div class="col-md-6">
+                                <label class="form-label">Pincode *</label>
+                                <input type="text" id="editPincode" name="pincode" class="form-control"
+                                    placeholder="Enter pincode" required>
+                            </div>
 
-                        <select id="editState" name="state_id" required>
+                            <div class="col-md-6">
+                                <label class="form-label">City *</label>
+                                <input type="text" id="editCity" name="city" class="form-control" placeholder="Enter city"
+                                    required>
+                            </div>
 
-                            {{-- Your actual states here --}}
+                            <div class="col-md-6">
+                                <label class="form-label">State *</label>
+                                <select id="editState" name="state_id" class="form-select" required>
+                                    {{-- Your actual states here --}}
+                                </select>
+                            </div>
 
-                        </select>
+                            <div class="col-md-6">
+                                <label class="form-label">Address Type</label>
+                                <select id="editType" name="address_type" class="form-select">
+                                    <option value="Home">Home</option>
+                                    <option value="Office">Office</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
 
-                        <select id="editType" name="address_type">
+                            <div class="col-12">
+                                <label class="form-label">House No, Street *</label>
+                                <textarea id="editAddress" name="address" class="form-control" rows="3"
+                                    placeholder="House No, Street, Area..." required></textarea>
+                            </div>
 
-                            <option value="Home">Home</option>
-                            <option value="Office">Office</option>
-                            <option value="Other">Other</option>
+                            <div class="col-12">
+                                <label class="form-label">Address 2</label>
+                                <textarea id="editAddress2" name="address_2" class="form-control" rows="3"
+                                    placeholder="Apartment, Area, Additional Address"></textarea>
+                            </div>
 
-                        </select>
+                            <!-- EDIT ADDRESS MAP -->
 
-                        <textarea id="editAddress" name="address" required></textarea>
+                            <div class="col-12 location-map-section">
 
-                        <textarea id="editAddress2" name="address_2"></textarea>
+                                <label>
+                                    <i class="fa fa-map-marker"></i>
+                                    Update Delivery Location *
+                                </label>
 
-                        <button type="button" onclick="updateAddress()" class="sudheera-save-btn">
+                                <button type="button" class="get-current-location" id="getEditCurrentLocation">
+
+                                    <i class="fa fa-location-arrow"></i>
+                                    Use My Current Location
+
+                                </button>
+
+                                <div id="editAddressMap"></div>
+
+                                <small class="text-muted d-block mt-2">
+                                    Click on the map to update your delivery location.
+                                </small>
+
+                            </div>
+
+                            <!-- LATITUDE AND LONGITUDE -->
+
+                            <input type="hidden" name="latitude" id="editLatitude">
+
+                            <input type="hidden" name="longitude" id="editLongitude">
+
+                        </div>
+
+                        <button type="button" onclick="updateAddress()" class="sudheera-save-btn mt-3">
 
                             <i class="fa fa-check me-1"></i>
                             Update Address
@@ -1341,7 +1470,9 @@
                         </button>
 
                     </form>
+
                 </div>
+
 
 
                 <div class="modal-footer">
@@ -1368,9 +1499,157 @@
 
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        /*
+    |--------------------------------------------------------------------------
+    | ADD ADDRESS LEAFLET MAP
+    |--------------------------------------------------------------------------
+    */
+
+        let addAddressMap = null;
+        let addAddressMarker = null;
+
+        function initializeAddAddressMap() {
+
+            if (addAddressMap) {
+                setTimeout(function () {
+                    addAddressMap.invalidateSize();
+                }, 200);
+                return;
+            }
+
+            // Default map view: India
+            addAddressMap = L.map('addAddressMap').setView(
+                [20.5937, 78.9629],
+                5
+            );
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(addAddressMap);
+
+            // Select location by clicking on the map
+            addAddressMap.on('click', function (event) {
+                setAddressLocation(
+                    event.latlng.lat,
+                    event.latlng.lng
+                );
+            });
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SET SELECTED LATITUDE AND LONGITUDE
+        |--------------------------------------------------------------------------
+        */
+
+        function setAddressLocation(latitude, longitude) {
+
+            document.getElementById('latitude').value = latitude.toFixed(7);
+            document.getElementById('longitude').value = longitude.toFixed(7);
+
+            const selectedLocation = [latitude, longitude];
+
+            if (addAddressMarker) {
+                addAddressMarker.setLatLng(selectedLocation);
+            } else {
+                addAddressMarker = L.marker(selectedLocation).addTo(addAddressMap);
+            }
+
+            addAddressMap.setView(selectedLocation, 16);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | INITIALIZE MAP WHEN ADD ADDRESS MODAL OPENS
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById('modalAddAddress').addEventListener(
+            'shown.bs.modal',
+            function () {
+                initializeAddAddressMap();
+            }
+        );
+
+
+        document.getElementById('getCurrentLocation').addEventListener('click', function () {
+
+            const button = this;
+
+            if (!navigator.geolocation) {
+                alert('Your browser does not support location services.');
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = 'Getting Location...';
+
+            navigator.geolocation.getCurrentPosition(
+
+                function (position) {
+
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    console.log('Latitude:', latitude);
+                    console.log('Longitude:', longitude);
+                    console.log('Accuracy:', position.coords.accuracy, 'meters');
+
+                    if (!addAddressMap) {
+                        initializeAddAddressMap();
+                    }
+
+                    setAddressLocation(latitude, longitude);
+
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa fa-location-arrow"></i> Use My Current Location';
+
+                    alert('Your current location has been selected successfully!');
+                },
+
+                function (error) {
+
+                    console.error('Location Error:', error.code, error.message);
+
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa fa-location-arrow"></i> Use My Current Location';
+
+                    switch (error.code) {
+
+                        case 1:
+                            alert('Location permission denied. Please enable location permission in Edge.');
+                            break;
+
+                        case 2:
+                            alert('Your location is currently unavailable. Please check Windows Location Services.');
+                            break;
+
+                        case 3:
+                            alert('Location request timed out. Please try again.');
+                            break;
+
+                        default:
+                            alert('Location error: ' + error.message);
+                    }
+                },
+
+                {
+                    enableHighAccuracy: false,
+                    timeout: 60000,
+                    maximumAge: 0
+                }
+            );
+        });
+
+    </script>
+
     <!-- =========================================================
-                                                 STATIC JAVASCRIPT
-                                            ========================================================= -->
+                                                                                                 STATIC JAVASCRIPT
+                                                                                            ========================================================= -->
 
     <script>
 
@@ -1411,15 +1690,15 @@
             document.getElementById('editPincode').value =
                 button.dataset.pincode || '';
 
-            /*
-             * Set Laravel update URL dynamically
-             *
-             * Example:
-             * /addresses/5
-             */
+            // Set update URL
             document.getElementById('editAddressForm').action =
                 "{{ url('/addresses') }}/" + id;
 
+            // Get saved coordinates
+            const latitude = button.dataset.latitude;
+            const longitude = button.dataset.longitude;
+
+            // Open modal
             const modalElement =
                 document.getElementById('modalEditAddress');
 
@@ -1427,7 +1706,150 @@
                 bootstrap.Modal.getOrCreateInstance(modalElement);
 
             modal.show();
+
+            // Initialize map after modal becomes visible
+            modalElement.addEventListener('shown.bs.modal', function () {
+
+                initializeEditAddressMap(latitude, longitude);
+
+            }, { once: true });
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | EDIT ADDRESS LEAFLET MAP
+        |--------------------------------------------------------------------------
+        */
+
+        let editAddressMap = null;
+        let editAddressMarker = null;
+
+
+        // Initialize Edit Address Map
+        function initializeEditAddressMap(latitude, longitude) {
+
+            latitude = parseFloat(latitude);
+            longitude = parseFloat(longitude);
+
+            // Default location if saved coordinates are unavailable
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                latitude = 20.5937;
+                longitude = 78.9629;
+            }
+
+            if (!editAddressMap) {
+
+                editAddressMap = L.map('editAddressMap').setView(
+                    [latitude, longitude],
+                    15
+                );
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(editAddressMap);
+
+                // Select location by clicking on map
+                editAddressMap.on('click', function (event) {
+
+                    setEditAddressLocation(
+                        event.latlng.lat,
+                        event.latlng.lng
+                    );
+
+                });
+            }
+
+            setEditAddressLocation(latitude, longitude);
+
+            // Important: Refresh map after modal becomes visible
+            setTimeout(function () {
+                editAddressMap.invalidateSize();
+            }, 300);
+        }
+
+
+        // Set Edit Address Location
+        function setEditAddressLocation(latitude, longitude) {
+
+            document.getElementById('editLatitude').value =
+                latitude.toFixed(7);
+
+            document.getElementById('editLongitude').value =
+                longitude.toFixed(7);
+
+            const selectedLocation = [latitude, longitude];
+
+            if (editAddressMarker) {
+
+                editAddressMarker.setLatLng(selectedLocation);
+
+            } else {
+
+                editAddressMarker = L.marker(selectedLocation)
+                    .addTo(editAddressMap);
+
+            }
+
+            editAddressMap.setView(selectedLocation, 16);
+        }
+
+
+        // Get Current Location for Edit Address
+        document.getElementById('getEditCurrentLocation')
+            .addEventListener('click', function () {
+
+                const button = this;
+
+                if (!navigator.geolocation) {
+                    alert('Your browser does not support location services.');
+                    return;
+                }
+
+                button.disabled = true;
+                button.innerHTML = 'Getting Location...';
+
+                navigator.geolocation.getCurrentPosition(
+
+                    function (position) {
+
+                        setEditAddressLocation(
+                            position.coords.latitude,
+                            position.coords.longitude
+                        );
+
+                        button.disabled = false;
+
+                        button.innerHTML =
+                            '<i class="fa fa-location-arrow"></i> Use My Current Location';
+
+                        alert('Location selected successfully!');
+
+                    },
+
+                    function (error) {
+
+                        console.error('Edit Location Error:', error);
+
+                        button.disabled = false;
+
+                        button.innerHTML =
+                            '<i class="fa fa-location-arrow"></i> Use My Current Location';
+
+                        alert('Unable to get location. Please check browser location permission.');
+
+                    },
+
+                    {
+                        enableHighAccuracy: false,
+                        timeout: 60000,
+                        maximumAge: 0
+                    }
+
+                );
+
+            });
 
 
         /*
@@ -1442,17 +1864,17 @@
                 return;
             }
 
-                            /*
-                             * Delete is handled by Laravel.
-                             * The button should be inside:
-                             *
-                             * <form method="POST">
-                             *     @csrf
-                             *     @method('DELETE')
-                             * </form >
-                             *
-                             * Submit that form.
-                             */
+                                                                            /*
+                                                                             * Delete is handled by Laravel.
+                                                                             * The button should be inside:
+                                                                             *
+                                                                             * <form method="POST">
+                                                                             *     @csrf
+                                                                             *     @method('DELETE')
+                                                                             * </form >
+                                                                             *
+                                                                             * Submit that form.
+                                                                             */
 
             const form = button.closest('form');
 

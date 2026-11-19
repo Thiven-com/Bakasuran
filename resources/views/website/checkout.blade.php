@@ -6,8 +6,8 @@
 
     <style>
         /* =========================================================
-                           SUDHEERA SAREES - STATIC CHECKOUT PAGE
-                        ========================================================= */
+                               SUDHEERA SAREES - STATIC CHECKOUT PAGE
+                            ========================================================= */
 
         .sudheera-checkout {
             background: #fbf8f3;
@@ -542,47 +542,47 @@
         }
 
         /* Checkout restaurant name */
-.checkout-restaurant-name {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: #de0000;
-    margin-top: 5px;
-    margin-bottom: 8px;
-    line-height: 1.5;
-}
+        .checkout-restaurant-name {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #de0000;
+            margin-top: 5px;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
 
-/* Optional restaurant icon */
-.checkout-restaurant-name::before {
-    /* content: "📍"; */
-     content: "🏪";
-    margin-right: 5px;
-    font-size: 11px;
-}
+        /* Optional restaurant icon */
+        .checkout-restaurant-name::before {
+            /* content: "📍"; */
+            content: "🏪";
+            margin-right: 5px;
+            font-size: 11px;
+        }
 
-.add-address-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid #98702e;
-    border-radius: 8px;
-    color: #98702e;
-    background: transparent;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
+        .add-address-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px solid #98702e;
+            border-radius: 8px;
+            color: #98702e;
+            background: transparent;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
 
-.add-address-btn:hover {
-    background: #98702e;
-    color: #fff;
-}
+        .add-address-btn:hover {
+            background: #98702e;
+            color: #fff;
+        }
 
-.add-address-btn span {
-    font-size: 20px;
-    line-height: 1;
-}
+        .add-address-btn span {
+            font-size: 20px;
+            line-height: 1;
+        }
     </style>
 
 
@@ -620,21 +620,21 @@
 
         <!-- ================= HEADER ================= -->
 
-       <div class="checkout-header">
+        <div class="checkout-header">
 
-    <small>
-        BAKASURAN FOOD
-    </small>
+            <small>
+                BAKASURAN FOOD
+            </small>
 
-    <h1>
-        Checkout
-    </h1>
+            <h1>
+                Checkout
+            </h1>
 
-    <p>
-        You're just a few steps away from enjoying your favourite food.
-    </p>
+            <p>
+                You're just a few steps away from enjoying your favourite food.
+            </p>
 
-</div>
+        </div>
 
 
         <!-- ================= MAIN ================= -->
@@ -642,192 +642,164 @@
         <div class="checkout-container">
 
             <div class="checkout-grid">
-                <form
-        id="checkoutForm"
-        action="{{ route('customer.order.store') }}"
-        method="POST"
-        class="checkout-left"
-    >
-        @csrf
+                <form id="checkoutForm" action="{{ route('customer.order.store') }}" method="POST" class="checkout-left">
+                    @csrf
 
-        <input
-    type="hidden"
-    name="mode"
-    value="{{ $mode ?? '' }}"
->   
+                    <input type="hidden" name="mode" value="{{ $mode ?? '' }}">
 
 
                     <!-- =================================================
-                                         LEFT
-                                    ================================================== -->
+                                             LEFT
+                                        ================================================== -->
 
 
 
-                        <!-- ================= CONTACT ================= -->
+                    <!-- ================= CONTACT ================= -->
 
-                        <div class="checkout-card">
+                    <div class="checkout-card">
 
-                            <div class="checkout-card-title">
+                        <div class="checkout-card-title">
 
-                                <div class="checkout-step">
-                                    01
-                                </div>
-
-                                <h2>
-                                    Contact Information
-                                </h2>
-
+                            <div class="checkout-step">
+                                01
                             </div>
 
-
-
-                            @php
-                                $customer = auth('customer')->user();
-                            @endphp
-
-                            <div class="checkout-field">
-                                <label>Email Address</label>
-                                <input type="email" name="contact_email"
-                                    value="{{ old('contact_email', $customer->email ?? '') }}"
-                                    placeholder="Enter your email address">
-                            </div>
-
-                            <div class="checkout-field">
-                                <label>Mobile Number</label>
-                                <input type="text" name="contact_mobile"
-                                    value="{{ old('contact_mobile', $customer->mobile ?? '') }}"
-                                    placeholder="Enter your mobile number">
-                            </div>
-
+                            <h2>
+                                Contact Information
+                            </h2>
 
                         </div>
 
 
-                        <!-- ================= DELIVERY ================= -->
+
+                        @php
+                            $customer = auth('customer')->user();
+                        @endphp
+
+                        <div class="checkout-field">
+                            <label>Email Address</label>
+                            <input type="email" name="contact_email"
+                                value="{{ old('contact_email', $customer->email ?? '') }}"
+                                placeholder="Enter your email address">
+                        </div>
+
+                        <div class="checkout-field">
+                            <label>Mobile Number</label>
+                            <input type="text" name="contact_mobile"
+                                value="{{ old('contact_mobile', $customer->mobile ?? '') }}"
+                                placeholder="Enter your mobile number">
+                        </div>
 
 
-<div class="checkout-card">
-    <div class="checkout-card-title">
-        <div class="checkout-step">02</div>
-        <h2>Delivery Address</h2>
-    </div>
+                    </div>
 
-    {{-- Add New Address Button --}}
-    <div style="margin-bottom: 16px;">
-        <a href="{{ route('addresses') }}"
-           class="add-address-btn">
-            <span>+</span> Add New Address
-        </a>
-    </div>
 
-    @if($addresses->isNotEmpty())
-        @foreach($addresses as $address)
-            <label class="address-card" style="margin-bottom: 12px;">
-                <input
-                    type="radio"
-                    name="address_id"
-                    value="{{ $address->id }}"
-                    required
-                    {{ old(
-                        'address_id',
-                        $addresses->firstWhere('default', true)?->id
-                            ?? $addresses->first()?->id
-                    ) == $address->id ? 'checked' : '' }}
-                >
+                    <!-- ================= DELIVERY ================= -->
 
-                <div>
-                    <strong>
-                        {{ $address->name }}
 
-                        @if($address->default)
-                            <span style="color:#98702e;">(Default)</span>
+                    <div class="checkout-card">
+                        <div class="checkout-card-title">
+                            <div class="checkout-step">02</div>
+                            <h2>Delivery Address</h2>
+                        </div>
+
+                        {{-- Add New Address Button --}}
+                        <div style="margin-bottom: 16px;">
+                            <a href="{{ route('addresses') }}" class="add-address-btn">
+                                <span>+</span> Add New Address
+                            </a>
+                        </div>
+
+                        @if($addresses->isNotEmpty())
+                            @foreach($addresses as $address)
+                                            <label class="address-card" style="margin-bottom: 12px;">
+                                                <input type="radio" name="address_id" value="{{ $address->id }}" required {{ old(
+                                    'address_id',
+                                    $addresses->firstWhere('default', true)?->id
+                                    ?? $addresses->first()?->id
+                                ) == $address->id ? 'checked' : '' }}>
+
+                                                <div>
+                                                    <strong>
+                                                        {{ $address->name }}
+
+                                                        @if($address->default)
+                                                            <span style="color:#98702e;">(Default)</span>
+                                                        @endif
+                                                    </strong>
+
+                                                    <p>
+                                                        {{ $address->address }}
+
+                                                        @if($address->address_2)
+                                                            , {{ $address->address_2 }}
+                                                        @endif
+
+                                                        <br>
+                                                        {{ $address->city }}, {{ $address->state }}
+                                                        - {{ $address->pincode }}
+
+                                                        <br>
+                                                        Mobile: {{ $address->mobile }}
+
+                                                        @if($address->email)
+                                                            <br>Email: {{ $address->email }}
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </label>
+                            @endforeach
+                        @else
+                            <p>
+                                No saved delivery address found. Please add a delivery
+                                address to your account before placing your food order.
+                            </p>
                         @endif
-                    </strong>
-
-                    <p>
-                        {{ $address->address }}
-
-                        @if($address->address_2)
-                            , {{ $address->address_2 }}
-                        @endif
-
-                        <br>
-                        {{ $address->city }}, {{ $address->state }}
-                        - {{ $address->pincode }}
-
-                        <br>
-                        Mobile: {{ $address->mobile }}
-
-                        @if($address->email)
-                            <br>Email: {{ $address->email }}
-                        @endif
-                    </p>
-                </div>
-            </label>
-        @endforeach
-    @else
-        <p>
-            No saved delivery address found. Please add a delivery
-            address to your account before placing your food order.
-        </p>
-    @endif
-</div>
+                    </div>
 
 
 
-                        
-<!-- ================= PAYMENT ================= -->
 
-<div class="checkout-card">
+                    <!-- ================= PAYMENT ================= -->
 
-    <div class="checkout-card-title">
-        <div class="checkout-step">03</div>
-        <h2>Payment Method</h2>
-    </div>
+                    <div class="checkout-card">
 
-    <label class="payment-card">
-        <input
-            type="radio"
-            name="payment_method"
-            value="online_payment"
-            required
-            {{ old('payment_method', 'online_payment') === 'online_payment' ? 'checked' : '' }}
-        >
+                        <div class="checkout-card-title">
+                            <div class="checkout-step">03</div>
+                            <h2>Payment Method</h2>
+                        </div>
 
-        <div class="payment-info">
-            <strong>Online Payment</strong>
-            <span>UPI, Credit Card, Debit Card &amp; Net Banking</span>
-        </div>
+                        <label class="payment-card">
+                            <input type="radio" name="payment_method" value="online_payment" required {{ old('payment_method', 'online_payment') === 'online_payment' ? 'checked' : '' }}>
 
-        <div class="payment-icon">₹</div>
-    </label>
+                            <div class="payment-info">
+                                <strong>Online Payment</strong>
+                                <span>UPI, Credit Card, Debit Card &amp; Net Banking</span>
+                            </div>
 
-    <label class="payment-card">
-        <input
-            type="radio"
-            name="payment_method"
-            value="cod"
-            required
-            {{ old('payment_method') === 'cod' ? 'checked' : '' }}
-        >
+                            <div class="payment-icon">₹</div>
+                        </label>
 
-        <div class="payment-info">
-            <strong>Cash on Delivery</strong>
-            <span>Pay securely when your order arrives</span>
-        </div>
+                        <label class="payment-card">
+                            <input type="radio" name="payment_method" value="cod" required {{ old('payment_method') === 'cod' ? 'checked' : '' }}>
 
-        <div class="payment-icon">✓</div>
-    </label>
+                            <div class="payment-info">
+                                <strong>Cash on Delivery</strong>
+                                <span>Pay securely when your order arrives</span>
+                            </div>
 
-</div>
+                            <div class="payment-icon">✓</div>
+                        </label>
+
+                    </div>
 
 
 
                 </form>
 
                 <!-- =================================================
-                                         RIGHT - ORDER SUMMARY
-                                    ================================================== -->
+                                             RIGHT - ORDER SUMMARY
+                                        ================================================== -->
 
                 <div class="checkout-right">
 
@@ -881,9 +853,9 @@
                                         <h4>{{ $productTitle }}</h4>
 
                                         @if($product?->restaurant)
-                                         <span class="checkout-restaurant-name" style="color: red;">
-                                         {{ $product->restaurant->name }}
-                                             </span>
+                                            <span class="checkout-restaurant-name" style="color: red;">
+                                                {{ $product->restaurant->name }}
+                                            </span>
                                         @endif
 
                                         @if($variant?->attributeValues)
@@ -906,16 +878,368 @@
                         </div>
 
 
-                        <!-- COUPON -->
+
+                        <!-- ================= COUPON SECTION ================= -->
+
                         <div class="coupon">
+
+                            <div class="coupon-heading">
+                                <div>
+                                    <h4>Special Offers</h4>
+                                    <p>Save more on your order with exclusive coupons.</p>
+                                </div>
+                                <span class="coupon-tag">OFFERS</span>
+                            </div>
+
+                            {{-- AVAILABLE COUPONS --}}
+                            @php
+                                $availableCoupons = isset($coupons)
+                                    ? $coupons->filter(function ($coupon) use ($subtotal) {
+                                        return $subtotal >= ($coupon->minimum_purchase ?? 0);
+                                    })
+                                    : collect();
+                            @endphp
+
+                            @if($availableCoupons->isNotEmpty())
+
+                                <div class="available-coupons">
+
+                                    @foreach($availableCoupons as $coupon)
+
+                                                <div class="available-coupon-card
+                                        {{ strtoupper($coupon->code) == strtoupper($couponCode ?? '') ? 'coupon-applied' : '' }}">
+
+                                                    <div class="coupon-left">
+
+                                                        <div class="coupon-icon">
+                                                            %
+                                                        </div>
+
+                                                        <div class="coupon-details">
+
+                                                            <div class="coupon-code">
+                                                                {{ strtoupper($coupon->code) }}
+
+                                                                @if(strtoupper($coupon->code) == strtoupper($couponCode ?? ''))
+                                                                    <span class="applied-label">APPLIED</span>
+                                                                @endif
+                                                            </div>
+
+                                                            <div class="coupon-discount">
+                                                                @if($coupon->type == 'percentage')
+                                                                    {{ $coupon->discount }}% OFF
+                                                                @else
+                                                                    FLAT ₹{{ number_format($coupon->discount, 0) }} OFF
+                                                                @endif
+                                                            </div>
+
+                                                            <p>
+                                                                {{ $coupon->description ?? $coupon->name }}
+                                                            </p>
+
+                                                            @if($coupon->minimum_purchase)
+                                                                <small>
+                                                                    On orders above ₹{{ number_format($coupon->minimum_purchase, 2) }}
+                                                                </small>
+                                                            @endif
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    @if(strtoupper($coupon->code) == strtoupper($couponCode ?? ''))
+
+                                                        <button type="button" class="coupon-applied-btn" disabled>
+                                                            APPLIED
+                                                        </button>
+
+                                                    @else
+
+                                                        <button type="button" class="coupon-apply-btn"
+                                                            onclick="applyCoupon(@js($coupon->code))">
+                                                            APPLY
+                                                        </button>
+
+                                                    @endif
+
+                                                </div>
+
+                                    @endforeach
+
+                                </div>
+
+                            @else
+
+                                <div class="no-coupon-message">
+                                    <span>🎁</span>
+                                    <div>
+                                        <strong>No offers available</strong>
+                                        <p>Check back later for exciting discounts.</p>
+                                    </div>
+                                </div>
+
+                            @endif
+
+                            {{-- COUPON INPUT --}}
                             <form action="{{ route('checkout') }}" method="GET" class="coupon-box">
+
                                 <input type="hidden" name="order_type" value="{{ $orderType }}">
 
-                                <input type="text" name="code" value="{{ $couponCode }}" placeholder="Discount code">
+                                <input type="text" name="code" id="couponCode" value="{{ $couponCode ?? '' }}"
+                                    placeholder="Enter coupon code">
 
                                 <button type="submit">APPLY</button>
+
                             </form>
+
                         </div>
+
+                        <style>
+                            /* ================= COUPON SECTION ================= */
+
+                            .coupon {
+                                padding: 20px 25px;
+                            }
+
+                            .coupon-heading {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 16px;
+                            }
+
+                            .coupon-heading h4 {
+                                color: #3b0713;
+                                font-family: Georgia, serif;
+                                font-size: 19px;
+                                margin: 0 0 5px;
+                            }
+
+                            .coupon-heading p {
+                                color: #999;
+                                font-size: 11px;
+                                margin: 0;
+                            }
+
+                            .coupon-tag {
+                                background: #f7f0e8;
+                                color: #98702e;
+                                font-size: 9px;
+                                font-weight: 700;
+                                letter-spacing: 1px;
+                                padding: 7px 10px;
+                                border-radius: 20px;
+                            }
+
+                            /* COUPON CARD */
+
+                            .available-coupons {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 11px;
+                                margin-bottom: 17px;
+                            }
+
+                            .available-coupon-card {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 13px;
+                                border: 1px dashed #d8c4a3;
+                                border-radius: 9px;
+                                background: #fffdfa;
+                                transition: .25s;
+                            }
+
+                            .available-coupon-card:hover {
+                                border-color: #98702e;
+                                background: #fffaf1;
+                            }
+
+                            .available-coupon-card.coupon-applied {
+                                border: 1px solid #98702e;
+                                background: #faf5eb;
+                            }
+
+                            .coupon-left {
+                                display: flex;
+                                align-items: center;
+                                gap: 11px;
+                                min-width: 0;
+                            }
+
+                            .coupon-icon {
+                                width: 38px;
+                                height: 38px;
+                                min-width: 38px;
+                                background: #f4e9d7;
+                                color: #98702e;
+                                border-radius: 8px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                font-size: 21px;
+                                font-weight: 700;
+                            }
+
+                            .coupon-details {
+                                min-width: 0;
+                            }
+
+                            .coupon-code {
+                                color: #4b0717;
+                                font-size: 12px;
+                                font-weight: 700;
+                                display: flex;
+                                align-items: center;
+                                flex-wrap: wrap;
+                                gap: 6px;
+                            }
+
+                            .coupon-discount {
+                                color: #98702e;
+                                font-size: 12px;
+                                font-weight: 700;
+                                margin-top: 4px;
+                            }
+
+                            .coupon-details p {
+                                color: #888;
+                                font-size: 10px;
+                                margin: 4px 0;
+                                line-height: 1.5;
+                            }
+
+                            .coupon-details small {
+                                color: #999;
+                                font-size: 10px;
+                            }
+
+                            .applied-label {
+                                background: #e9f3e9;
+                                color: #34733c;
+                                font-size: 8px;
+                                padding: 3px 6px;
+                                border-radius: 4px;
+                            }
+
+                            .coupon-apply-btn,
+                            .coupon-applied-btn {
+                                border: 0;
+                                border-radius: 5px;
+                                padding: 9px 12px;
+                                font-size: 10px;
+                                font-weight: 700;
+                                cursor: pointer;
+                                flex-shrink: 0;
+                            }
+
+                            .coupon-apply-btn {
+                                color: #fff;
+                                background: #4b0717;
+                            }
+
+                            .coupon-apply-btn:hover {
+                                background: #98702e;
+                            }
+
+                            .coupon-applied-btn {
+                                color: #34733c;
+                                background: #e9f3e9;
+                                cursor: default;
+                            }
+
+                            /* NO COUPON */
+
+                            .no-coupon-message {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                padding: 15px;
+                                margin-bottom: 15px;
+                                background: #faf7f2;
+                                border: 1px solid #eee4d8;
+                                border-radius: 8px;
+                            }
+
+                            .no-coupon-message>span {
+                                font-size: 23px;
+                            }
+
+                            .no-coupon-message strong {
+                                color: #4b0717;
+                                font-size: 12px;
+                            }
+
+                            .no-coupon-message p {
+                                color: #999;
+                                font-size: 10px;
+                                margin: 4px 0 0;
+                            }
+
+                            /* COUPON INPUT */
+
+                            .coupon-box {
+                                display: flex;
+                                gap: 8px;
+                                padding-top: 14px;
+                                border-top: 1px solid #eee4d8;
+                            }
+
+                            .coupon-box input {
+                                flex: 1;
+                                min-width: 0;
+                                border: 1px solid #ddd2c4;
+                                padding: 12px;
+                                border-radius: 6px;
+                                outline: none;
+                                font-size: 12px;
+                            }
+
+                            .coupon-box input:focus {
+                                border-color: #98702e;
+                            }
+
+                            .coupon-box button {
+                                border: 0;
+                                background: #4b0717;
+                                color: #fff;
+                                border-radius: 6px;
+                                padding: 0 17px;
+                                font-size: 11px;
+                                font-weight: 700;
+                                cursor: pointer;
+                            }
+
+                            .coupon-box button:hover {
+                                background: #98702e;
+                            }
+
+                            /* MOBILE */
+
+                            @media (max-width: 600px) {
+
+                                .coupon {
+                                    padding: 17px;
+                                }
+
+                                .coupon-heading h4 {
+                                    font-size: 17px;
+                                }
+
+                                .available-coupon-card {
+                                    padding: 11px 9px;
+                                }
+
+                                .coupon-apply-btn,
+                                .coupon-applied-btn {
+                                    padding: 8px 9px;
+                                    font-size: 9px;
+                                }
+
+                            }
+                        </style>
 
                         <!-- TOTAL -->
                         <div class="summary-total">
@@ -941,14 +1265,9 @@
                                 <strong>₹{{ number_format($total, 2) }}</strong>
                             </div>
 
-                            <button
-    type="submit"
-    form="checkoutForm"
-    class="place-order"
-    {{ $addresses->isEmpty() || $cartItems->isEmpty() ? 'disabled' : '' }}
->
-    PLACE ORDER
-</button>
+                            <button type="submit" form="checkoutForm" class="place-order" {{ $addresses->isEmpty() || $cartItems->isEmpty() ? 'disabled' : '' }}>
+                                PLACE ORDER
+                            </button>
 
                             <div class="secure-text">
                                 🔒 Secure &amp; encrypted checkout
@@ -960,33 +1279,33 @@
 
                     <!-- TRUST -->
 
-                   <div class="trust-box">
+                    <div class="trust-box">
 
-    <div class="trust-item">
+                        <div class="trust-item">
 
-        <strong>✓</strong>
+                            <strong>✓</strong>
 
-        Secure Payment
+                            Secure Payment
 
-    </div>
+                        </div>
 
-    <div class="trust-item">
+                        <div class="trust-item">
 
-        <strong>◆</strong>
+                            <strong>◆</strong>
 
-        Freshly Prepared Food
+                            Freshly Prepared Food
 
-    </div>
+                        </div>
 
-    <div class="trust-item">
+                        <div class="trust-item">
 
-        <strong>↻</strong>
+                            <strong>↻</strong>
 
-        Easy Order Tracking
+                            Easy Order Tracking
 
-    </div>
+                        </div>
 
-</div>
+                    </div>
 
                 </div>
 
@@ -996,5 +1315,20 @@
         </div>
 
     </div>
+    <script>
+
+
+        function applyCoupon(code) {
+
+            const couponInput = document.getElementById('couponCode');
+
+            couponInput.value = code;
+
+            document.querySelector('.coupon-box').submit();
+
+        }
+
+
+    </script>
 
 @endsection

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\DeliveryPartner;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\SiteSetting;
@@ -367,6 +368,7 @@ class AuthController extends Controller
             'month_values' => $chartValues,
             'peak_day' => max($chartValues ?: [0]),
         ];
+        $counts['delivery_partners'] = DeliveryPartner::count();
 
         return view('admin.auth.dashboard', compact(
             'site',

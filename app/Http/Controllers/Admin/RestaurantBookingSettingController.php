@@ -179,7 +179,7 @@ class RestaurantBookingSettingController extends Controller
 ]);
 
 return redirect()
-    ->route('admin.booking-settings.edit', $bookingSetting->id)
+    ->route('admin.booking-settings.index', $bookingSetting->id)
     ->with('success', 'Booking settings created successfully.');
     }
 
@@ -278,7 +278,7 @@ return redirect()
         ]);
 
        return redirect()
-    ->route('admin.booking-settings.edit', $booking_setting->id)
+    ->route('admin.booking-settings.index', $booking_setting->id)
     ->with('success', 'Booking settings updated successfully.');
     }
 

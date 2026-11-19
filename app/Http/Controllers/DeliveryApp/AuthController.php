@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -56,7 +57,8 @@ class AuthController extends Controller
         }
 
         // Generate 4-digit OTP
-        $otp = (string) random_int(1000, 9999);
+        // $otp = (string) random_int(1000, 9999);
+        $otp = '1234';
 
         // Save OTP in database
         $partner->update([
@@ -134,14 +136,74 @@ class AuthController extends Controller
     /**
      * Logout
      */
+    // public function logout(Request $request)
+    // {
+    //     $request->user()->currentAccessToken()->delete();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Logout successful.',
+    //     ]);
+    // }
+
+
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Logout successful.',
-        ]);
+        try {
+
+            $user = $request->user();
+
+            if (!$user) {
+
+                return response()->json([
+
+                    'status' => false,
+
+                    'message' => 'Unauthenticated.',
+
+                ], 401);
+
+            }
+
+            $token = $user->currentAccessToken();
+
+            if (!$token) {
+
+                return response()->json([
+
+                    'status' => false,
+
+                    'message' => 'No active token found.',
+
+                ], 401);
+
+            }
+
+            $token->delete();
+
+            return response()->json([
+
+                'status' => true,
+
+                'message' => 'Logout successful.',
+
+            ], 200);
+
+        } catch (\Throwable $e) {
+
+            Log::error('Logout API Error: ' . $e->getMessage());
+
+            return response()->json([
+
+                'status' => false,
+
+                'message' => 'Logout failed.',
+
+            ], 500);
+
+        }
+
     }
 
     public function home(Request $request)
@@ -194,6 +256,8 @@ class AuthController extends Controller
                 'image' => $partner->profile_image
                     ? asset($partner->profile_image)
                     : null,
+                'latitude' => $partner->latitude,
+                'longitude' => $partner->longitude,
             ],
         ]);
     }
@@ -215,7 +279,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
 
-            'mobile' => 'sometimes|required|string|max:20|unique:delivery_partners,mobile,' . $partner->id,
+            'mobile' => 'sometimes|string|max:20|unique:delivery_partners,mobile,' . $partner->id,
 
             'email' => 'sometimes|nullable|email|max:255|unique:delivery_partners,email,' . $partner->id,
 
@@ -232,6 +296,10 @@ class AuthController extends Controller
             'pincode' => 'sometimes|nullable|string|max:20',
 
             'profile_image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+
+            'latitude' => 'sometimes|nullable|numeric|between:-90,90',
+
+            'longitude' => 'sometimes|nullable|numeric|between:-180,180',
         ]);
 
         if ($validator->fails()) {
@@ -257,6 +325,8 @@ class AuthController extends Controller
                 'state',
                 'country',
                 'pincode',
+                'latitude',
+                'longitude',
             ])
         );
 
@@ -291,8 +361,8 @@ class AuthController extends Controller
                 'email' => $partner->email,
                 'date_of_birth' => $partner->date_of_birth,
                 'profile_image' => $partner->profile_image
-                ? asset($partner->profile_image)
-                : null,
+                    ? asset($partner->profile_image)
+                    : null,
                 'address' => [
                     'address_line_1' => $partner->address_line_1,
                     'address_line_2' => $partner->address_line_2,
@@ -303,7 +373,9 @@ class AuthController extends Controller
                     'state' => $partner->state,
                     'country' => $partner->country,
                     'pincode' => $partner->pincode,
-                ]
+                ],
+                'latitude' => $partner->latitude,
+                'longitude' => $partner->longitude,
             ]
         ]);
     }

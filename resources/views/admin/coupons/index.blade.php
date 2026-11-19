@@ -20,6 +20,66 @@
             <div class="card">
 
                 <div class="card-body p-0">
+                    <div class="card-body border-bottom">
+                        <form action="{{ route('admin.coupons.index') }}" method="GET">
+                            <div class="row">
+
+                                {{-- Coupon Name --}}
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Coupon Name</label>
+                                    <input type="text" name="search" class="form-control" placeholder="Search coupon name"
+                                        value="{{ request('search') }}">
+                                </div>
+
+                                {{-- Coupon Code --}}
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Coupon Code</label>
+                                    <input type="text" name="code" class="form-control" placeholder="Search coupon code"
+                                        value="{{ request('code') }}">
+                                </div>
+
+                                {{-- Coupon Type --}}
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">Type</label>
+                                    <select name="type" class="form-select">
+                                        <option value="">All Types</option>
+                                        <option value="percentage" {{ request('type') == 'percentage' ? 'selected' : '' }}>
+                                            Percentage
+                                        </option>
+                                        <option value="fixed" {{ request('type') == 'fixed' ? 'selected' : '' }}>
+                                            Fixed
+                                        </option>
+                                    </select>
+                                </div>
+
+                                {{-- Status --}}
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-select">
+                                        <option value="">All Status</option>
+                                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                                            Active
+                                        </option>
+                                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                                            Inactive
+                                        </option>
+                                    </select>
+                                </div>
+
+                                {{-- Buttons --}}
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="ti ti-search me-1"></i> Filter
+                                    </button>
+
+                                    <a href="{{ route('admin.coupons.index') }}" class="btn btn-secondary">
+                                        Reset
+                                    </a>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                     <div class="table-responsive">
                         <table class="table">
                             <thead class="thead-light">
@@ -73,7 +133,8 @@
                                                 </a>
                                             </div> --}}
                                             <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="POST"
-                                                onsubmit="return confirm('Are you sure to Delete Coupon?')" style="display:inline;">
+                                                onsubmit="return confirm('Are you sure to Delete Coupon?')"
+                                                style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="p-2 border-0 bg-transparent">

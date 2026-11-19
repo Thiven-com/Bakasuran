@@ -98,23 +98,48 @@ class HomeOfferController extends Controller
     {
         $homeOffer = HomeOffer::findOrFail($id);
 
-        $homeOffer->title = $request->title;
-        $homeOffer->offer = $request->offer;
+        $validation = [
+            'title' => 'required|max:255',
+            'product_ids' => 'required|array',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'offer' => 'nullable',
+        ];
 
+        $validator = Validator::make($request->all(), $validation);
+
+        if ($validator->fails()) {
+            Alert::toast($validator->errors()->first(), 'error');
+            return back()->withInput();
+        }
+
+        // Remove old image if requested
+        if ($request->remove_image == 1 && $homeOffer->image) {
+            Storage::delete($homeOffer->image);
+            $homeOffer->image = null;
+        }
+
+        // Upload new image
         if ($request->hasFile('image')) {
+
             if ($homeOffer->image) {
                 Storage::delete($homeOffer->image);
             }
 
             $path = $request->file('image')->store('homeoffer');
+
             $homeOffer->image = $path;
         }
-        $homeOffer->product_ids = json_encode($request->product_ids) ?? [];
+
+        $homeOffer->title = $request->title;
+        $homeOffer->slug = $this->slugGenerate($request->title, $id);
+        $homeOffer->offer = $request->offer;
+        $homeOffer->product_ids = json_encode($request->product_ids);
+
         $homeOffer->save();
 
-        // Sync products
+        Alert::toast('Home Offer Updated successfully', 'success');
 
-        return redirect()->route('admin.homeoffers.index')->with('success', 'Updated successfully');
+        return redirect()->route('admin.homeoffers.index');
     }
 
     /**

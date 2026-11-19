@@ -10,15 +10,40 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class AddonGroupController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        $groups = AddonGroup::withCount('options')
+        $query = AddonGroup::withCount('options');
+
+        // Search by group name
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by selection type
+        if ($request->filled('selection_type')) {
+            $query->where('selection_type', $request->selection_type);
+        }
+
+        // Filter by required
+        if ($request->has('is_required') && $request->is_required !== '') {
+            $query->where('is_required', $request->is_required);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Apply filters and retrieve records
+        $groups = $query
             ->orderBy('sort_order')
             ->latest()
             ->get();
 
         return view('admin.catalog.addons.groups.index', compact('groups'));
     }
+
 
     public function create()
     {

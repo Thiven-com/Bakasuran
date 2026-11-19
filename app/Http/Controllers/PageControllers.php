@@ -14,6 +14,7 @@ use App\Models\BlogCategory;
 use App\Models\CartItem;
 use App\Models\Coupon;
 use App\Models\FreightCharge;
+use App\Models\HomeOffer;
 use App\Models\ShippingZone;
 use Illuminate\Support\Facades\Auth;
 use App\Models\WishlistItem;
@@ -84,6 +85,16 @@ class PageControllers extends Controller
         }
 
         /*
+   |--------------------------------------------------------------------------
+   | Home Offers
+   |--------------------------------------------------------------------------
+   */
+
+        $homeOffers = HomeOffer::orderBy('id', 'asc')
+            ->take(4)
+            ->get();
+
+        /*
        /*
     |--------------------------------------------------------------------------
     | Approved Testimonials
@@ -109,7 +120,8 @@ class PageControllers extends Controller
             'products',
             'wishlistVariantIds',
             'testimonials',
-            'testimonialCarousel'
+            'testimonialCarousel',
+            'homeOffers'
         ));
     }
 
@@ -234,7 +246,7 @@ class PageControllers extends Controller
         |--------------------------------------------------------------------------
         */
 
-       switch ($request->input('sort')) {
+        switch ($request->input('sort')) {
 
             case 'best-selling':
 
@@ -875,11 +887,11 @@ class PageControllers extends Controller
 
         // Customer can select Razorpay only
         foreach ($bookingOrders as $bookingOrder) {
-    RestaurantFoodOrder::where('id', $bookingOrder->id)
-        ->update([
-            'payment_method' => 'razorpay',
-        ]);
-}
+            RestaurantFoodOrder::where('id', $bookingOrder->id)
+                ->update([
+                    'payment_method' => 'razorpay',
+                ]);
+        }
 
         return redirect()->route(
             'customer.dine-in-payment',
@@ -1207,6 +1219,15 @@ class PageControllers extends Controller
             }
         }
 
+        // Fetch available coupons
+        $coupons = Coupon::where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('expiry_date')
+                    ->orWhereDate('expiry_date', '>=', now()->toDateString());
+            })
+            ->orderBy('discount', 'desc')
+            ->get();
+
         /*
         |--------------------------------------------------------------------------
         | 6. TOTAL
@@ -1225,7 +1246,8 @@ class PageControllers extends Controller
             'couponCode',
             'orderType',
             'mode',
-            'isBuyNow'
+            'isBuyNow',
+            'coupons'
         ));
     }
 

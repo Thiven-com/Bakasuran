@@ -11,11 +11,32 @@ class CouponController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $data = Coupon::query();
-        $data = $data->latest()->paginate(20);
+        $query = Coupon::query();
+
+        // Search by coupon name
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Search by coupon code
+        if ($request->filled('code')) {
+            $query->where('code', 'like', '%' . $request->code . '%');
+        }
+
+        // Filter by coupon type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $data = $query->latest()->paginate(20)->withQueryString();
+
         return view('admin.coupons.index', compact('data'));
     }
 

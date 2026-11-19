@@ -12,19 +12,54 @@ use RealRashid\SweetAlert\Facades\Alert;
 class AddonOptionController extends Controller
 {
     // Display all add-on options
-    public function index()
+
+
+    public function index(Request $request)
     {
-        $options = AddonOption::with('group')
-            ->withCount('group')
-            ->orderBy('sort_order')
-            ->latest()
+        $query = AddonOption::with('group');
+
+        // Search by option name
+        if ($request->filled('search')) {
+            $query->where('name', 'LIKE', '%' . $request->search . '%');
+        }
+
+        // Filter by add-on group
+        if ($request->filled('group_id')) {
+            $query->where('addon_group_id', $request->group_id);
+        }
+
+        // Filter by track stock (0 or 1)
+        if (
+            $request->input('track_stock') !== null &&
+            $request->input('track_stock') !== ''
+        ) {
+            $query->where('track_stock', $request->input('track_stock'));
+        }
+
+        // Filter by availability (0 or 1)
+        if (
+            $request->input('is_available') !== null &&
+            $request->input('is_available') !== ''
+        ) {
+            $query->where('is_available', $request->input('is_available'));
+        }
+
+        // Fetch filtered records
+        $options = $query
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
+
+        // Dropdown groups
+        $groups = AddonGroup::orderBy('name')->get();
 
         return view(
             'admin.catalog.addons.options.index',
-            compact('options')
+            compact('options', 'groups')
         );
     }
+
+
 
     // Show create form
     public function create()

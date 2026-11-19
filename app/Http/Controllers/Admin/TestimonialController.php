@@ -10,9 +10,33 @@ use Illuminate\Support\Facades\File;
 class TestimonialController extends Controller
 {
     // Display all testimonials
-    public function index()
+    public function index(Request $request)
     {
-        $testimonials = Testimonial::latest()->get();
+        $query = Testimonial::query();
+
+        // Search by customer name
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by city
+        if ($request->filled('city')) {
+            $query->where('city', 'like', '%' . $request->city . '%');
+        }
+
+        // Filter by rating
+        if ($request->filled('rating')) {
+            $query->where('rating', $request->rating);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $testimonials = $query->latest()
+            ->paginate(20)
+            ->withQueryString();
 
         return view(
             'admin.testimonials.index',
@@ -146,11 +170,11 @@ class TestimonialController extends Controller
     }
 
     public function publicTestimonials()
-{
-    $testimonials = \App\Models\Testimonial::where('status', 'approved')
-        ->latest()
-        ->get();
+    {
+        $testimonials = \App\Models\Testimonial::where('status', 'approved')
+            ->latest()
+            ->get();
 
-    return view('website.testimonials', compact('testimonials'));
-}
+        return view('website.testimonials', compact('testimonials'));
+    }
 }

@@ -1711,10 +1711,10 @@
         }
 
         /* =========================================================
-               PREMIUM UI REFINEMENT
-               Visual-only overrides. Existing Blade, routes and JS remain
-               unchanged.
-            ========================================================= */
+                       PREMIUM UI REFINEMENT
+                       Visual-only overrides. Existing Blade, routes and JS remain
+                       unchanged.
+                    ========================================================= */
         .rd-page {
             --rd-accent: #d7192d;
             --rd-accent-dark: #b91427;
@@ -3164,7 +3164,8 @@
 
                                 <div class="rd-dish-actions">
                                     <button type="button" class="rd-fav" aria-label="Favourite dish">♡</button>
-                                    <button type="button" class="rd-add" {{ !$itemAvailable || ($variants->isNotEmpty() && $activeVariants->isEmpty()) ? 'disabled' : '' }}>
+                                    <button type="button" class="rd-add" {{ !$itemAvailable || ($variants->isNotEmpty() && $activeVariants->isEmpty()) ? 'disabled' : '' }}
+                                        onclick="{{ Auth::guard('customer')->check() ? '' : "alert('Please login to continue.')" }}">
                                         {{ !$itemAvailable || ($variants->isNotEmpty() && $activeVariants->isEmpty()) ? 'Unavailable' : 'Add' }}
                                     </button>
                                     <div class="rd-qty">
@@ -3387,7 +3388,7 @@
 
                 </div>
 
-                <button type="button" class="rd-coupon" id="rd-coupon-toggle">
+                {{-- <button type="button" class="rd-coupon" id="rd-coupon-toggle">
 
                     <span class="rd-coupon-icon">%</span>
 
@@ -3403,7 +3404,7 @@
 
                     <button type="button" id="rd-apply-coupon">Apply</button>
 
-                </div>
+                </div> --}}
 
                 <div class="rd-cart-totals">
 
@@ -3666,7 +3667,7 @@
             const addonConfirmButton = document.getElementById('rd-addon-confirm');
 
             const cartStorageKey = 'bakasuran_cart_restaurant_{{ (int) $restaurant->id }}';
-            
+
             const cartAddUrl = @json(route('cart.add'));
             const cartUpdateUrlTemplate = @json(route('cart.update', ['id' => '__ID__']));
             const cartRemoveUrlTemplate = @json(route('cart.remove', ['id' => '__ID__']));
@@ -4485,12 +4486,12 @@
                 if (!items.length) {
 
                     cartItemsElement.innerHTML = `
-                                        <div class="rd-cart-empty">
-                                            <span>🛒</span>
-                                            Your cart is waiting.<br>
-                                            Add delicious dishes to get started!
-                                        </div>
-                                    `;
+                                                <div class="rd-cart-empty">
+                                                    <span>🛒</span>
+                                                    Your cart is waiting.<br>
+                                                    Add delicious dishes to get started!
+                                                </div>
+                                            `;
 
                 } else {
 

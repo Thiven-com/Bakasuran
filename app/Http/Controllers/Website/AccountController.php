@@ -212,34 +212,34 @@ class AccountController extends Controller
 
 
 
-  public function addToWishlist(Request $request)
-{
-    if (!Auth::guard('customer')->check()) {
+    public function addToWishlist(Request $request)
+    {
+        if (!Auth::guard('customer')->check()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Please login first.'
+            ], 401);
+        }
+
+        $request->validate([
+            'product_variant_id' => 'required|exists:product_variants,id',
+        ]);
+
+        $userId = Auth::guard('customer')->id();
+
+        $wishlistItem = WishlistItem::firstOrCreate([
+            'user_id' => $userId,
+            'product_variant_id' => $request->product_variant_id,
+        ]);
+
         return response()->json([
-            'status' => false,
-            'message' => 'Please login first.'
-        ], 401);
+            'status' => true,
+            'message' => $wishlistItem->wasRecentlyCreated
+                ? 'Product added to wishlist.'
+                : 'Product already added to wishlist.',
+            'wishlist_item_id' => $wishlistItem->id
+        ]);
     }
-
-    $request->validate([
-        'product_variant_id' => 'required|exists:product_variants,id',
-    ]);
-
-    $userId = Auth::guard('customer')->id();
-
-    $wishlistItem = WishlistItem::firstOrCreate([
-        'user_id' => $userId,
-        'product_variant_id' => $request->product_variant_id,
-    ]);
-
-    return response()->json([
-        'status' => true,
-        'message' => $wishlistItem->wasRecentlyCreated
-            ? 'Product added to wishlist.'
-            : 'Product already added to wishlist.',
-        'wishlist_item_id' => $wishlistItem->id
-    ]);
-}
 
 
     public function removeFromWishlist($id)
@@ -288,6 +288,9 @@ class AccountController extends Controller
             'landmark' => 'nullable|string|max:255',
             'address' => 'required|string',
             'address_2' => 'nullable|string',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+
         ]);
 
         $validated['customer_id'] = $customer->id;
@@ -331,6 +334,9 @@ class AccountController extends Controller
             'landmark' => 'nullable|string|max:255',
             'address' => 'required|string',
             'address_2' => 'nullable|string',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+
         ]);
 
         $address->update($validated);
@@ -402,226 +408,222 @@ class AccountController extends Controller
     }
 
 
-   
-public function addToCart(Request $request)
-{
-    if (!Auth::guard('customer')->check()) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Please login first.'
-        ], 401);
-    }
 
-    $validated = $request->validate([
-        'product_variant_id' => 'required|exists:product_variants,id',
-        'quantity' => 'nullable|integer|min:1',
-        'addon_option_ids' => 'nullable|array',
-        'addon_option_ids.*' => 'required|integer|distinct|exists:addon_options,id',
-    ]);
+    public function addToCart(Request $request)
+    {
+        if (!Auth::guard('customer')->check()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Please login first.'
+            ], 401);
+        }
 
-    try {
-        $customerId = Auth::guard('customer')->id();
-        $quantity = $validated['quantity'] ?? 1;
+        $validated = $request->validate([
+            'product_variant_id' => 'required|exists:product_variants,id',
+            'quantity' => 'nullable|integer|min:1',
+            'addon_option_ids' => 'nullable|array',
+            'addon_option_ids.*' => 'required|integer|distinct|exists:addon_options,id',
+        ]);
 
-        $result = DB::transaction(function () use (
-            $validated,
-            $customerId,
-            $quantity
-        ) {
-            $variant = ProductVariant::where(
-                'id',
-                $validated['product_variant_id']
-            )->lockForUpdate()->firstOrFail();
+        try {
+            $customerId = Auth::guard('customer')->id();
+            $quantity = $validated['quantity'] ?? 1;
 
-            $productId = $variant->product_id;
+            $result = DB::transaction(function () use ($validated, $customerId, $quantity) {
+                $variant = ProductVariant::where(
+                    'id',
+                    $validated['product_variant_id']
+                )->lockForUpdate()->firstOrFail();
 
-            // Get add-on groups assigned to this product.
-            $groupIds = DB::table('product_addon_groups')
-                ->where('product_id', $productId)
-                ->pluck('addon_group_id');
+                $productId = $variant->product_id;
 
-            $selectedIds = collect(
-                $validated['addon_option_ids'] ?? []
-            )->unique()->values();
+                // Get add-on groups assigned to this product.
+                $groupIds = DB::table('product_addon_groups')
+                    ->where('product_id', $productId)
+                    ->pluck('addon_group_id');
 
-            // Load selected options and their groups.
-            $selectedAddons = AddonOption::with('group')
-                ->whereIn('id', $selectedIds)
-                ->whereIn('addon_group_id', $groupIds)
-                ->get();
+                $selectedIds = collect(
+                    $validated['addon_option_ids'] ?? []
+                )->unique()->values();
 
-            if ($selectedAddons->count() !== $selectedIds->count()) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'addon_option_ids' => [
-                        'One or more selected add-ons are invalid for this product.'
-                    ]
-                ]);
-            }
+                // Load selected options and their groups.
+                $selectedAddons = AddonOption::with('group')
+                    ->whereIn('id', $selectedIds)
+                    ->whereIn('addon_group_id', $groupIds)
+                    ->get();
 
-            // Check required and maximum selections for each group.
-            $groups = \App\Models\AddonGroup::whereIn('id', $groupIds)
-                ->where('status', 'active')
-                ->get();
-
-            foreach ($groups as $group) {
-                $groupSelected = $selectedAddons->where(
-                    'addon_group_id',
-                    $group->id
-                )->count();
-
-                $minimum = $group->is_required
-                    ? max(1, (int) $group->min_select)
-                    : (int) $group->min_select;
-
-                $maximum = $group->max_select !== null
-                    ? (int) $group->max_select
-                    : null;
-
-                if (
-                    strtolower($group->selection_type) === 'single'
-                    && $maximum === null
-                ) {
-                    $maximum = 1;
-                }
-
-                if ($groupSelected < $minimum) {
+                if ($selectedAddons->count() !== $selectedIds->count()) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
                         'addon_option_ids' => [
-                            "Please select at least {$minimum} option(s) from {$group->name}."
+                            'One or more selected add-ons are invalid for this product.'
                         ]
                     ]);
                 }
 
-                if (
-                    $maximum !== null
-                    && $groupSelected > $maximum
-                ) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'addon_option_ids' => [
-                            "You can select a maximum of {$maximum} option(s) from {$group->name}."
-                        ]
-                    ]);
+                // Check required and maximum selections for each group.
+                $groups = \App\Models\AddonGroup::whereIn('id', $groupIds)
+                    ->where('status', 'active')
+                    ->get();
+
+                foreach ($groups as $group) {
+                    $groupSelected = $selectedAddons->where(
+                        'addon_group_id',
+                        $group->id
+                    )->count();
+
+                    $minimum = $group->is_required
+                        ? max(1, (int) $group->min_select)
+                        : (int) $group->min_select;
+
+                    $maximum = $group->max_select !== null
+                        ? (int) $group->max_select
+                        : null;
+
+                    if (
+                        strtolower($group->selection_type) === 'single'
+                        && $maximum === null
+                    ) {
+                        $maximum = 1;
+                    }
+
+                    if ($groupSelected < $minimum) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'addon_option_ids' => [
+                                "Please select at least {$minimum} option(s) from {$group->name}."
+                            ]
+                        ]);
+                    }
+
+                    if (
+                        $maximum !== null
+                        && $groupSelected > $maximum
+                    ) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'addon_option_ids' => [
+                                "You can select a maximum of {$maximum} option(s) from {$group->name}."
+                            ]
+                        ]);
+                    }
                 }
-            }
 
-            // Check add-on availability and stock.
-            foreach ($selectedAddons as $addon) {
-                if (!$addon->is_available) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'addon_option_ids' => [
-                            $addon->name . ' is currently unavailable.'
-                        ]
-                    ]);
-                }
-
-                if (
-                    $addon->track_stock
-                    && $addon->stock < $quantity
-                ) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'addon_option_ids' => [
-                            'Insufficient stock for ' . $addon->name . '.'
-                        ]
-                    ]);
-                }
-            }
-
-            // Calculate the final per-food-item price.
-            $basePrice = (float) $variant->price;
-
-            $addonTotal = $selectedAddons->sum(function ($addon) {
-                return (float) $addon->price;
-            });
-
-            $finalUnitPrice = $basePrice + $addonTotal;
-
-            // Find an existing cart item with the same variant
-            // and exactly the same add-on selections.
-            $cartItems = CartItem::where('user_id', $customerId)
-                ->where('product_variant_id', $variant->id)
-                ->where('type', 'order')
-                ->with('addons')
-                ->lockForUpdate()
-                ->get();
-
-            $cartItem = $cartItems->first(function ($item) use ($selectedIds) {
-                $existingIds = $item->addons
-                    ->pluck('addon_option_id')
-                    ->filter()
-                    ->map(fn($id) => (int) $id)
-                    ->sort()
-                    ->values();
-
-                $requestedIds = $selectedIds
-                    ->map(fn($id) => (int) $id)
-                    ->sort()
-                    ->values();
-
-                return $existingIds->all() === $requestedIds->all();
-            });
-
-            if ($cartItem) {
-                $cartItem->quantity += $quantity;
-                $cartItem->unit_price = $finalUnitPrice;
-                $cartItem->save();
-
-                $message = 'Product quantity updated in cart.';
-            } else {
-                $cartItem = CartItem::create([
-                    'user_id' => $customerId,
-                    'session_id' => null,
-                    'product_variant_id' => $variant->id,
-                    'quantity' => $quantity,
-                    'unit_price' => $finalUnitPrice,
-                    'type' => 'order',
-                ]);
-
+                // Check add-on availability and stock.
                 foreach ($selectedAddons as $addon) {
-                    CartItemAddon::create([
-                        'cart_item_id' => $cartItem->id,
-                        'addon_option_id' => $addon->id,
-                        'addon_name' => $addon->name,
-                        'unit_price' => $addon->price,
-                        'quantity' => 1,
-                        'subtotal' => $addon->price,
-                    ]);
+                    if (!$addon->is_available) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'addon_option_ids' => [
+                                $addon->name . ' is currently unavailable.'
+                            ]
+                        ]);
+                    }
+
+                    if (
+                        $addon->track_stock
+                        && $addon->stock < $quantity
+                    ) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'addon_option_ids' => [
+                                'Insufficient stock for ' . $addon->name . '.'
+                            ]
+                        ]);
+                    }
                 }
 
-                $message = 'Product added to cart successfully.';
-            }
+                // Calculate the final per-food-item price.
+                $basePrice = (float) $variant->price;
 
-            $cartCount = CartItem::where('user_id', $customerId)
-             ->where('type', 'order')
-                ->sum('quantity');
+                $addonTotal = $selectedAddons->sum(function ($addon) {
+                    return (float) $addon->price;
+                });
 
-            return [
-                'cart_item_id' => $cartItem->id,
-                'cart_count' => $cartCount,
-                'message' => $message,
-            ];
-        });
+                $finalUnitPrice = $basePrice + $addonTotal;
 
-        return response()->json([
-            'status' => true,
-            'message' => $result['message'],
-            'cart_count' => $result['cart_count'],
-            'cart_item_id' => $result['cart_item_id'],
-        ]);
+                // Find an existing cart item with the same variant
+                // and exactly the same add-on selections.
+                $cartItems = CartItem::where('user_id', $customerId)
+                    ->where('product_variant_id', $variant->id)
+                    ->where('type', 'order')
+                    ->with('addons')
+                    ->lockForUpdate()
+                    ->get();
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        throw $e;
-    } catch (\Throwable $e) {
-        Log::error('Add to cart failed', [
-            'customer_id' => Auth::guard('customer')->id(),
-            'error' => $e->getMessage(),
-        ]);
+                $cartItem = $cartItems->first(function ($item) use ($selectedIds) {
+                    $existingIds = $item->addons
+                        ->pluck('addon_option_id')
+                        ->filter()
+                        ->map(fn($id) => (int) $id)
+                        ->sort()
+                        ->values();
 
-        return response()->json([
-            'status' => false,
-            'message' => 'Unable to add product to cart. Please try again.'
-        ], 500);
+                    $requestedIds = $selectedIds
+                        ->map(fn($id) => (int) $id)
+                        ->sort()
+                        ->values();
+
+                    return $existingIds->all() === $requestedIds->all();
+                });
+
+                if ($cartItem) {
+                    $cartItem->quantity += $quantity;
+                    $cartItem->unit_price = $finalUnitPrice;
+                    $cartItem->save();
+
+                    $message = 'Product quantity updated in cart.';
+                } else {
+                    $cartItem = CartItem::create([
+                        'user_id' => $customerId,
+                        'session_id' => null,
+                        'product_variant_id' => $variant->id,
+                        'quantity' => $quantity,
+                        'unit_price' => $finalUnitPrice,
+                        'type' => 'order',
+                    ]);
+
+                    foreach ($selectedAddons as $addon) {
+                        CartItemAddon::create([
+                            'cart_item_id' => $cartItem->id,
+                            'addon_option_id' => $addon->id,
+                            'addon_name' => $addon->name,
+                            'unit_price' => $addon->price,
+                            'quantity' => 1,
+                            'subtotal' => $addon->price,
+                        ]);
+                    }
+
+                    $message = 'Product added to cart successfully.';
+                }
+
+                $cartCount = CartItem::where('user_id', $customerId)
+                    ->where('type', 'order')
+                    ->sum('quantity');
+
+                return [
+                    'cart_item_id' => $cartItem->id,
+                    'cart_count' => $cartCount,
+                    'message' => $message,
+                ];
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => $result['message'],
+                'cart_count' => $result['cart_count'],
+                'cart_item_id' => $result['cart_item_id'],
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            Log::error('Add to cart failed', [
+                'customer_id' => Auth::guard('customer')->id(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to add product to cart. Please try again.'
+            ], 500);
+        }
     }
-}
 
 
     public function removeFromCart($id)

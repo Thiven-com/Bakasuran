@@ -19,6 +19,8 @@ class Address extends Model
         'mobile',
         'alternate_mobile',
         'state_id',
+        'latitude',
+        'longitude'
     ];
     public function toSnapshot(): array
     {

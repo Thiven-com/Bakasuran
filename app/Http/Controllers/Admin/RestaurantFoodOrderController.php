@@ -11,139 +11,180 @@ use Illuminate\Support\Facades\DB;
 class RestaurantFoodOrderController extends Controller
 {
     // Display all dine-in food orders
-    public function index()
+    public function index(Request $request)
     {
-        $orders = RestaurantFoodOrder::with([
+        $query = RestaurantFoodOrder::with([
             'restaurant',
             'table',
             'booking',
             'booking.foodOrders',
             'items'
-        ])->latest()->paginate(15);
+        ]);
+
+        // Search by order number
+        if ($request->filled('search')) {
+            $query->where('order_number', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by restaurant
+        if ($request->filled('restaurant_id')) {
+            $query->where('restaurant_id', $request->restaurant_id);
+        }
+
+        // Filter by table number
+        if ($request->filled('table_number')) {
+            $query->whereHas('table', function ($q) use ($request) {
+                $q->where('table_number', 'like', '%' . $request->table_number . '%');
+            });
+        }
+
+        // Filter by seating type
+        if ($request->filled('seating_type')) {
+            $query->whereHas('table', function ($q) use ($request) {
+                $q->where('seating_type', $request->seating_type);
+            });
+        }
+
+        // Filter by order status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by order date
+        if ($request->filled('order_date')) {
+            $query->whereDate('created_at', $request->order_date);
+        }
+
+        $orders = $query->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        // Dropdown data
+        $restaurants = \App\Models\Restaurant::orderBy('name')->get();
 
         return view(
             'admin.catalog.restaurant-food-orders.index',
-            compact('orders')
+            compact('orders', 'restaurants')
         );
     }
 
     // Display individual order
-   public function show($id)
-{
-    $order = RestaurantFoodOrder::with([
-        'restaurant',
-        'table',
-        'booking',
-        'items',
-        'booking.foodOrders.items',
-    ])->findOrFail($id);
+    public function show($id)
+    {
+        $order = RestaurantFoodOrder::with([
+            'restaurant',
+            'table',
+            'booking',
+            'items',
+            'booking.foodOrders.items',
+        ])->findOrFail($id);
 
-    return view(
-        'admin.catalog.restaurant-food-orders.show',
-        compact('order')
-    );
-}
+        return view(
+            'admin.catalog.restaurant-food-orders.show',
+            compact('order')
+        );
+    }
 
 
     // Generate Dine-In Bill
-   
-public function generateBill($id)
-{
-    $order = RestaurantFoodOrder::with('booking.foodOrders')
-        ->findOrFail($id);
 
-    $orders = $order->booking
-        ? $order->booking->foodOrders
-        : collect([$order]);
+    public function generateBill($id)
+    {
+        $order = RestaurantFoodOrder::with('booking.foodOrders')
+            ->findOrFail($id);
 
-    // All orders must be served before generating the bill
-    if ($orders->contains(fn($item) => $item->status !== 'served')) {
+        $orders = $order->booking
+            ? $order->booking->foodOrders
+            : collect([$order]);
+
+        // All orders must be served before generating the bill
+        if ($orders->contains(fn($item) => $item->status !== 'served')) {
+            return back()->with(
+                'error',
+                'All orders must be served before generating the final bill.'
+            );
+        }
+
+        // Prevent duplicate bill generation
+        if ($orders->contains(fn($item) => $item->bill_generated_at)) {
+            return back()->with(
+                'error',
+                'Bill has already been generated for this booking.'
+            );
+        }
+
+        $billGeneratedAt = now();
+
+        foreach ($orders as $item) {
+            $item->update([
+                'bill_generated_at' => $billGeneratedAt,
+                'payment_status' => 'pending',
+            ]);
+        }
+
         return back()->with(
-            'error',
-            'All orders must be served before generating the final bill.'
+            'success',
+            'Combined dine-in bill generated successfully.'
         );
     }
-
-    // Prevent duplicate bill generation
-    if ($orders->contains(fn($item) => $item->bill_generated_at)) {
-        return back()->with(
-            'error',
-            'Bill has already been generated for this booking.'
-        );
-    }
-
-    $billGeneratedAt = now();
-
-    foreach ($orders as $item) {
-        $item->update([
-            'bill_generated_at' => $billGeneratedAt,
-            'payment_status' => 'pending',
-        ]);
-    }
-
-    return back()->with(
-        'success',
-        'Combined dine-in bill generated successfully.'
-    );
-}
 
 
 
 
     // Confirm Cash or UPI Payment
-    
 
-public function confirmOfflinePayment(Request $request, $id)
-{
-    $validated = $request->validate([
-        'payment_method' => 'required|in:cash,upi',
-    ]);
 
-    $order = RestaurantFoodOrder::with('booking.foodOrders')
-        ->findOrFail($id);
-
-    $orders = $order->booking
-        ? $order->booking->foodOrders
-        : collect([$order]);
-
-    // Check whether all bills are generated
-    if ($orders->contains(fn($item) => !$item->bill_generated_at)) {
-        return back()->with(
-            'error',
-            'Combined bill has not been generated for all orders.'
-        );
-    }
-
-    // Prevent duplicate payment confirmation
-    if ($orders->every(fn($item) => $item->payment_status === 'paid')) {
-        return back()->with(
-            'error',
-            'Payment is already confirmed.'
-        );
-    }
-
-    // Do not allow offline confirmation for Razorpay orders
-    if ($orders->contains(fn($item) => $item->payment_method === 'razorpay')) {
-        return back()->with(
-            'error',
-            'Razorpay payments must be verified online.'
-        );
-    }
-
-    // Update every order under this booking
-    foreach ($orders as $item) {
-        $item->update([
-            'payment_method' => $validated['payment_method'],
-            'payment_status' => 'paid',
-            'paid_at' => now(),
+    public function confirmOfflinePayment(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'payment_method' => 'required|in:cash,upi',
         ]);
-    }
 
-    return back()->with(
-        'success',
-        'Combined payment confirmed successfully for all orders.'
-    );
-}
+        $order = RestaurantFoodOrder::with('booking.foodOrders')
+            ->findOrFail($id);
+
+        $orders = $order->booking
+            ? $order->booking->foodOrders
+            : collect([$order]);
+
+        // Check whether all bills are generated
+        if ($orders->contains(fn($item) => !$item->bill_generated_at)) {
+            return back()->with(
+                'error',
+                'Combined bill has not been generated for all orders.'
+            );
+        }
+
+        // Prevent duplicate payment confirmation
+        if ($orders->every(fn($item) => $item->payment_status === 'paid')) {
+            return back()->with(
+                'error',
+                'Payment is already confirmed.'
+            );
+        }
+
+        // Do not allow offline confirmation for Razorpay orders
+        if ($orders->contains(fn($item) => $item->payment_method === 'razorpay')) {
+            return back()->with(
+                'error',
+                'Razorpay payments must be verified online.'
+            );
+        }
+
+        // Update every order under this booking
+        foreach ($orders as $item) {
+            $item->update([
+                'payment_method' => $validated['payment_method'],
+                'payment_status' => 'paid',
+                'paid_at' => now(),
+            ]);
+        }
+
+        return back()->with(
+            'success',
+            'Combined payment confirmed successfully for all orders.'
+        );
+    }
 
 
 
@@ -191,50 +232,54 @@ public function confirmOfflinePayment(Request $request, $id)
 
 
 
-public function completeAllOrders($id)
-{
-    return DB::transaction(function () use ($id) {
+    public function completeAllOrders($id)
+    {
+        return DB::transaction(function () use ($id) {
 
-        $order = RestaurantFoodOrder::findOrFail($id);
+            $order = RestaurantFoodOrder::findOrFail($id);
 
-        $orders = $order->restaurant_table_booking_id
-            ? RestaurantFoodOrder::where(
-                'restaurant_table_booking_id',
-                $order->restaurant_table_booking_id
-            )->lockForUpdate()->get()
-            : RestaurantFoodOrder::whereKey($order->id)
-                ->lockForUpdate()->get();
+            $orders = $order->restaurant_table_booking_id
+                ? RestaurantFoodOrder::where(
+                    'restaurant_table_booking_id',
+                    $order->restaurant_table_booking_id
+                )->lockForUpdate()->get()
+                : RestaurantFoodOrder::whereKey($order->id)
+                    ->lockForUpdate()->get();
 
-        if ($orders->contains(
-            fn($item) => !in_array($item->status, ['served', 'completed'])
-        )) {
+            if (
+                $orders->contains(
+                    fn($item) => !in_array($item->status, ['served', 'completed'])
+                )
+            ) {
+                return back()->with(
+                    'error',
+                    'All orders must be served before completion.'
+                );
+            }
+
+            if (
+                $orders->contains(
+                    fn($item) => $item->payment_status !== 'paid'
+                )
+            ) {
+                return back()->with(
+                    'error',
+                    'Please confirm the combined payment first.'
+                );
+            }
+
+            foreach ($orders as $item) {
+                $item->update([
+                    'status' => 'completed',
+                ]);
+            }
+
             return back()->with(
-                'error',
-                'All orders must be served before completion.'
+                'success',
+                'All orders in this table booking completed successfully.'
             );
-        }
-
-        if ($orders->contains(
-            fn($item) => $item->payment_status !== 'paid'
-        )) {
-            return back()->with(
-                'error',
-                'Please confirm the combined payment first.'
-            );
-        }
-
-        foreach ($orders as $item) {
-            $item->update([
-                'status' => 'completed',
-            ]);
-        }
-
-        return back()->with(
-            'success',
-            'All orders in this table booking completed successfully.'
-        );
-    });
-}
+        });
+    }
 
 
 

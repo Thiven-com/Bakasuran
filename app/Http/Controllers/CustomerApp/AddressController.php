@@ -71,6 +71,8 @@ class AddressController extends Controller
             //'default' => 'required|boolean',
             // 'state_id' => 'nullable|exists:states,id',
             // 'state' => 'required',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'email' => 'nullable|email',
             'location_id' => 'nullable|exists:addresses,id,customer_id,' . $user->id,
         ]);
@@ -88,16 +90,26 @@ class AddressController extends Controller
             }
         }
         if (!empty($request->location_id)) {
-            $location = Address::where('id', $request->location_id)->first();
-            if (!isset($location->id)) {
+
+            $location = Address::where('id', $request->location_id)
+                ->where('customer_id', $user->id)
+                ->first();
+
+            if (!$location) {
                 return response()->json([
                     'success' => 0,
                     'message' => 'Location Not Found'
                 ]);
             }
+
         } else {
-            $location = new Address();
-            $location->customer_id = $user->id;
+
+            $location = Address::where('customer_id', $user->id)->first();
+
+            if (!$location) {
+                $location = new Address();
+                $location->customer_id = $user->id;
+            }
         }
         $location->name = $request->name;
         $location->mobile = $request->mobile;
@@ -118,6 +130,8 @@ class AddressController extends Controller
         // }
         $location->state = $request->state ?? null;
         $location->pincode = $request->pincode;
+        $location->latitude = $request->latitude;
+        $location->longitude = $request->longitude;
         $location->default = in_array(strtolower($request->input('default')), ['yes', '1', 'true', 'on']);
         // $location->city_id = $request->city_id;
         $location->state_id = $request->state_id;
@@ -164,33 +178,33 @@ class AddressController extends Controller
     {
         $my_location = Address::find($id);
 
-            if ($my_location) {
-                $my_location->delete();
-                $responseData = array('success' => 1,  'message' => "Locations Deleted Successfully.");
-            } else {
-                $responseData = array('success' => 0, 'message' => "No Location Found.");
+        if ($my_location) {
+            $my_location->delete();
+            $responseData = array('success' => 1, 'message' => "Locations Deleted Successfully.");
+        } else {
+            $responseData = array('success' => 0, 'message' => "No Location Found.");
 
-            }
+        }
 
-            $userResponse = json_encode($responseData);
+        $userResponse = json_encode($responseData);
 
-            return $userResponse;
+        return $userResponse;
     }
-        public function states(Request $request)
+    public function states(Request $request)
     {
 
         $states = State::get();
         if (count($states) > 0) {
-                return response()->json([
-                    'success' => 1,
-                    'data' => $states,
-                    'message' => "Fetched Successfully."
-                ]);
+            return response()->json([
+                'success' => 1,
+                'data' => $states,
+                'message' => "Fetched Successfully."
+            ]);
         } else {
-                return response()->json([
-                    'success' => 0,
-                    'message' => 'No Data Found'
-                ]);
+            return response()->json([
+                'success' => 0,
+                'message' => 'No Data Found'
+            ]);
         }
 
     }

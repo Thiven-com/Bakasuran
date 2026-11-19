@@ -1,164 +1,214 @@
-
 <?php $page = 'testimonial-list'; ?>
 
 @extends('layout.mainlayout')
 
 @section('content')
 
-<style>
-    .testimonial-list-page {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-    }
+    <style>
+        .testimonial-list-page {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
 
-    .testimonial-list-page .table-responsive {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: auto;
-    }
+        .testimonial-list-page .table-responsive {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+        }
 
-    .testimonial-list-page .table {
-        min-width: 900px;
-    }
-</style>
+        .testimonial-list-page .table {
+            min-width: 900px;
+        }
+    </style>
 
-<div class="page-wrapper">
-    <div class="content testimonial-list-page">
+    <div class="page-wrapper">
+        <div class="content testimonial-list-page">
 
-        {{-- Page Header --}}
-        <div class="page-header">
-            <div class="add-item d-flex">
-                <div class="page-title">
-                    <h4 class="fw-bold">Customer Testimonials</h4>
-                    <h6>Manage customer reviews and ratings</h6>
+            {{-- Page Header --}}
+            <div class="page-header">
+                <div class="add-item d-flex">
+                    <div class="page-title">
+                        <h4 class="fw-bold">Customer Testimonials</h4>
+                        <h6>Manage customer reviews and ratings</h6>
+                    </div>
+                </div>
+
+                <div class="page-btn">
+                    <a href="{{ route('admin.testimonials.create') }}" class="btn btn-primary">
+                        <i class="ti ti-circle-plus me-1"></i>
+                        Add Testimonial
+                    </a>
                 </div>
             </div>
 
-            <div class="page-btn">
-                <a href="{{ route('admin.testimonials.create') }}"
-                   class="btn btn-primary">
-                    <i class="ti ti-circle-plus me-1"></i>
-                    Add Testimonial
-                </a>
-            </div>
-        </div>
+            {{-- Success Message --}}
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
 
-        {{-- Success Message --}}
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close"
-                        data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+            {{-- Validation Errors --}}
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-        {{-- Validation Errors --}}
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+            {{-- Testimonials Table --}}
+            <div class="card">
+                <div class="card-body p-0">
+                    {{-- Filters --}}
+                    <div class="card-body border-bottom">
+                        <form action="{{ route('admin.testimonials.index') }}" method="GET">
+                            <div class="row">
 
-        {{-- Testimonials Table --}}
-        <div class="card">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped align-middle mb-0">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Image</th>
-                                <th>Customer</th>
-                                <th>City</th>
-                                <th>Rating</th>
-                                <th>Review</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
+                                {{-- Customer Name --}}
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Customer Name</label>
+                                    <input type="text" name="search" class="form-control" placeholder="Search customer name"
+                                        value="{{ request('search') }}">
+                                </div>
 
-                        <tbody>
-                            @forelse($testimonials as $testimonial)
+                                {{-- City --}}
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">City</label>
+                                    <input type="text" name="city" class="form-control" placeholder="Search city"
+                                        value="{{ request('city') }}">
+                                </div>
+
+                                {{-- Rating --}}
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">Rating</label>
+                                    <select name="rating" class="form-select">
+                                        <option value="">All Ratings</option>
+                                        @for ($i = 5; $i >= 1; $i--)
+                                            <option value="{{ $i }}" {{ request('rating') == (string) $i ? 'selected' : '' }}>
+                                                {{ $i }} Star{{ $i > 1 ? 's' : '' }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                {{-- Status --}}
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-select">
+                                        <option value="">All Status</option>
+                                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                                            Active
+                                        </option>
+                                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                                            Inactive
+                                        </option>
+                                    </select>
+                                </div>
+
+                                {{-- Buttons --}}
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="ti ti-search me-1"></i> Filter
+                                    </button>
+
+                                    <a href="{{ route('admin.testimonials.index') }}" class="btn btn-secondary">
+                                        Reset
+                                    </a>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle mb-0">
+                            <thead class="thead-light">
                                 <tr>
-                                    <td>{{ $testimonial->id }}</td>
-
-                                    <td>
-                                        @if($testimonial->image)
-                                            <img
-                                                src="{{ asset($testimonial->image) }}"
-                                                alt="{{ $testimonial->name }}"
-                                                width="55"
-                                                height="55"
-                                                style="object-fit:cover;border-radius:50%;"
-                                            >
-                                        @else
-                                            <span class="text-muted">No image</span>
-                                        @endif
-                                    </td>
-
-                                    <td>{{ $testimonial->name }}</td>
-
-                                    <td>{{ $testimonial->city ?? '--' }}</td>
-
-                                    <td>
-                                        <span style="color:#f5a623;">
-                                            {{ str_repeat('★', max(0, min(5, (int) $testimonial->rating))) }}
-                                        </span>
-                                        <span class="text-muted">
-                                            ({{ $testimonial->rating }}/5)
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        {{ \Illuminate\Support\Str::limit($testimonial->description, 60) }}
-                                    </td>
-
-                                    <td>
-                                        {{ ucfirst($testimonial->status ?? 'Unknown') }}
-                                    </td>
-
-                                    <td>
-                                        <div class="d-flex gap-2 align-items-center">
-                                            <a href="{{ route('admin.testimonials.edit', $testimonial->id) }}"
-                                               class="btn btn-sm btn-warning">
-                                                Edit
-                                            </a>
-
-                                            <form
-                                                action="{{ route('admin.testimonials.destroy', $testimonial->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Are you sure you want to delete this testimonial?');">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit"
-                                                        class="btn btn-sm btn-danger">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Image</th>
+                                    <th>Customer</th>
+                                    <th>City</th>
+                                    <th>Rating</th>
+                                    <th>Review</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center py-4">
-                                        No testimonials found.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+
+                            <tbody>
+                                @forelse($testimonials as $testimonial)
+                                    <tr>
+                                        <td>{{ $testimonial->id }}</td>
+
+                                        <td>
+                                            @if($testimonial->image)
+                                                <img src="{{ asset($testimonial->image) }}" alt="{{ $testimonial->name }}"
+                                                    width="55" height="55" style="object-fit:cover;border-radius:50%;">
+                                            @else
+                                                <span class="text-muted">No image</span>
+                                            @endif
+                                        </td>
+
+                                        <td>{{ $testimonial->name }}</td>
+
+                                        <td>{{ $testimonial->city ?? '--' }}</td>
+
+                                        <td>
+                                            <span style="color:#f5a623;">
+                                                {{ str_repeat('★', max(0, min(5, (int) $testimonial->rating))) }}
+                                            </span>
+                                            <span class="text-muted">
+                                                ({{ $testimonial->rating }}/5)
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ \Illuminate\Support\Str::limit($testimonial->description, 60) }}
+                                        </td>
+
+                                        <td>
+                                            {{ ucfirst($testimonial->status ?? 'Unknown') }}
+                                        </td>
+
+                                        <td>
+                                            <div class="d-flex gap-2 align-items-center">
+                                                <a href="{{ route('admin.testimonials.edit', $testimonial->id) }}"
+                                                    class="btn btn-sm btn-warning">
+                                                    Edit
+                                                </a>
+
+                                                <form action="{{ route('admin.testimonials.destroy', $testimonial->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Are you sure you want to delete this testimonial?');">
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4">
+                                            No testimonials found.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
-</div>
 
 @endsection
