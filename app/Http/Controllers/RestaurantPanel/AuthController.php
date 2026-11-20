@@ -14,6 +14,44 @@ use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
+
+    public function showRegisterForm()
+    {
+        return view('restaurantpanel.auth.register');
+    }
+
+
+    // Restaurant registration
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'owner_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:restaurants,email',
+            'phone' => 'required|string|max:20',
+            'password' => 'required|string|min:4|confirmed',
+        ]);
+
+        $baseSlug = \Illuminate\Support\Str::slug($validated['name']);
+        $slug = $baseSlug ?: 'restaurant';
+        $counter = 1;
+
+        while (Restaurant::where('slug', $slug)->exists()) {
+            $slug = ($baseSlug ?: 'restaurant') . '-' . $counter;
+            $counter++;
+        }
+
+        $validated['slug'] = $slug;
+        $validated['approval_status'] = 'pending';
+        $validated['is_active'] = false;
+        $validated['is_open'] = false;
+
+        Restaurant::create($validated);
+
+        return redirect()
+            ->route('restaurant.login')
+            ->with('success', 'Registration submitted successfully. Please wait for admin approval.');
+    }
     // Display restaurant login page
     public function showLoginForm()
     {
@@ -29,14 +67,15 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
-        
+
 
         $remember = $request->boolean('remember');
-        $credentials['is_active'] = true;
+
+        $credentials['approval_status'] = 'approved';
 
         $restaurant = Restaurant::where('email', $request->email)->first();
 
-        
+
 
         if (Auth::guard('restaurant')->attempt($credentials, $remember)) {
 
@@ -55,7 +94,7 @@ class AuthController extends Controller
 
         return back()
             ->withErrors([
-                'email' => 'Invalid credentials or inactive restaurant account.',
+                'email' => 'Your account is awaiting Admin approval. Please try again after your account has been approved.',
             ])
             ->onlyInput('email');
     }

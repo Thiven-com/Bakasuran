@@ -81,6 +81,13 @@
                                 <li class="submenu-open">
                                         <h6 class="submenu-hdr">Main</h6>
                                         <ul>
+
+                                                <li class="{{ Request::is('restaurant-owners') ? 'active' : '' }}">
+                                                        <a href="{{ route('admin.restaurant-owners.index') }}">
+                                                                <i data-feather="users"></i>
+                                                                <span>Restaurant Owners</span>
+                                                        </a>
+                                                </li>
                                                 <li class="submenu">
                                                         <a href="javascript:void(0);"
                                                                 class="{{ Request::is('admin/products', 'admin/categories', 'admin/brands', 'admin/banners', 'admin/units', 'admin/attributes') ? 'active subdrop' : '' }}"><i

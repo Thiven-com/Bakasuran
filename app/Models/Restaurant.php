@@ -14,6 +14,7 @@ class Restaurant extends Authenticatable
 
     protected $fillable = [
         'name',
+        'owner_name',
         'slug',
         'description',
         'logo',
@@ -33,6 +34,10 @@ class Restaurant extends Authenticatable
         'password',
         'profile_pic',
         'otp',
+        'approval_status',
+        'rejection_reason',
+        'approved_at',
+        'approved_by',
 
         'opening_time',
         'closing_time',
@@ -72,6 +77,8 @@ class Restaurant extends Authenticatable
             'sort_order' => 'integer',
             'type' => 'array',
             'password' => 'hashed',
+            'approved_at' => 'datetime',
+            'approved_by' => 'integer',
         ];
     }
 

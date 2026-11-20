@@ -8,6 +8,7 @@ use App\Models\RestaurantType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class RestaurantController extends Controller
 {
@@ -256,6 +257,106 @@ class RestaurantController extends Controller
             ->with('success', 'Restaurant updated successfully!');
     }
 
+
+
+   public function approve(Restaurant $restaurant)
+{
+    if ($restaurant->approval_status !== 'pending') {
+        return redirect()
+            ->route('admin.restaurant-owners.index')
+            ->with('error', 'Only pending restaurants can be approved.');
+    }
+
+    $restaurant->update([
+        'approval_status' => 'approved',
+        // 'is_active' => true,
+        'approved_at' => now(),
+        'approved_by' => Auth::guard('admin')->id(),
+        'rejection_reason' => null,
+    ]);
+
+    return redirect()
+        ->route('admin.restaurant-owners.index')
+        ->with('success', 'Restaurant approved successfully.');
+}
+
+
+
+
+    public function reject(Request $request, Restaurant $restaurant)
+    {
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|min:5|max:1000',
+        ]);
+
+        if ($restaurant->approval_status !== 'pending') {
+            return redirect()
+                ->route('admin.restaurant-owners.index')
+                ->with('error', 'Only pending restaurants can be rejected.');
+        }
+
+        $restaurant->update([
+            'approval_status' => 'rejected',
+            'rejection_reason' => $validated['rejection_reason'],
+            'approved_at' => null,
+            'approved_by' => null,
+        ]);
+
+        return redirect()
+            ->route('admin.restaurant-owners.index')
+            ->with('success', 'Restaurant rejected successfully.');
+    }
+
+
+    public function activate(Restaurant $restaurant)
+    {
+        if ($restaurant->approval_status !== 'approved') {
+            return redirect()
+                ->route('admin.restaurant-owners.index')
+                ->with('error', 'Only approved restaurants can be activated.');
+        }
+
+        if ($restaurant->is_active) {
+            return redirect()
+                ->route('admin.restaurant-owners.index')
+                ->with('error', 'Restaurant is already active.');
+        }
+
+        $restaurant->update([
+            'is_active' => true,
+        ]);
+
+        return redirect()
+            ->route('admin.restaurant-owners.index')
+            ->with('success', 'Restaurant activated successfully.');
+    }
+
+
+
+
+    public function deactivate(Restaurant $restaurant)
+    {
+        if ($restaurant->approval_status !== 'approved') {
+            return redirect()
+                ->route('admin.restaurant-owners.index')
+                ->with('error', 'Only approved restaurants can be deactivated.');
+        }
+
+        if (!$restaurant->is_active) {
+            return redirect()
+                ->route('admin.restaurant-owners.index')
+                ->with('error', 'Restaurant is already inactive.');
+        }
+
+        $restaurant->update([
+            'is_active' => false,
+        ]);
+
+        return redirect()
+            ->route('admin.restaurant-owners.index')
+            ->with('success', 'Restaurant deactivated successfully.');
+    }
+
     public function destroy(Restaurant $restaurant)
     {
         // Prevent deletion when products are associated with this restaurant.
@@ -285,4 +386,39 @@ class RestaurantController extends Controller
             ->route('admin.restaurants.index')
             ->with('success', 'Restaurant deleted successfully!');
     }
+
+
+
+    public function owners(Request $request)
+{
+    $query = Restaurant::whereNotNull('owner_name');
+
+    // Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('owner_name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%");
+        });
+    }
+
+    // Status filter
+    if ($request->status === 'pending') {
+        $query->where('approval_status', 'pending');
+    } elseif ($request->status === 'approved') {
+        $query->where('approval_status', 'approved');
+    } elseif ($request->status === 'rejected') {
+        $query->where('approval_status', 'rejected');
+    } elseif ($request->status === 'inactive') {
+        $query->where('approval_status', 'approved')
+              ->where('is_active', false);
+    }
+
+    $restaurants = $query->latest()->paginate(10)->withQueryString();
+
+    return view('admin.restaurant-owners.index', compact('restaurants'));
+}
 }

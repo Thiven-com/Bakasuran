@@ -144,6 +144,7 @@
     'email-verification-2',
     'register-3',
     'restaurant.login',
+    'restaurant.register',
     'restaurant.password.request',
     'restaurant.password.verifyForm',
     'restaurant.password.verifyOtp'
@@ -219,6 +220,7 @@
     'success-3',
     'lock-screen',
     'restaurant.login',
+    'restaurant.register',
     'restaurant.password.request',
     'restaurant.password.verifyForm',
     'restaurant.password.verifyOtp'
@@ -255,6 +257,7 @@
     'success-3',
     'lock-screen',
     'restaurant.login',
+    'restaurant.register',
     'restaurant.password.request',
     'restaurant.password.verifyForm',
     'restaurant.password.verifyOtp'

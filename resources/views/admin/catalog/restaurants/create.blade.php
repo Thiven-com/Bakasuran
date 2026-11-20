@@ -193,6 +193,11 @@
                 <i class="fas fa-arrow-left"></i>
                 Back to Restaurants
             </a>
+
+            <a href="{{ route('admin.restaurant-owners.index') }}"
+   class="btn btn-secondary">
+    <i class="ti ti-arrow-left"></i> Back to Restaurant Owners
+</a>
         </div>
 
 

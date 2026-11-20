@@ -1,4 +1,3 @@
-
 <!-- Restaurant Panel Sidebar -->
 
 <div class="sidebar" id="sidebar">
@@ -61,14 +60,14 @@
                     <ul>
 
                         <li>
-                            <a href="#">
+                            <a href="{{ route('restaurant.tables.index') }}">
                                 <i class="ti ti-layout-grid fs-16 me-2"></i>
                                 <span>Table Management</span>
                             </a>
                         </li>
 
                         <li>
-                            <a href="#">
+                            <a href="{{ route('restaurant.table-bookings.index') }}">
                                 <i class="ti ti-calendar-check fs-16 me-2"></i>
                                 <span>Table Bookings</span>
                             </a>
@@ -174,8 +173,7 @@
                             <form action="{{ route('restaurant.logout') }}" method="POST">
                                 @csrf
 
-                                <button type="submit"
-                                    class="btn btn-link text-start text-decoration-none w-100">
+                                <button type="submit" class="btn btn-link text-start text-decoration-none w-100">
                                     <i class="ti ti-logout fs-16 me-2"></i>
                                     <span>Logout</span>
                                 </button>

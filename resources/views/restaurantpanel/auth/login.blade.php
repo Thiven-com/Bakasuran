@@ -9,9 +9,10 @@
                         @csrf
                         <div class="login-userset">
                             <div class="final-logo logo-normal">
-                               <a href="{{ route('restaurant.dashboard') }}" class="logo logo-normal d-flex align-items-center">
+                                <a href="{{ route('restaurant.dashboard') }}"
+                                    class="logo logo-normal d-flex align-items-center">
                                     <img src="{{ asset($site->logo ?? ' ') }}" alt="Logo"
-                                      style="width:400px; margin-left: 30px; ">
+                                        style="width:400px; margin-left: 30px; ">
                                 </a>
                             </div>
                             {{-- <a href="{{url('index')}}" class="login-logo logo-white">
@@ -25,6 +26,29 @@
                                 <h3>Sign In</h3>
                                 <h3>{{ $settings->site_name ?? '' }}</h3>
                             </div>
+
+                            {{-- Success message --}}
+                            @if (session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            {{-- Error message --}}
+                            @if (session('error'))
+                                <div class="alert alert-danger">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+
+                            {{-- Validation and login errors --}}
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    @foreach ($errors->all() as $error)
+                                        <div>{{ $error }}</div>
+                                    @endforeach
+                                </div>
+                            @endif
                             <div class="mb-3">
                                 <label class="form-label">Email Address</label>
                                 <div class="input-group">
@@ -63,6 +87,15 @@
                             <div class="form-login">
                                 <button type="submit" class="btn btn-login">Sign In</button>
                             </div>
+
+                            <div class="signinform text-center mt-3">
+                                <h4>
+                                    New Owner?
+                                    <a href="{{ route('restaurant.register') }}" class="hover-a">
+                                        Register Now
+                                    </a>
+                                </h4>
+                            </div>
                             {{-- <div class="signinform">
                                 <h4>New on our platform?<a href="{{url('register-2')}}" class="hover-a"> Create an
                                         account</a></h4>
@@ -95,7 +128,7 @@
                                     </div>
                                 </div>
                                 <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
-                                    <p>Copyright &copy; 2025 {{ $site->site_name ?? ' '  }}</p>
+                                    <p>Copyright &copy; 2025 {{ $site->site_name ?? ' ' }}</p>
                                 </div>
                             </div> --}}
                         </div>

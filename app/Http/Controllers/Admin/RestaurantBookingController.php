@@ -530,10 +530,7 @@ class RestaurantBookingController extends Controller
     /**
      * Validate table capacity and booking time availability.
      */
-    private function validateBookingAvailability(
-        array $data,
-        $ignoreBookingId = null
-    ) {
+    private function validateBookingAvailability(array $data,$ignoreBookingId = null) {
         $settings = RestaurantBookingSetting::where(
             'restaurant_id',
             $data['restaurant_id']

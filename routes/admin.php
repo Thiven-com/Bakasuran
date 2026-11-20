@@ -162,6 +162,34 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('restaurants/{restaurant}', [RestaurantController::class, 'show'])
         ->name('admin.restaurants.show');
 
+        // Restaurant Owner Management
+Route::get('restaurant-owners', [RestaurantController::class, 'owners'])
+    ->name('admin.restaurant-owners.index');
+
+    // Restaurant Approval Workflow
+
+    Route::post('restaurants/{restaurant}/approve', [
+        RestaurantController::class,
+        'approve'
+    ])->name('admin.restaurants.approve');
+
+    Route::post('restaurants/{restaurant}/reject', [
+        RestaurantController::class,
+        'reject'
+    ])->name('admin.restaurants.reject');
+
+    // Restaurant Activation
+
+    Route::post('restaurants/{restaurant}/activate', [
+        RestaurantController::class,
+        'activate'
+    ])->name('admin.restaurants.activate');
+
+    Route::post('restaurants/{restaurant}/deactivate', [
+        RestaurantController::class,
+        'deactivate'
+    ])->name('admin.restaurants.deactivate');
+
     // Restaurant Table Management
     Route::resource('restaurant-tables', RestaurantTableController::class)
         ->names('admin.restaurant-tables');
